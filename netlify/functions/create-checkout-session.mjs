@@ -134,10 +134,10 @@ export default async (request) => {
       cancel_url: `${origin}/cart`,
       customer_creation: 'always',
       billing_address_collection: 'auto',
-      // Off by default: Stripe makes the phone field *required* once enabled,
-      // and collection is arranged by email. Set COLLECT_PHONE=true in Netlify
-      // if the family would rather have a number.
-      phone_number_collection: { enabled: process.env.COLLECT_PHONE === 'true' },
+      // On by design: Stripe makes the phone field required once enabled, and
+      // the family would rather have a number for chasing uncollected orders.
+      // Set COLLECT_PHONE=false in Netlify to drop it — no code change.
+      phone_number_collection: { enabled: process.env.COLLECT_PHONE !== 'false' },
       // Made to order, collection only — no addresses, no shipping rates.
       metadata,
       payment_intent_data: {

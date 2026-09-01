@@ -178,8 +178,8 @@ Videos are not stored on the website — they live on YouTube.
 
 Everything is in Stripe. Go to **Payments** in the left menu and click an order.
 
-You will see the customer's **name and email**, what they bought, and what they
-paid.
+You will see the customer's **name, email and phone number**, what they bought,
+and what they paid.
 
 If they ordered anything personalised, scroll down that page to the **Metadata**
 box. It looks like this:

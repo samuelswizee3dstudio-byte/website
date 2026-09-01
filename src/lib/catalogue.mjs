@@ -155,10 +155,17 @@ export async function getCatalogue() {
   if (!key) {
     // Netlify sets CONTEXT on every build. A production deploy must never ship
     // placeholder products, so fail loudly rather than build something plausible.
-    if (process.env.CONTEXT === 'production') {
+    // The one exception is proving the deploy pipeline works before the Stripe
+    // account exists — see ALLOW_SAMPLE_CATALOGUE in README.md. Temporary.
+    if (process.env.CONTEXT === 'production' && process.env.ALLOW_SAMPLE_CATALOGUE !== 'true') {
       throw new Error(
-        'STRIPE_SECRET_KEY is not set. Set it in Netlify > Site configuration > Environment variables before deploying to production.'
+        'STRIPE_SECRET_KEY is not set. Set it in Netlify > Site configuration > Environment variables ' +
+        'before deploying to production, or set ALLOW_SAMPLE_CATALOGUE=true to deploy the sample ' +
+        'catalogue while the Stripe account is still being set up.'
       );
+    }
+    if (process.env.CONTEXT === 'production') {
+      console.warn('[catalogue] ALLOW_SAMPLE_CATALOGUE is on — this PRODUCTION deploy is shipping SAMPLE products. Remove it once STRIPE_SECRET_KEY is set.');
     }
     console.warn(
       '\n[catalogue] STRIPE_SECRET_KEY is not set — building with SAMPLE products from src/lib/fixtures.mjs.\n' +

@@ -3,8 +3,9 @@
 The shop at [swizee.co.uk](https://swizee.co.uk). Astro (static) on Netlify, with
 Stripe Checkout for payments and Stripe as the product catalogue.
 
-**If you are here to add a product or change some words, you want
-[HOWTO.md](HOWTO.md), not this file.**
+- **Adding a product or changing some words?** → [HOWTO.md](HOWTO.md)
+- **Setting up Netlify, Stripe or the domain?** → [SETUP.md](SETUP.md)
+- **Working on the code?** → you are in the right place.
 
 ---
 
@@ -119,8 +120,9 @@ variables**.
 | `STRIPE_SECRET_KEY` | Everything. Build-time catalogue and checkout |
 | `NETLIFY_BUILD_HOOK_URL` | Automatic rebuilds when Stripe changes |
 | `STRIPE_WEBHOOK_SECRET` | Verifying those Stripe webhook calls |
-| `COLLECT_PHONE` | Set to `true` to ask for a phone number at checkout (Stripe makes it required once on) |
+| `COLLECT_PHONE` | Set to `false` to stop asking for a phone number at checkout. On by default, and required once on — Stripe has no optional setting |
 | `ALLOW_PLACEHOLDERS` | Temporary. Lets a production build succeed while the legal wording is still a draft. **Delete this before go-live** |
+| `ALLOW_SAMPLE_CATALOGUE` | Temporary. Lets a production build ship the sample catalogue while there is no Stripe key yet. **Delete this before go-live** |
 
 ## Automatic rebuilds
 
