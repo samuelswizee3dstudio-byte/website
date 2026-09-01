@@ -3,18 +3,13 @@ title: "Terms of sale"
 description: "How ordering, payment, collection and refunds work at Swizee 3D Studio."
 ---
 
-> **DRAFT — for Paul's review.** Replace the details marked `[[REPLACE: ...]]`
-> and delete this note before go-live.
-
 These terms apply to everything you buy from Swizee 3D Studio on this website.
 By placing an order you agree to them.
 
 ## Who you are buying from
 
-Swizee 3D Studio is a small home business trading as
-`[[REPLACE: trading name if different]]`. The seller is
-`[[REPLACE: seller's full name]]`, based in Great Sankey, Warrington. We are not
-VAT registered.
+Swizee 3D Studio is a small home business based in Great Sankey, Warrington.
+The seller is Rebecca Dagger. We are not VAT registered.
 
 ## Everything is made to order
 
@@ -55,7 +50,7 @@ arrive, tell us and we will chase it, and re-make or refund your order. Royal
 Mail does not treat an item as lost until 10 working days after the due date, so
 we may have to wait that long before we can act.
 
-If you chose collection and have not collected within `[[REPLACE: 30]]` days of
+If you chose collection and have not collected within 30 days of
 us telling you it is ready, and we cannot reach you, we may treat the order as
 abandoned.
 
@@ -99,4 +94,4 @@ Use the [contact form](/contact). We aim to reply within a few days.
 
 These terms are governed by the law of England and Wales.
 
-*Last updated: `[[REPLACE: date]]`*
+*Last updated: 1 September 2026*
