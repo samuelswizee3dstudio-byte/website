@@ -169,7 +169,7 @@ export async function getCatalogue() {
     // account exists — see ALLOW_SAMPLE_CATALOGUE in README.md. Temporary.
     if (process.env.CONTEXT === 'production' && process.env.ALLOW_SAMPLE_CATALOGUE !== 'true') {
       throw new Error(
-        'STRIPE_SECRET_KEY is not set. Set it in Netlify > Site configuration > Environment variables ' +
+        'STRIPE_SECRET_KEY is not set. Set it in Netlify > Project configuration > Environment variables ' +
         'before deploying to production, or set ALLOW_SAMPLE_CATALOGUE=true to deploy the sample ' +
         'catalogue while the Stripe account is still being set up.'
       );

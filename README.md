@@ -133,7 +133,7 @@ at three, which does not work for a multi-item basket.
 
 ## Environment variables
 
-See [.env.example](.env.example). On Netlify: **Site configuration → Environment
+See [.env.example](.env.example). On Netlify: **Project configuration → Environment
 variables**.
 
 | Variable | Needed for |
@@ -149,7 +149,7 @@ variables**.
 
 Product edits in Stripe go live via a rebuild. Preferred setup:
 
-1. Netlify → Site configuration → Build & deploy → **Build hooks** → Add build
+1. Netlify → Project configuration → Build & deploy → **Build hooks** → Add build
    hook. Copy the URL into `NETLIFY_BUILD_HOOK_URL`.
 2. Stripe → Developers → **Webhooks** → Add endpoint:
    `https://swizee.co.uk/api/stripe-rebuild`

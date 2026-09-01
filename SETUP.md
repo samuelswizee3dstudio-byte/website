@@ -40,7 +40,7 @@ Stay on the **Free** plan. Skip any team/upgrade prompts.
 
 ### 1.2 Import the site
 
-1. **Add new site** → **Import an existing project** → **GitHub**.
+1. **Add new project** → **Import an existing project** → **GitHub**.
 2. Authorise Netlify if asked. If `swizee-site` is not in the list, click
    **Configure the Netlify app on GitHub** and give it access to that repo.
 3. Pick `swizee-site`.
@@ -68,7 +68,7 @@ the Stripe redirect settings.
 
 ### 1.3 Give the site a sensible name
 
-**Site configuration → General → Site details → Change site name** →
+**Project configuration → General → Project details → Change project name** →
 `swizee`. The URL becomes `swizee.netlify.app`, which is easier to check on your
 phone while we build.
 
@@ -85,10 +85,15 @@ stage 1 of the brief done.
 The contact form is already wired up. Netlify finds it automatically during the
 build; you only need to say where submissions go.
 
-1. **Site configuration → Forms**. You should see a form called **contact**. If
-   you do not, the site has not deployed yet — do Part 1 first.
-2. **Form notifications** → **Add notification** → **Email notification**.
+1. **Project configuration → Notifications → Emails and webhooks**.
+   (Netlify renamed "Site configuration" to **Project configuration** — it is the
+   left-hand sidebar item once you have opened the project.)
+2. Under **Form submission notifications**, click **Add notification** →
+   **Email notification**.
 3. Email to notify: `p.d.rutter@gmail.com`. Form: **contact**. Save.
+
+   If no form called **contact** is offered, the site has not finished a deploy
+   that contains the form yet — deploy first, then come back.
 
 Test it: open the site's `/contact` page, send yourself a message, and check it
 arrives. Then check **Forms** in Netlify — the submission should be listed.
@@ -98,6 +103,22 @@ arrives. Then check **Forms** in Netlify — the submission should be listed.
 > Free tier allows 100 submissions a month.
 
 ---
+
+## Part 2.5 — Make the site publicly visible (1 min)
+
+New Netlify projects can default to **private**, which makes every page return
+`401` and bounce visitors to a Netlify login screen. If you open your
+`.netlify.app` URL and are asked to log in, that is this setting and not a broken
+build.
+
+**Project configuration → General → Visitor access → Project visibility** → set
+to **Public** → save.
+
+Check it worked from a terminal — this should print `200`, not `401`:
+
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" https://sprightly-twilight-171df0.netlify.app
+```
 
 ## Part 3 — Stripe settings (10 min)
 
@@ -127,8 +148,8 @@ without touching code.
 
 **First, get a build hook from Netlify:**
 
-1. Netlify → **Site configuration → Build & deploy → Build hooks** → **Add build
-   hook**.
+1. Netlify → **Project configuration → Build & deploy → Build hooks** → **Add
+   build hook**.
 2. Name it `Stripe product change`. Branch: `main`. Save.
 3. Copy the URL. It looks like
    `https://api.netlify.com/build_hooks/6512ab...`.
