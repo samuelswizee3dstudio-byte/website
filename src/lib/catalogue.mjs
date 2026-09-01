@@ -201,11 +201,17 @@ export async function getCatalogue() {
   if (cached.length === 0) {
     console.warn('[catalogue] Stripe returned no sellable products. Check products are Active and have an active one-off GBP price.');
   } else {
-    console.log(`[catalogue] ${cached.length} products from Stripe (${key.startsWith('sk_live') ? 'LIVE' : 'test'} mode).`);
+    console.log(`[catalogue] ${cached.length} products from Stripe (${/^[a-z]{2}_live_/.test(key) ? 'LIVE' : 'test'} mode).`);
   }
   return cached;
 }
 
+/**
+ * Live keys come in more than one shape: `sk_live_...` for a standard secret key
+ * and `rk_live_...` for a restricted one. Matching only `sk_live` meant a site
+ * running on a restricted live key would show the purple "test mode, payments
+ * are not real" banner to real customers.
+ */
 export function isTestMode() {
-  return !String(process.env.STRIPE_SECRET_KEY ?? '').startsWith('sk_live');
+  return !/^[a-z]{2}_live_/.test(String(process.env.STRIPE_SECRET_KEY ?? ''));
 }
