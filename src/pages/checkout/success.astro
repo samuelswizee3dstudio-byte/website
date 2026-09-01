@@ -1,0 +1,37 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+<Base title="Order received" noindex description="Thank you — your Swizee 3D Studio order has been received.">
+  <div class="wrap wrap--narrow stack centre">
+    <p class="tick" aria-hidden="true">🎉</p>
+    <h1>Order received. Thank you!</h1>
+    <p class="lede">Stripe has emailed you a receipt. Check your junk folder if it has not arrived in a few minutes.</p>
+
+    <ol class="next">
+      <li><strong>We print it.</strong> Everything is made to order — please allow 7 days.</li>
+      <li><strong>We email you</strong> as soon as it is ready.</li>
+      <li><strong>You collect it</strong> from Great Sankey, Warrington. We will arrange a time by email.</li>
+    </ol>
+
+    <p class="notice">
+      If you typed a name or word, we print exactly what you typed. Spotted a mistake?
+      <a href="/contact">Message us straight away</a> and we will fix it if we have not started printing.
+    </p>
+
+    <p><a class="btn btn--secondary" href="/shop">Back to the shop</a></p>
+  </div>
+</Base>
+
+<script>
+  // The order is paid for, so the basket has done its job.
+  import { clearCart } from '../../lib/cart.mjs';
+  clearCart();
+</script>
+
+<style>
+  .centre { text-align: center; padding-block: var(--s-6); }
+  .centre p, .centre li { margin-inline: auto; }
+  .tick { font-size: 3.5rem; }
+  .lede { font-size: var(--fs-lg); color: var(--c-ink-soft); }
+  .next { text-align: left; display: grid; gap: var(--s-3); max-width: 34rem; margin-inline: auto; padding-left: var(--s-5); }
+</style>

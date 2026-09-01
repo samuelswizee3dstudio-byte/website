@@ -1,0 +1,34 @@
+---
+import { formatPriceRange } from '../lib/catalogue.mjs';
+
+const { product, eager = false } = Astro.props;
+const price = formatPriceRange(product);
+const img = product.images[0];
+---
+<li class="card product">
+  <a href={`/products/${product.slug}`}>
+    <div class="shot">
+      {img
+        ? <img src={img} alt={product.name} loading={eager ? 'eager' : 'lazy'} decoding="async" width="480" height="480" />
+        : <div class="shot--none" aria-hidden="true">📷</div>}
+      {product.personalise && <span class="badge tag">Personalise it</span>}
+    </div>
+    <div class="body">
+      <h3>{product.name}</h3>
+      <p class="price">{price}</p>
+    </div>
+  </a>
+</li>
+
+<style>
+  .product { transition: transform 0.15s ease, box-shadow 0.15s ease; }
+  .product:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+  .product a { display: block; text-decoration: none; color: inherit; height: 100%; }
+  .shot { position: relative; aspect-ratio: 1; background: var(--c-surface-alt); }
+  .shot img { width: 100%; height: 100%; object-fit: cover; }
+  .shot--none { display: grid; place-items: center; height: 100%; font-size: 2.5rem; opacity: 0.35; }
+  .tag { position: absolute; left: var(--s-3); top: var(--s-3); background: var(--c-surface); box-shadow: var(--shadow-sm); }
+  .body { padding: var(--s-4); }
+  .body h3 { font-size: var(--fs-md); }
+  .price { font-family: var(--font-display); font-weight: 700; color: var(--c-brand-dark); margin-top: var(--s-1); }
+</style>

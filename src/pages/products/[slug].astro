@@ -1,0 +1,216 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCatalogue, formatPrice } from '../../lib/catalogue.mjs';
+import { PERSONALISATION_PATTERN, PERSONALISATION_MAX } from '../../lib/validation.mjs';
+
+export async function getStaticPaths() {
+  const products = await getCatalogue();
+  return products.map((product) => ({ params: { slug: product.slug }, props: { product } }));
+}
+
+const { product } = Astro.props;
+const hasVariants = product.variants.length > 1;
+const only = product.variants[0];
+---
+<Base title={product.name} description={product.description || `${product.name} — 3D printed to order by Swizee 3D Studio.`}>
+  <div class="wrap">
+    <p class="crumbs"><a href="/shop">← Back to shop</a></p>
+
+    <div class="layout">
+      <div class="gallery">
+        {product.images.length > 0 ? (
+          <>
+            <img id="main-shot" class="shot" src={product.images[0]} alt={product.name} width="800" height="800" fetchpriority="high" />
+            {product.images.length > 1 && (
+              <ul class="thumbs">
+                {product.images.map((src: string, i: number) => (
+                  <li>
+                    <button type="button" data-src={src} aria-label={`Photo ${i + 1} of ${product.name}`} aria-pressed={i === 0}>
+                      <img src={src} alt="" width="120" height="120" loading="lazy" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
+        ) : (
+          <div class="shot shot--none" aria-hidden="true">📷</div>
+        )}
+      </div>
+
+      <div class="detail stack">
+        <h1>{product.name}</h1>
+        <p class="price" data-price>{hasVariants ? formatPrice(product.priceFrom) : formatPrice(only.unitAmount)}</p>
+        {product.description && <p class="desc">{product.description}</p>}
+
+        <form id="add-form" novalidate>
+          {hasVariants ? (
+            <fieldset class="variants">
+              <legend>Choose an option</legend>
+              {product.variants.map((v: any, i: number) => (
+                <label class="variant">
+                  <input type="radio" name="priceId" value={v.id} data-amount={v.unitAmount} checked={i === 0} required />
+                  <span class="variant__label">{v.label}</span>
+                  <span class="variant__price">{formatPrice(v.unitAmount)}</span>
+                </label>
+              ))}
+            </fieldset>
+          ) : (
+            <input type="hidden" name="priceId" value={only.id} data-amount={only.unitAmount} />
+          )}
+
+          {product.personalise && (
+            <div class="field personalise">
+              <label for="text">{product.personaliseLabel}</label>
+              <input
+                class="input" id="text" name="text" type="text"
+                inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false"
+                maxlength={PERSONALISATION_MAX} pattern={PERSONALISATION_PATTERN} required
+                placeholder="e.g. JAKE"
+                aria-describedby="text-hint text-error"
+              />
+              <p class="hint" id="text-hint">
+                Letters and numbers only, up to {PERSONALISATION_MAX} characters. No spaces or punctuation.
+                We print exactly what you type — please check the spelling.
+              </p>
+              <p class="error-text" id="text-error" role="alert" aria-live="polite"></p>
+            </div>
+          )}
+
+          <div class="field qty">
+            <label for="qty">How many?</label>
+            <input class="input" id="qty" name="qty" type="number" min="1" max="10" step="1" value="1" inputmode="numeric" />
+          </div>
+
+          <button class="btn btn--primary btn--block" type="submit">Add to basket</button>
+          <p class="error-text" id="form-error" role="alert" aria-live="polite"></p>
+          <p class="added notice notice--ok" role="status" hidden>
+            Added to your basket. <a href="/cart">Go to basket →</a>
+          </p>
+          <noscript><p class="notice notice--warn">Please turn JavaScript on to add things to your basket.</p></noscript>
+        </form>
+
+        <p class="made">
+          <strong>Made to order.</strong> Allow 7 days. Collection from Great Sankey, Warrington —
+          we email you to arrange it once your order is ready.
+        </p>
+      </div>
+    </div>
+  </div>
+</Base>
+
+<script>
+  import { addLine } from '../../lib/cart.mjs';
+  import { validatePersonalisation } from '../../lib/validation.mjs';
+
+  const form = document.querySelector<HTMLFormElement>('#add-form');
+  if (form) {
+    const priceEl = document.querySelector<HTMLElement>('[data-price]');
+    const textInput = form.querySelector<HTMLInputElement>('#text');
+    const textError = form.querySelector<HTMLElement>('#text-error');
+    const formError = form.querySelector<HTMLElement>('#form-error');
+    const added = form.querySelector<HTMLElement>('.added');
+
+    const money = (pence: number) =>
+      pence % 100 === 0 ? `£${pence / 100}` : `£${(pence / 100).toFixed(2)}`;
+
+    // Keep the headline price in step with the chosen variant.
+    for (const radio of form.querySelectorAll<HTMLInputElement>('input[name="priceId"]')) {
+      radio.addEventListener('change', () => {
+        const amount = Number(radio.dataset.amount);
+        if (priceEl && Number.isFinite(amount)) priceEl.textContent = money(amount);
+      });
+    }
+
+    const showTextError = (msg: string) => {
+      if (textError) textError.textContent = msg;
+      textInput?.setAttribute('aria-invalid', msg ? 'true' : 'false');
+    };
+
+    textInput?.addEventListener('input', () => {
+      // Strip as they type rather than scolding them after the fact.
+      const cleaned = textInput.value.replace(/[^A-Za-z0-9]/g, '').slice(0, 10);
+      if (cleaned !== textInput.value) {
+        textInput.value = cleaned;
+        showTextError('Letters and numbers only please — no spaces, punctuation or emoji.');
+      } else {
+        showTextError('');
+      }
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (formError) formError.textContent = '';
+      if (added) added.hidden = true;
+
+      const data = new FormData(form);
+      const priceId = String(data.get('priceId') ?? '');
+      const qty = Number(data.get('qty') ?? 1);
+      const text = textInput ? String(data.get('text') ?? '') : '';
+
+      if (textInput) {
+        const check = validatePersonalisation(text);
+        if (!check.ok) {
+          showTextError(check.message);
+          textInput.focus();
+          return;
+        }
+        showTextError('');
+      }
+
+      const result = addLine({ priceId, text, qty });
+      if (!result.ok) {
+        if (formError) formError.textContent = result.message;
+        return;
+      }
+      if (added) added.hidden = false;
+      added?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    });
+  }
+
+  // Gallery thumbnails.
+  const mainShot = document.querySelector<HTMLImageElement>('#main-shot');
+  for (const btn of document.querySelectorAll<HTMLButtonElement>('.thumbs button')) {
+    btn.addEventListener('click', () => {
+      if (mainShot && btn.dataset.src) mainShot.src = btn.dataset.src;
+      for (const b of document.querySelectorAll('.thumbs button')) b.setAttribute('aria-pressed', String(b === btn));
+    });
+  }
+</script>
+
+<style>
+  .crumbs { margin-bottom: var(--s-4); font-size: var(--fs-sm); }
+  .crumbs a { text-decoration: none; font-weight: 600; }
+  .layout { display: grid; gap: var(--s-6); align-items: start; }
+  @media (min-width: 50rem) { .layout { grid-template-columns: 1fr 1fr; gap: var(--s-7); } }
+
+  .shot { width: 100%; aspect-ratio: 1; object-fit: cover; background: var(--c-surface-alt); border-radius: var(--r-lg); border: 1px solid var(--c-line); }
+  .shot--none { display: grid; place-items: center; font-size: 3rem; opacity: 0.3; }
+  .thumbs { display: flex; gap: var(--s-2); list-style: none; padding: 0; margin: var(--s-3) 0 0; flex-wrap: wrap; }
+  .thumbs li { max-width: none; }
+  .thumbs button { padding: 0; border: 2px solid var(--c-line); border-radius: var(--r-md); background: none; cursor: pointer; overflow: hidden; line-height: 0; }
+  .thumbs button[aria-pressed='true'] { border-color: var(--c-brand); }
+  .thumbs img { width: 66px; height: 66px; object-fit: cover; }
+
+  .price { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: 800; color: var(--c-brand-dark); }
+  .desc { color: var(--c-ink-soft); }
+
+  #add-form { display: grid; gap: var(--s-4); margin-top: var(--s-2); }
+  .variants { border: 0; padding: 0; margin: 0; display: grid; gap: var(--s-2); }
+  .variants legend { font-weight: 600; font-size: var(--fs-sm); padding: 0; margin-bottom: var(--s-2); }
+  .variant {
+    display: flex; align-items: center; gap: var(--s-3);
+    padding: var(--s-3) var(--s-4); min-height: 52px;
+    border: 2px solid var(--c-line); border-radius: var(--r-md);
+    background: var(--c-surface); cursor: pointer;
+  }
+  .variant:hover { border-color: var(--c-ink-soft); }
+  .variant:has(input:checked) { border-color: var(--c-brand); background: var(--c-brand-tint); }
+  .variant:has(input:focus-visible) { outline: 3px solid var(--c-accent); outline-offset: 2px; }
+  .variant input { accent-color: var(--c-brand); width: 1.15rem; height: 1.15rem; }
+  .variant__label { font-weight: 600; }
+  .variant__price { margin-left: auto; font-weight: 700; color: var(--c-brand-dark); }
+
+  .qty .input { max-width: 7rem; }
+  .made { font-size: var(--fs-sm); color: var(--c-ink-soft); border-top: 1px solid var(--c-line); padding-top: var(--s-4); }
+</style>

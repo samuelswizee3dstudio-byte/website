@@ -1,0 +1,19 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Page not found" noindex>
+  <div class="wrap wrap--narrow centre">
+    <h1>We cannot find that page</h1>
+    <p>It may have moved, or the link might be wrong.</p>
+    <p class="buttons">
+      <a class="btn btn--primary" href="/shop">Go to the shop</a>
+      <a class="btn btn--secondary" href="/">Back to the start</a>
+    </p>
+  </div>
+</Base>
+
+<style>
+  .centre { text-align: center; padding-block: var(--s-7); }
+  .centre p { margin-inline: auto; margin-top: var(--s-4); }
+  .buttons { display: flex; gap: var(--s-3); justify-content: center; flex-wrap: wrap; max-width: none; }
+</style>

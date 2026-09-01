@@ -1,0 +1,41 @@
+---
+import Base from '../layouts/Base.astro';
+import { getEntry, render } from 'astro:content';
+
+const page = await getEntry('copy', 'about');
+const { Content } = await render(page!);
+const videos = page!.data.videos;
+---
+<Base title={page!.data.title} description={page!.data.description}>
+  <div class="wrap wrap--narrow stack">
+    <h1>{page!.data.title}</h1>
+    <div class="prose"><Content /></div>
+
+    {videos.length > 0 && (
+      <section class="videos">
+        <h2>Watch</h2>
+        <div class="video-list">
+          {videos.map((id: string) => (
+            <div class="embed">
+              <iframe
+                src={`https://www.youtube-nocookie.com/embed/${id}`}
+                title="Swizee 3D Studio video"
+                loading="lazy"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen
+              ></iframe>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+  </div>
+</Base>
+
+<style>
+  .videos { margin-top: var(--s-7); }
+  .video-list { display: grid; gap: var(--s-5); margin-top: var(--s-4); }
+  .embed { position: relative; aspect-ratio: 16 / 9; border-radius: var(--r-md); overflow: hidden; background: var(--c-ink); }
+  .embed iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+</style>

@@ -1,0 +1,31 @@
+---
+import Base from '../layouts/Base.astro';
+import { getEntry, render } from 'astro:content';
+
+interface Props { slug: string }
+const { slug } = Astro.props;
+const page = await getEntry('copy', slug);
+if (!page) throw new Error(`Missing src/content/copy/${slug}.md`);
+const { Content } = await render(page);
+---
+<Base title={page.data.title} description={page.data.description}>
+  <div class="wrap wrap--narrow">
+    <h1>{page.data.title}</h1>
+    <div class="prose legal"><Content /></div>
+  </div>
+</Base>
+
+<style>
+  .legal { margin-top: var(--s-5); font-size: var(--fs-sm); }
+  .legal :global(blockquote) {
+    border-left: 4px solid var(--c-warn-line);
+    background: var(--c-warn-bg);
+    padding: var(--s-3) var(--s-4);
+    border-radius: var(--r-sm);
+  }
+  .legal :global(blockquote p) { max-width: none; }
+  .legal :global(code) {
+    background: var(--c-surface-alt); padding: 0.1em 0.35em;
+    border-radius: 4px; font-size: 0.9em;
+  }
+</style>

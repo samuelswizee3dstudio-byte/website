@@ -1,0 +1,83 @@
+---
+import Base from '../layouts/Base.astro';
+import ProductCard from '../components/ProductCard.astro';
+import { getCatalogue } from '../lib/catalogue.mjs';
+
+const products = await getCatalogue();
+
+// Categories come from Stripe product metadata, so adding a new one in the
+// Dashboard adds a filter here with no code change.
+const categories = [...new Set(products.map((p) => p.category).filter(Boolean))].sort();
+const labelFor = (slug: string) => slug.replace(/-/g, ' ').replace(/^./, (c) => c.toUpperCase());
+---
+<Base title="Shop" description="Every 3D printed axolotl, fidget toy and personalised name item we make. Made to order, collection from Warrington.">
+  <div class="wrap stack">
+    <header class="head">
+      <h1>Shop</h1>
+      <p>Everything is printed to order — allow 7 days. Collection only, from Great Sankey in Warrington.</p>
+    </header>
+
+    {categories.length > 1 && (
+      <div class="filters" role="group" aria-label="Filter by type">
+        <button class="chip is-on" type="button" data-filter="all" aria-pressed="true">Everything</button>
+        {categories.map((c) => (
+          <button class="chip" type="button" data-filter={c} aria-pressed="false">{labelFor(c!)}</button>
+        ))}
+      </div>
+    )}
+
+    {products.length === 0 ? (
+      <p class="notice">The shop is empty right now. New things are on the way — follow
+        <a href="https://www.instagram.com/swizee3dstudio" rel="noopener" target="_blank">@swizee3dstudio</a> for updates.</p>
+    ) : (
+      <>
+        <ul class="grid-products" id="grid">
+          {products.map((p, i) => (
+            <div data-category={p.category ?? ''} style="display: contents">
+              <ProductCard product={p} eager={i < 4} />
+            </div>
+          ))}
+        </ul>
+        <p class="empty notice" hidden>Nothing in that group yet.</p>
+      </>
+    )}
+  </div>
+</Base>
+
+<script>
+  const chips = document.querySelectorAll<HTMLButtonElement>('.chip');
+  const items = document.querySelectorAll<HTMLElement>('[data-category]');
+  const empty = document.querySelector<HTMLElement>('.empty');
+
+  for (const chip of chips) {
+    chip.addEventListener('click', () => {
+      const want = chip.dataset.filter;
+      for (const c of chips) {
+        const on = c === chip;
+        c.classList.toggle('is-on', on);
+        c.setAttribute('aria-pressed', String(on));
+      }
+      let shown = 0;
+      for (const item of items) {
+        const show = want === 'all' || item.dataset.category === want;
+        // The wrapper is display:contents, so hide the card inside it.
+        const card = item.firstElementChild as HTMLElement | null;
+        if (card) card.hidden = !show;
+        if (show) shown++;
+      }
+      if (empty) empty.hidden = shown > 0;
+    });
+  }
+</script>
+
+<style>
+  .head p { color: var(--c-ink-soft); }
+  .filters { display: flex; gap: var(--s-2); flex-wrap: wrap; }
+  .chip {
+    padding: var(--s-2) var(--s-4); min-height: 40px;
+    background: var(--c-surface); border: 2px solid var(--c-line);
+    border-radius: var(--r-pill); font-weight: 600; font-size: var(--fs-sm); cursor: pointer;
+  }
+  .chip:hover { border-color: var(--c-ink-soft); }
+  .chip.is-on { background: var(--c-ink); border-color: var(--c-ink); color: #fff; }
+</style>

@@ -1,0 +1,54 @@
+/* ---------------------------------------------------------------------------
+   DESIGN TOKENS — this is the file to replace when the Claude Design export
+   arrives. Every colour, font, radius and space used anywhere on the site comes
+   from here. Nothing else should contain a raw hex value.
+   Placeholder palette below: friendly, high-contrast, axolotl pink + deep ink.
+   --------------------------------------------------------------------------- */
+:root {
+  /* Brand */
+  --c-brand:        #ff5fa2;
+  --c-brand-dark:   #d63d80;
+  --c-brand-tint:   #ffe9f2;
+  --c-accent:       #00c2b2;
+  --c-accent-dark:  #009e91;
+
+  /* Ink and ground */
+  --c-ink:          #191527;
+  --c-ink-soft:     #56506b;
+  --c-ink-faint:    #8a83a0;
+  --c-bg:           #fffdfb;
+  --c-surface:      #ffffff;
+  --c-surface-alt:  #f6f2f8;
+  --c-line:         #e6e0ee;
+
+  /* Feedback */
+  --c-error:        #c02c3c;
+  --c-error-bg:     #fdecee;
+  --c-ok:           #17794a;
+  --c-ok-bg:        #e7f6ee;
+  --c-warn-bg:      #fff4d6;
+  --c-warn-line:    #e0b83a;
+
+  /* Type */
+  --font-display: 'Baloo 2', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+  --fs-xs: 0.8125rem;
+  --fs-sm: 0.9375rem;
+  --fs-md: 1.0625rem;
+  --fs-lg: 1.25rem;
+  --fs-xl: clamp(1.5rem, 1.1rem + 1.8vw, 2rem);
+  --fs-2xl: clamp(2rem, 1.4rem + 3vw, 3rem);
+
+  /* Space */
+  --s-1: 0.25rem;  --s-2: 0.5rem;   --s-3: 0.75rem;  --s-4: 1rem;
+  --s-5: 1.5rem;   --s-6: 2rem;     --s-7: 3rem;     --s-8: 4rem;
+
+  /* Shape */
+  --r-sm: 8px;  --r-md: 14px;  --r-lg: 22px;  --r-pill: 999px;
+  --shadow-sm: 0 1px 2px rgb(25 21 39 / 0.06), 0 2px 8px rgb(25 21 39 / 0.05);
+  --shadow-md: 0 4px 14px rgb(25 21 39 / 0.10);
+
+  --wrap: 1120px;
+  --wrap-narrow: 46rem;
+}

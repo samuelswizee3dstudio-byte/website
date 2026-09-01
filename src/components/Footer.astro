@@ -1,0 +1,35 @@
+---
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="wrap inner">
+    <div>
+      <p class="tag">3D printed in Great Sankey, Warrington.<br />Made to order — allow 7 days. Collection only.</p>
+      <a class="ig" href="https://www.instagram.com/swizee3dstudio" rel="me noopener" target="_blank">
+        Follow @swizee3dstudio on Instagram
+      </a>
+    </div>
+    <nav aria-label="Footer">
+      <ul>
+        <li><a href="/shop">Shop</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/contact">Contact</a></li>
+        <li><a href="/terms">Terms of sale</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+      </ul>
+    </nav>
+  </div>
+  <p class="copy">&copy; {year} Swizee 3D Studio</p>
+</footer>
+
+<style>
+  .site-footer { background: var(--c-surface-alt); border-top: 1px solid var(--c-line); padding-block: var(--s-6) var(--s-4); font-size: var(--fs-sm); }
+  .inner { display: flex; flex-wrap: wrap; gap: var(--s-6); justify-content: space-between; }
+  .tag { color: var(--c-ink-soft); margin-bottom: var(--s-3); }
+  .ig { font-weight: 700; }
+  nav ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2); }
+  nav li { max-width: none; }
+  nav a { color: var(--c-ink-soft); text-decoration: none; }
+  nav a:hover { color: var(--c-brand-dark); text-decoration: underline; }
+  .copy { color: var(--c-ink-faint); font-size: var(--fs-xs); text-align: center; margin-top: var(--s-6); }
+</style>

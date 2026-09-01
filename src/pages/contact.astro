@@ -1,0 +1,82 @@
+---
+import Base from '../layouts/Base.astro';
+import { getEntry, render } from 'astro:content';
+
+const page = await getEntry('copy', 'contact');
+const { Content } = await render(page!);
+---
+<Base title={page!.data.title} description={page!.data.description}>
+  <div class="wrap wrap--narrow stack">
+    <h1>{page!.data.title}</h1>
+
+    <!-- Revealed by the script below when Netlify sends the visitor back with
+         ?sent=1. The page is static, so this cannot be decided at build time. -->
+    <p class="notice notice--ok" id="thanks" role="status" hidden>
+      <strong>Thank you — your message has been sent.</strong><br />
+      We will get back to you as soon as we can.
+    </p>
+
+    <div class="prose"><Content /></div>
+
+    <!-- Netlify Forms. The data-netlify and netlify-honeypot attributes are what
+         Netlify's build-time form detection looks for; the honeypot traps bots
+         without putting a captcha in front of a ten-year-old's parent. -->
+    <form
+      name="contact"
+      method="POST"
+      data-netlify="true"
+      netlify-honeypot="fax-number"
+      action="/contact?sent=1"
+      class="stack form"
+      id="contact-form"
+    >
+      <input type="hidden" name="form-name" value="contact" />
+      <p class="hp" aria-hidden="true">
+        <label>Do not fill this in<input name="fax-number" tabindex="-1" autocomplete="off" /></label>
+      </p>
+
+      <div class="field">
+        <label for="name">Your name</label>
+        <input class="input" id="name" name="name" type="text" autocomplete="name" required maxlength="80" />
+      </div>
+
+      <div class="field">
+        <label for="email">Your email</label>
+        <input class="input" id="email" name="email" type="email" autocomplete="email" required maxlength="120" />
+        <p class="hint">So we can reply. We do not use it for anything else.</p>
+      </div>
+
+      <div class="field">
+        <label for="message">Message</label>
+        <textarea class="textarea" id="message" name="message" required maxlength="2000"
+          placeholder="If it is about an order, please include the name you used at checkout."></textarea>
+      </div>
+
+      <button class="btn btn--primary" type="submit">Send message</button>
+      <p class="hint">By sending this you agree to our <a href="/privacy">privacy notice</a>.</p>
+    </form>
+
+    <p class="notice">
+      <strong>Collection:</strong> collection from Great Sankey, Warrington, arranged by email once
+      your order is ready. We do not post orders.
+    </p>
+  </div>
+</Base>
+
+<script>
+  if (new URLSearchParams(window.location.search).get('sent') === '1') {
+    const thanks = document.querySelector<HTMLElement>('#thanks');
+    if (thanks) {
+      thanks.hidden = false;
+      thanks.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+    document.querySelector<HTMLFormElement>('#contact-form')?.reset();
+    // Leave a clean URL behind so a refresh does not re-show the message.
+    window.history.replaceState({}, '', '/contact');
+  }
+</script>
+
+<style>
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .form { background: var(--c-surface); border: 1px solid var(--c-line); border-radius: var(--r-lg); padding: var(--s-5); }
+</style>

@@ -1,0 +1,22 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+<Base title="Checkout cancelled" noindex description="Your payment was cancelled. Your basket is still here.">
+  <div class="wrap wrap--narrow stack centre">
+    <h1>No payment was taken</h1>
+    <p class="lede">You cancelled at the payment page, so nothing has been charged. Your basket is exactly as you left it.</p>
+    <p class="buttons">
+      <a class="btn btn--primary" href="/cart">Back to my basket</a>
+      <a class="btn btn--secondary" href="/shop">Keep shopping</a>
+    </p>
+    <p class="small">Something go wrong? <a href="/contact">Let us know</a> and we will help.</p>
+  </div>
+</Base>
+
+<style>
+  .centre { text-align: center; padding-block: var(--s-7); }
+  .centre p { margin-inline: auto; }
+  .lede { font-size: var(--fs-lg); color: var(--c-ink-soft); }
+  .buttons { display: flex; gap: var(--s-3); justify-content: center; flex-wrap: wrap; max-width: none; }
+  .small { font-size: var(--fs-sm); color: var(--c-ink-soft); }
+</style>

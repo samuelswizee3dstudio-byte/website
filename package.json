@@ -1,0 +1,29 @@
+{
+  "name": "swizee-site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "node scripts/check-placeholders.mjs && astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "node --test \"tests/**/*.test.mjs\"",
+    "check:placeholders": "node scripts/check-placeholders.mjs"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^7.2.10",
+    "stripe": "^22.6.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "typescript": "^5.9.2"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
+  }
+}

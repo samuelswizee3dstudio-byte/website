@@ -1,0 +1,203 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCatalogue } from '../lib/catalogue.mjs';
+
+const products = await getCatalogue();
+
+// A price-ID keyed snapshot of the catalogue, baked in at build time. The basket
+// stores only { priceId, text, qty } and looks everything else up here, so a
+// basket cannot display a price that Stripe no longer charges.
+const index: Record<string, unknown> = {};
+for (const p of products) {
+  for (const v of p.variants) {
+    index[v.id] = {
+      slug: p.slug,
+      name: p.name,
+      variantLabel: p.variants.length > 1 ? v.label : '',
+      unitAmount: v.unitAmount,
+      image: p.images[0] ?? null,
+      personalise: p.personalise,
+    };
+  }
+}
+---
+<Base title="Your basket" description="Your Swizee 3D Studio basket.">
+  <div class="wrap wrap--narrow stack">
+    <h1>Your basket</h1>
+
+    <div id="empty" hidden>
+      <p class="notice">Your basket is empty.</p>
+      <p><a class="btn btn--primary" href="/shop">Have a look in the shop</a></p>
+    </div>
+
+    <div id="dropped" class="notice notice--warn" hidden role="status">
+      <p>Some items were removed because they are no longer available. Sorry about that.</p>
+    </div>
+
+    <div id="filled" hidden>
+      <ul id="lines" class="lines"></ul>
+
+      <div class="totals">
+        <div class="row"><span>Total</span><strong id="total">£0</strong></div>
+        <p class="small">Made to order — allow 7 days. Collection from Great Sankey, Warrington. No delivery.</p>
+      </div>
+
+      <button class="btn btn--primary btn--block" id="checkout" type="button">
+        <span data-label>Go to secure checkout</span>
+      </button>
+      <p class="error-text" id="checkout-error" role="alert" aria-live="assertive"></p>
+      <p class="small pay">You will pay on Stripe's secure page. We never see your card details.</p>
+      <p class="small"><a href="/shop">← Keep shopping</a></p>
+    </div>
+
+    <noscript><p class="notice notice--warn">Please turn JavaScript on to use the basket.</p></noscript>
+  </div>
+
+  <script is:inline type="application/json" id="catalogue" set:html={JSON.stringify(index)}></script>
+</Base>
+
+<script>
+  import { readCart, setQty, removeLine, lineKey, onCartChange } from '../lib/cart.mjs';
+
+  type Entry = { slug: string; name: string; variantLabel: string; unitAmount: number; image: string | null; personalise: boolean };
+
+  const catalogue: Record<string, Entry> = JSON.parse(
+    document.querySelector('#catalogue')?.textContent || '{}'
+  );
+
+  const el = <T extends HTMLElement>(id: string) => document.querySelector<T>(id);
+  const linesEl = el<HTMLUListElement>('#lines')!;
+  const emptyEl = el('#empty')!;
+  const filledEl = el('#filled')!;
+  const droppedEl = el('#dropped')!;
+  const totalEl = el('#total')!;
+  const errorEl = el('#checkout-error')!;
+  const checkoutBtn = el<HTMLButtonElement>('#checkout')!;
+
+  const money = (pence: number) => (pence % 100 === 0 ? `£${pence / 100}` : `£${(pence / 100).toFixed(2)}`);
+
+  function render() {
+    const stored = readCart();
+    const known = stored.filter((l) => catalogue[l.priceId]);
+
+    // A line whose Stripe price has been archived or deleted cannot be bought.
+    // Drop it here rather than letting checkout fail with a confusing error.
+    if (known.length !== stored.length) {
+      droppedEl.hidden = false;
+      for (const l of stored) if (!catalogue[l.priceId]) removeLine(lineKey(l));
+      return; // removeLine re-fires the change event; this render is superseded.
+    }
+
+    emptyEl.hidden = known.length > 0;
+    filledEl.hidden = known.length === 0;
+    linesEl.replaceChildren();
+
+    let total = 0;
+    for (const line of known) {
+      const item = catalogue[line.priceId];
+      const lineTotal = item.unitAmount * line.qty;
+      total += lineTotal;
+      const key = lineKey(line);
+
+      const li = document.createElement('li');
+      li.className = 'line';
+      li.innerHTML = `
+        <a class="line__shot" href="/products/${item.slug}">
+          ${item.image ? `<img src="${item.image}" alt="" width="88" height="88" loading="lazy">` : '<span aria-hidden="true">📷</span>'}
+        </a>
+        <div class="line__main">
+          <a class="line__name" href="/products/${item.slug}"></a>
+          <p class="line__meta"></p>
+          <div class="line__controls">
+            <label class="visually-hidden" for="q-${key}">Quantity</label>
+            <input class="input line__qty" id="q-${key}" type="number" min="1" max="10" step="1" inputmode="numeric">
+            <button class="btn btn--ghost" type="button" data-remove>Remove</button>
+          </div>
+        </div>
+        <p class="line__price">${money(lineTotal)}</p>`;
+
+      // Product names and personalisation are user/Dashboard text — set as text,
+      // never as HTML.
+      li.querySelector<HTMLElement>('.line__name')!.textContent = item.name;
+      const bits: string[] = [];
+      if (item.variantLabel) bits.push(item.variantLabel);
+      if (line.text) bits.push(`Personalised: ${line.text}`);
+      bits.push(`${money(item.unitAmount)} each`);
+      li.querySelector<HTMLElement>('.line__meta')!.textContent = bits.join(' · ');
+
+      const qtyInput = li.querySelector<HTMLInputElement>('.line__qty')!;
+      qtyInput.value = String(line.qty);
+      qtyInput.addEventListener('change', () => {
+        const r = setQty(key, Number(qtyInput.value));
+        if (!r.ok) { errorEl.textContent = r.message; qtyInput.value = String(line.qty); }
+        else errorEl.textContent = '';
+      });
+      li.querySelector<HTMLButtonElement>('[data-remove]')!.addEventListener('click', () => removeLine(key));
+
+      linesEl.append(li);
+    }
+    totalEl.textContent = money(total);
+  }
+
+  render();
+  onCartChange(render);
+  // The basket must still be intact if they came back from Stripe's cancel link.
+  window.addEventListener('pageshow', render);
+
+  checkoutBtn.addEventListener('click', async () => {
+    const lines = readCart().filter((l) => catalogue[l.priceId]);
+    if (lines.length === 0) return;
+
+    errorEl.textContent = '';
+    checkoutBtn.disabled = true;
+    const label = checkoutBtn.querySelector('[data-label]')!;
+    const original = label.textContent;
+    label.textContent = 'Taking you to checkout…';
+
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: lines }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.url) {
+        throw new Error(data.message || 'Sorry, we could not start checkout. Please try again in a moment.');
+      }
+      window.location.href = data.url;
+    } catch (err) {
+      errorEl.textContent = err instanceof Error ? err.message : 'Sorry, something went wrong. Please try again.';
+      checkoutBtn.disabled = false;
+      label.textContent = original;
+    }
+  });
+</script>
+
+<style>
+  .lines { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-3); }
+  .line {
+    display: grid; grid-template-columns: 88px 1fr auto; gap: var(--s-4); align-items: start;
+    background: var(--c-surface); border: 1px solid var(--c-line); border-radius: var(--r-md);
+    padding: var(--s-3); max-width: none;
+  }
+  .line__shot { display: grid; place-items: center; width: 88px; height: 88px; background: var(--c-surface-alt); border-radius: var(--r-sm); overflow: hidden; font-size: 1.5rem; }
+  .line__shot img { width: 100%; height: 100%; object-fit: cover; }
+  .line__name { font-family: var(--font-display); font-weight: 700; text-decoration: none; color: var(--c-ink); }
+  .line__meta { font-size: var(--fs-sm); color: var(--c-ink-soft); margin-top: var(--s-1); max-width: none; }
+  .line__controls { display: flex; align-items: center; gap: var(--s-2); margin-top: var(--s-3); }
+  .line__qty { width: 5rem; min-height: 40px; padding: var(--s-2); }
+  .line__price { font-weight: 700; white-space: nowrap; }
+
+  .totals { border-top: 1px solid var(--c-line); margin-top: var(--s-5); padding-top: var(--s-4); }
+  .totals .row { display: flex; justify-content: space-between; font-family: var(--font-display); font-size: var(--fs-lg); }
+  .small { font-size: var(--fs-sm); color: var(--c-ink-soft); max-width: none; }
+  .totals .small { margin-top: var(--s-2); }
+  #checkout { margin-top: var(--s-5); }
+  .pay { text-align: center; margin-top: var(--s-2); }
+
+  @media (max-width: 30rem) {
+    .line { grid-template-columns: 64px 1fr; }
+    .line__shot { width: 64px; height: 64px; }
+    .line__price { grid-column: 2; text-align: right; }
+  }
+</style>

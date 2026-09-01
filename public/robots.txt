@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /checkout/
+
+Sitemap: https://swizee.co.uk/sitemap-index.xml

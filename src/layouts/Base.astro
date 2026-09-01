@@ -1,0 +1,82 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { isTestMode } from '../lib/catalogue.mjs';
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Set on pages that must not be indexed (checkout success/cancel). */
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description = 'Swizee 3D Studio — 3D printed axolotls, fidget toys and personalised name items. Made to order in Warrington, collection only.',
+  noindex = false,
+} = Astro.props;
+
+const fullTitle = title === 'home' ? 'Swizee 3D Studio' : `${title} · Swizee 3D Studio`;
+const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', Astro.site);
+const testMode = isTestMode();
+---
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content="Swizee 3D Studio" />
+    <meta property="og:locale" content="en_GB" />
+    <meta name="theme-color" content="#ff5fa2" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    {testMode && (
+      <div class="testbar" role="status">
+        Test mode — payments are not real. Use card 4242 4242 4242 4242.
+      </div>
+    )}
+    <Header />
+    <main id="main"><slot /></main>
+    <Footer />
+    <script>
+      // Keeps the header basket count in sync on every page, including when the
+      // page is restored from the back/forward cache after Stripe Checkout.
+      import { cartCount, onCartChange } from '../lib/cart.mjs';
+      const render = () => {
+        const n = cartCount();
+        for (const el of document.querySelectorAll<HTMLElement>('[data-cart-count]')) {
+          el.textContent = String(n);
+          el.hidden = n === 0;
+        }
+      };
+      render();
+      onCartChange(render);
+      window.addEventListener('pageshow', render);
+    </script>
+    <style>
+      .testbar {
+        background: var(--c-warn-bg);
+        border-bottom: 1px solid var(--c-warn-line);
+        color: var(--c-ink);
+        font-size: var(--fs-xs);
+        font-weight: 700;
+        text-align: center;
+        padding: var(--s-2) var(--s-4);
+      }
+    </style>
+  </body>
+</html>

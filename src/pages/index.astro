@@ -1,0 +1,70 @@
+---
+import Base from '../layouts/Base.astro';
+import ProductCard from '../components/ProductCard.astro';
+import { getCatalogue } from '../lib/catalogue.mjs';
+import { getEntry, render } from 'astro:content';
+
+const products = await getCatalogue();
+const featured = (products.filter((p) => p.featured).length ? products.filter((p) => p.featured) : products).slice(0, 6);
+
+const home = await getEntry('copy', 'home');
+const { Content } = await render(home!);
+---
+<Base title="home" description={home!.data.description}>
+  <section class="hero wrap">
+    <div class="hero__text stack">
+      <p class="badge">Made to order · Collection from Warrington</p>
+      <h1>{home!.data.title}</h1>
+      <div class="lede prose"><Content /></div>
+      <p class="cta">
+        <a class="btn btn--primary" href="/shop">See what we make</a>
+        <a class="btn btn--secondary" href="/about">How it works</a>
+      </p>
+    </div>
+    <div class="hero__art" aria-hidden="true">
+      <img src="/images/hero.svg" alt="" width="520" height="420" />
+    </div>
+  </section>
+
+  <section class="wrap section">
+    <div class="section__head">
+      <h2>Popular right now</h2>
+      <a href="/shop">See everything →</a>
+    </div>
+    {featured.length === 0 ? (
+      <p class="notice">Nothing in the shop just yet — check back very soon.</p>
+    ) : (
+      <ul class="grid-products">
+        {featured.map((p, i) => <ProductCard product={p} eager={i < 3} />)}
+      </ul>
+    )}
+  </section>
+
+  <section class="wrap section">
+    <ul class="steps">
+      <li><span aria-hidden="true">1</span><h3>Pick and pay</h3><p>Choose your item, type a name if it takes one, and pay securely.</p></li>
+      <li><span aria-hidden="true">2</span><h3>We print it</h3><p>Yours is printed specially for you. Allow 7 days.</p></li>
+      <li><span aria-hidden="true">3</span><h3>Collect it</h3><p>We email you and arrange collection from Great Sankey, Warrington.</p></li>
+    </ul>
+  </section>
+</Base>
+
+<style>
+  .hero { display: grid; gap: var(--s-6); align-items: center; padding-block: var(--s-5) var(--s-7); }
+  @media (min-width: 52rem) { .hero { grid-template-columns: 1.1fr 1fr; } }
+  .lede p { font-size: var(--fs-lg); color: var(--c-ink-soft); }
+  .cta { display: flex; gap: var(--s-3); flex-wrap: wrap; max-width: none; }
+  .hero__art img { width: 100%; }
+  .section { padding-block: var(--s-6); }
+  .section__head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-4); margin-bottom: var(--s-5); }
+  .section__head a { font-weight: 700; text-decoration: none; white-space: nowrap; }
+  .steps { display: grid; gap: var(--s-5); list-style: none; margin: 0; padding: 0; }
+  @media (min-width: 42rem) { .steps { grid-template-columns: repeat(3, 1fr); } }
+  .steps li { background: var(--c-surface-alt); border-radius: var(--r-lg); padding: var(--s-5); max-width: none; }
+  .steps span {
+    display: grid; place-items: center; width: 2.25rem; height: 2.25rem;
+    background: var(--c-brand); color: #fff; border-radius: var(--r-pill);
+    font-family: var(--font-display); font-weight: 800; margin-bottom: var(--s-3);
+  }
+  .steps p { color: var(--c-ink-soft); font-size: var(--fs-sm); margin-top: var(--s-2); }
+</style>
