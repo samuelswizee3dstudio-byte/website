@@ -1,0 +1,14 @@
+name = "swizee-rebuild-drain"
+main = "rebuild-drain.js"
+compatibility_date = "2026-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Every 2 minutes. The worker itself only deploys once edits have been quiet for
+# QUIET_PERIOD_MS (3 minutes), so this is just how often it checks.
+[triggers]
+crons = ["*/2 * * * *"]
+
+# kv_namespaces filled in at setup:
+# [[kv_namespaces]]
+# binding = "REBUILD_STATE"
+# id = "<created by: npx wrangler kv namespace create REBUILD_STATE>"

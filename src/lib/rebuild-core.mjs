@@ -55,17 +55,75 @@ export async function handleRebuild(request, env) {
     return json(200, { ignored: event.type });
   }
 
-  const res = await fetch(buildHook, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ trigger_title: `Stripe: ${event.type}` }),
-  });
-
-  if (!res.ok) {
-    console.error('Netlify build hook returned', res.status);
-    return json(502, { message: 'Build hook failed.' });
+  // --- Debounce -----------------------------------------------------------
+  // Deploys are metered, and editing fifteen products fires fifteen events. If
+  // a KV namespace is bound we only record that a rebuild is due; a scheduled
+  // worker drains it once edits have stopped, so a burst costs one deploy.
+  //
+  // This has to be a TRAILING debounce. A leading throttle would build on the
+  // first edit and silently drop the next fourteen, so the family would watch
+  // one product appear and the rest not.
+  if (env.REBUILD_STATE) {
+    await env.REBUILD_STATE.put(
+      PENDING_KEY,
+      JSON.stringify({ at: Date.now(), reason: event.type }),
+    );
+    console.log(`Rebuild queued by ${event.type}`);
+    return json(200, { queued: true, event: event.type });
   }
 
-  console.log(`Rebuild triggered by ${event.type}`);
-  return json(200, { rebuilding: true, event: event.type });
+  // No KV bound (e.g. the Netlify deploy): fall back to building immediately.
+  return triggerDeploy(buildHook, `Stripe: ${event.type}`);
+}
+
+export const PENDING_KEY = 'rebuild:pending';
+
+/** How long edits must be quiet before we spend a deploy on them. */
+export const QUIET_PERIOD_MS = 3 * 60 * 1000;
+
+/** @param {string} hookUrl @param {string} title */
+export async function triggerDeploy(hookUrl, title) {
+  const res = await fetch(hookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ trigger_title: title }),
+  });
+  if (!res.ok) {
+    console.error('Deploy hook returned', res.status);
+    return json(502, { message: 'Deploy hook failed.' });
+  }
+  console.log(`Deploy triggered: ${title}`);
+  return json(200, { rebuilding: true });
+}
+
+/**
+ * Drain the pending flag if edits have gone quiet. Called on a schedule.
+ * @param {{ REBUILD_STATE?: any, DEPLOY_HOOK_URL?: string }} env
+ * @param {number} now injectable so the behaviour can be tested
+ */
+export async function drainPendingRebuild(env, now = Date.now()) {
+  if (!env.REBUILD_STATE || !env.DEPLOY_HOOK_URL) return { skipped: 'not configured' };
+
+  const raw = await env.REBUILD_STATE.get(PENDING_KEY);
+  if (!raw) return { skipped: 'nothing pending' };
+
+  let pending;
+  try {
+    pending = JSON.parse(raw);
+  } catch {
+    await env.REBUILD_STATE.delete(PENDING_KEY);
+    return { skipped: 'unreadable, cleared' };
+  }
+
+  const quietFor = now - Number(pending.at ?? 0);
+  if (quietFor < QUIET_PERIOD_MS) {
+    return { waiting: true, quietForMs: quietFor };
+  }
+
+  // Clear before triggering. If the deploy hook fails we would rather miss a
+  // rebuild than loop on a stuck flag; the next edit or the manual rebuild
+  // link recovers it.
+  await env.REBUILD_STATE.delete(PENDING_KEY);
+  await triggerDeploy(env.DEPLOY_HOOK_URL, `Stripe: ${pending.reason ?? 'changes'} (debounced)`);
+  return { deployed: true, reason: pending.reason };
 }

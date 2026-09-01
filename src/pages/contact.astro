@@ -4,6 +4,11 @@ import { getEntry, render } from 'astro:content';
 
 const page = await getEntry('copy', 'contact');
 const { Content } = await render(page!);
+
+// Web3Forms relays the message to the family's inbox. The access key is public
+// by design — it only identifies which inbox to deliver to, and cannot read
+// past submissions. Set PUBLIC_WEB3FORMS_KEY in the host's env vars.
+const web3formsKey = import.meta.env.PUBLIC_WEB3FORMS_KEY ?? '';
 ---
 <Base title={page!.data.title} description={page!.data.description}>
   <div class="wrap wrap--narrow stack">
@@ -18,21 +23,28 @@ const { Content } = await render(page!);
 
     <div class="prose"><Content /></div>
 
-    <!-- Netlify Forms. The data-netlify and netlify-honeypot attributes are what
-         Netlify's build-time form detection looks for; the honeypot traps bots
-         without putting a captcha in front of a ten-year-old's parent. -->
+    {!web3formsKey && (
+      <p class="notice notice--warn">
+        <strong>The contact form is not connected yet.</strong>
+        Set <code>PUBLIC_WEB3FORMS_KEY</code> in the hosting environment variables.
+      </p>
+    )}
+
+    <!-- Posted to Web3Forms, which emails the family. The botcheck field is a
+         honeypot: bots fill it, humans never see it, and Web3Forms silently
+         discards those. No captcha in front of a ten-year-old's parent. -->
     <form
-      name="contact"
       method="POST"
-      data-netlify="true"
-      netlify-honeypot="fax-number"
-      action="/contact?sent=1"
+      action="https://api.web3forms.com/submit"
       class="stack form"
       id="contact-form"
     >
-      <input type="hidden" name="form-name" value="contact" />
+      <input type="hidden" name="access_key" value={web3formsKey} />
+      <input type="hidden" name="subject" value="New message from the Swizee website" />
+      <input type="hidden" name="from_name" value="Swizee 3D Studio" />
+      <input type="hidden" name="redirect" value="https://swizee.co.uk/contact?sent=1" />
       <p class="hp" aria-hidden="true">
-        <label>Do not fill this in<input name="fax-number" tabindex="-1" autocomplete="off" /></label>
+        <label>Do not fill this in<input name="botcheck" tabindex="-1" autocomplete="off" /></label>
       </p>
 
       <div class="field">
