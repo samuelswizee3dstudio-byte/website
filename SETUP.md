@@ -90,7 +90,10 @@ build; you only need to say where submissions go.
    left-hand sidebar item once you have opened the project.)
 2. Under **Form submission notifications**, click **Add notification** →
    **Email notification**.
-3. Email to notify: `p.d.rutter@gmail.com`. Form: **contact**. Save.
+3. Email to notify: **Paul's email address**. Form: **contact**. Save.
+
+   > Deliberately not written down here — this repo is public, and published
+   > addresses get scraped. The address lives only in Netlify's own settings.
 
    If no form called **contact** is offered, the site has not finished a deploy
    that contains the form yet — deploy first, then come back.

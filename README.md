@@ -180,7 +180,7 @@ build command, the `www` → apex redirect and the security headers.
       `www` redirecting
 - [ ] Stripe email receipts turned on (Stripe → Settings → Customer emails)
 - [ ] Stripe branding and public business name set (shown on the Checkout page)
-- [ ] Netlify form notification for `contact` set to p.d.rutter@gmail.com
+- [ ] Netlify form notification for `contact` set to Paul's email address
 - [ ] `STRIPE_SECRET_KEY` swapped to the live key, site rebuilt
 - [ ] One real £1 purchase, checked in the Dashboard, then refunded
 
