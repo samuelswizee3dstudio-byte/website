@@ -38,6 +38,16 @@ export function formatPriceRange(product) {
     : `${formatPrice(product.priceFrom)} – ${formatPrice(product.priceTo)}`;
 }
 
+/**
+ * Card price, per the design handoff: "from £3.50" when the product has
+ * variants, plain "£3.50" when it does not.
+ */
+export function formatCardPrice(product) {
+  return product.variants.length > 1
+    ? `from ${formatPrice(product.priceFrom)}`
+    : formatPrice(product.priceFrom);
+}
+
 const truthy = (v) => String(v ?? '').trim().toLowerCase() === 'true';
 const intOr = (v, fallback) => {
   const n = Number.parseInt(String(v ?? ''), 10);

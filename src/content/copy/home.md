@@ -1,9 +1,7 @@
 ---
-title: "Wiggly, spinny, printed-to-order"
-description: "3D printed axolotls, fidget toys and personalised name items. Made to order in Warrington."
+title: "Fidgets made\none at a time."
+description: "3D printed fidgets, axolotls and personalised name items. Printed to order in Warrington, collection only."
 ---
 
-Everything here is designed and printed by hand in Warrington. Pick a colour,
-type a name if you want one, and we will print it just for you.
-
-Made to order — allow 7 days. Collection only.
+Printed in Warrington by a ten-year-old and his mum. Pick a colour, put your
+name on it, collect it in a week.

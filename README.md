@@ -62,6 +62,27 @@ Other commands:
 | `npm run check` | TypeScript / Astro diagnostics |
 | `npm run check:placeholders` | Lists unreviewed `[[REPLACE: ...]]` legal wording |
 
+## Design
+
+The look comes from the Claude Design project `Swizee Design.dc.html` and its
+`design_handoff_swizee/README.md`. That handoff is the authority; this codebase
+recreates it in Astro rather than copying its markup, which is what the handoff
+asks for.
+
+- **Tokens** live in `src/styles/tokens.css`, copied verbatim from the design's
+  `:root` block. Nothing else in the repo holds a raw hex value.
+- **Fonts** are Anton (display, always uppercase) and Nunito (body), from Google
+  Fonts.
+- **One breakpoint**, 900px, between the mobile and desktop layouts. Product
+  grids flex 2 -> 3 -> 4 columns in between.
+- The shop deliberately has **no filters and no search**, per the handoff.
+- Photo **placeholders** (the diagonal-striped blocks) appear only where a
+  product has no photo in Stripe. The handoff is explicit that these must not
+  ship — upload real photos to Stripe before go-live.
+
+Still needed from the client: axolotl, name sign, bag tag, rainbow slider,
+pencil topper, flexi dragon and maker photos, plus the "how it's made" video.
+
 ## Stripe metadata conventions
 
 Set these in the Stripe Dashboard on the **Product** (Product → Edit → Metadata).
@@ -170,7 +191,7 @@ src/lib/catalogue.mjs   Stripe -> site data. The only place product shape is dec
 src/lib/cart.mjs        Browser basket
 src/lib/validation.mjs  Personalisation + quantity rules, shared by browser AND server
 src/content/copy/       Site text as markdown, edited on GitHub by the family
-src/styles/tokens.css   Every colour, font and spacing value. Replace this to reskin
+src/styles/tokens.css   Every colour, font and spacing value, verbatim from the design handoff
 netlify/functions/      The only server-side code
 tests/                  node --test, no framework
 ```

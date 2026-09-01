@@ -10,90 +10,94 @@ export async function getStaticPaths() {
 
 const { product } = Astro.props;
 const hasVariants = product.variants.length > 1;
-const only = product.variants[0];
+const first = product.variants[0];
 ---
 <Base title={product.name} description={product.description || `${product.name} — 3D printed to order by Swizee 3D Studio.`}>
-  <div class="wrap">
-    <p class="crumbs"><a href="/shop">← Back to shop</a></p>
+  <div class="wrap pdp">
+    <p class="crumb"><a href="/shop">Shop</a> <span aria-hidden="true">/</span> {product.name}</p>
 
-    <div class="layout">
+    <div class="pdp__grid">
+      <!-- Gallery -->
       <div class="gallery">
-        {product.images.length > 0 ? (
-          <>
-            <img id="main-shot" class="shot" src={product.images[0]} alt={product.name} width="800" height="800" fetchpriority="high" />
-            {product.images.length > 1 && (
-              <ul class="thumbs">
-                {product.images.map((src: string, i: number) => (
-                  <li>
-                    <button type="button" data-src={src} aria-label={`Photo ${i + 1} of ${product.name}`} aria-pressed={i === 0}>
-                      <img src={src} alt="" width="120" height="120" loading="lazy" />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </>
-        ) : (
-          <div class="shot shot--none" aria-hidden="true">📷</div>
+        {product.images.length > 1 && (
+          <ul class="thumbs">
+            {product.images.map((src: string, i: number) => (
+              <li>
+                <button type="button" data-src={src} aria-pressed={i === 0} aria-label={`Photo ${i + 1} of ${product.name}`}>
+                  <img src={src} alt="" width="80" height="80" loading="lazy" />
+                </button>
+              </li>
+            ))}
+          </ul>
         )}
+        <div class="gallery__main">
+          {product.images.length > 0
+            ? <img id="main-shot" src={product.images[0]} alt={product.name} width="800" height="1000" fetchpriority="high" />
+            : <span class="shot-placeholder">{product.name.toLowerCase()} photo</span>}
+        </div>
       </div>
 
-      <div class="detail stack">
-        <h1>{product.name}</h1>
-        <p class="price" data-price>{hasVariants ? formatPrice(product.priceFrom) : formatPrice(only.unitAmount)}</p>
-        {product.description && <p class="desc">{product.description}</p>}
+      <!-- Buy column -->
+      <div class="buy">
+        {product.personalise && <p><span class="badge badge--lilac">Personalisable</span></p>}
+        <h1 class="t-page-title pdp__title">{product.name}</h1>
+        <p class="pdp__price" data-price>{formatPrice(first.unitAmount)}</p>
+        {product.description && <p class="pdp__desc">{product.description}</p>}
 
         <form id="add-form" novalidate>
           {hasVariants ? (
             <fieldset class="variants">
-              <legend>Choose an option</legend>
-              {product.variants.map((v: any, i: number) => (
-                <label class="variant">
-                  <input type="radio" name="priceId" value={v.id} data-amount={v.unitAmount} checked={i === 0} required />
-                  <span class="variant__label">{v.label}</span>
-                  <span class="variant__price">{formatPrice(v.unitAmount)}</span>
-                </label>
-              ))}
+              <legend>How many letters?</legend>
+              <div class="variants__row">
+                {product.variants.map((v: any, i: number) => (
+                  <label class="variant">
+                    <input type="radio" name="priceId" value={v.id} data-amount={v.unitAmount} checked={i === 0} class="visually-hidden" />
+                    <span class="variant__label">{v.label}</span>
+                    <span class="variant__price">{formatPrice(v.unitAmount)}</span>
+                  </label>
+                ))}
+              </div>
             </fieldset>
           ) : (
-            <input type="hidden" name="priceId" value={only.id} data-amount={only.unitAmount} />
+            <input type="hidden" name="priceId" value={first.id} data-amount={first.unitAmount} />
           )}
 
           {product.personalise && (
-            <div class="field personalise">
+            <div class="field" id="text-field">
               <label for="text">{product.personaliseLabel}</label>
               <input
                 class="input" id="text" name="text" type="text"
-                inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false"
+                autocomplete="off" autocapitalize="characters" spellcheck="false"
                 maxlength={PERSONALISATION_MAX} pattern={PERSONALISATION_PATTERN} required
-                placeholder="e.g. JAKE"
                 aria-describedby="text-hint text-error"
               />
-              <p class="hint" id="text-hint">
-                Letters and numbers only, up to {PERSONALISATION_MAX} characters. No spaces or punctuation.
-                We print exactly what you type — please check the spelling.
-              </p>
+              <p class="hint" id="text-hint"><span data-counter>0</span> of {PERSONALISATION_MAX} characters</p>
               <p class="error-text" id="text-error" role="alert" aria-live="polite"></p>
             </div>
           )}
 
-          <div class="field qty">
-            <label for="qty">How many?</label>
-            <input class="input" id="qty" name="qty" type="number" min="1" max="10" step="1" value="1" inputmode="numeric" />
+          <div class="buy__row">
+            <div class="stepper" role="group" aria-label="Quantity">
+              <button type="button" data-step="-1" aria-label="One fewer">−</button>
+              <input id="qty" name="qty" type="number" min="1" max="10" step="1" value="1" inputmode="numeric" aria-label="Quantity" />
+              <button type="button" data-step="1" aria-label="One more">+</button>
+            </div>
+            <button class="btn btn--primary buy__add" type="submit">Add to cart</button>
           </div>
 
-          <button class="btn btn--primary btn--block" type="submit">Add to basket</button>
-          <p class="error-text" id="form-error" role="alert" aria-live="polite"></p>
-          <p class="added notice notice--ok" role="status" hidden>
-            Added to your basket. <a href="/cart">Go to basket →</a>
+          <p class="error-text" id="form-error" role="alert" aria-live="assertive"></p>
+          <p class="notice notice--ok added" role="status" hidden>
+            <strong>Added to your basket.</strong>
+            <a href="/cart">Go to basket →</a>
           </p>
           <noscript><p class="notice notice--warn">Please turn JavaScript on to add things to your basket.</p></noscript>
         </form>
 
-        <p class="made">
-          <strong>Made to order.</strong> Allow 7 days. Collection from Great Sankey, Warrington —
-          we email you to arrange it once your order is ready.
-        </p>
+        <div class="notice made">
+          <strong>Made to order — allow 7 days</strong>
+          We print it once you've ordered, then message you when it's ready.
+          Collection from Great Sankey, Warrington. No delivery.
+        </div>
       </div>
     </div>
   </div>
@@ -101,20 +105,22 @@ const only = product.variants[0];
 
 <script>
   import { addLine } from '../../lib/cart.mjs';
-  import { validatePersonalisation } from '../../lib/validation.mjs';
+  import { validatePersonalisation, PERSONALISATION_MAX } from '../../lib/validation.mjs';
 
   const form = document.querySelector<HTMLFormElement>('#add-form');
   if (form) {
     const priceEl = document.querySelector<HTMLElement>('[data-price]');
+    const textField = form.querySelector<HTMLElement>('#text-field');
     const textInput = form.querySelector<HTMLInputElement>('#text');
     const textError = form.querySelector<HTMLElement>('#text-error');
+    const counter = form.querySelector<HTMLElement>('[data-counter]');
     const formError = form.querySelector<HTMLElement>('#form-error');
     const added = form.querySelector<HTMLElement>('.added');
+    const submit = form.querySelector<HTMLButtonElement>('.buy__add')!;
+    const qty = form.querySelector<HTMLInputElement>('#qty')!;
 
-    const money = (pence: number) =>
-      pence % 100 === 0 ? `£${pence / 100}` : `£${(pence / 100).toFixed(2)}`;
+    const money = (p: number) => (p % 100 === 0 ? `£${p / 100}` : `£${(p / 100).toFixed(2)}`);
 
-    // Keep the headline price in step with the chosen variant.
     for (const radio of form.querySelectorAll<HTMLInputElement>('input[name="priceId"]')) {
       radio.addEventListener('change', () => {
         const amount = Number(radio.dataset.amount);
@@ -122,21 +128,49 @@ const only = product.variants[0];
       });
     }
 
-    const showTextError = (msg: string) => {
+    // Quantity stepper. The − button greys out at 1, per the handoff.
+    const syncStepper = () => {
+      const n = Number(qty.value) || 1;
+      form.querySelector<HTMLButtonElement>('[data-step="-1"]')!.disabled = n <= 1;
+      form.querySelector<HTMLButtonElement>('[data-step="1"]')!.disabled = n >= 10;
+    };
+    for (const btn of form.querySelectorAll<HTMLButtonElement>('[data-step]')) {
+      btn.addEventListener('click', () => {
+        const next = (Number(qty.value) || 1) + Number(btn.dataset.step);
+        qty.value = String(Math.min(10, Math.max(1, next)));
+        syncStepper();
+      });
+    }
+    qty.addEventListener('change', syncStepper);
+    syncStepper();
+
+    // Add to cart stays disabled while a personalisable product has no valid name.
+    const setError = (msg: string) => {
       if (textError) textError.textContent = msg;
+      textField?.classList.toggle('is-error', Boolean(msg));
       textInput?.setAttribute('aria-invalid', msg ? 'true' : 'false');
+    };
+    const syncSubmit = () => {
+      if (!textInput) return;
+      submit.disabled = !validatePersonalisation(textInput.value).ok;
     };
 
     textInput?.addEventListener('input', () => {
-      // Strip as they type rather than scolding them after the fact.
-      const cleaned = textInput.value.replace(/[^A-Za-z0-9]/g, '').slice(0, 10);
-      if (cleaned !== textInput.value) {
-        textInput.value = cleaned;
-        showTextError('Letters and numbers only please — no spaces, punctuation or emoji.');
-      } else {
-        showTextError('');
-      }
+      const cleaned = textInput.value.replace(/[^A-Za-z0-9]/g, '').slice(0, PERSONALISATION_MAX);
+      const stripped = cleaned !== textInput.value;
+      textInput.value = cleaned;
+      if (counter) counter.textContent = String(cleaned.length);
+      // Live counter while typing; the full message only once they have tried
+      // something we cannot print.
+      setError(stripped ? 'Letters and numbers only, up to 10' : '');
+      syncSubmit();
     });
+    textInput?.addEventListener('blur', () => {
+      const check = validatePersonalisation(textInput.value);
+      setError(check.ok ? '' : 'Letters and numbers only, up to 10');
+      syncSubmit();
+    });
+    syncSubmit();
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -145,30 +179,23 @@ const only = product.variants[0];
 
       const data = new FormData(form);
       const priceId = String(data.get('priceId') ?? '');
-      const qty = Number(data.get('qty') ?? 1);
       const text = textInput ? String(data.get('text') ?? '') : '';
 
       if (textInput) {
         const check = validatePersonalisation(text);
-        if (!check.ok) {
-          showTextError(check.message);
-          textInput.focus();
-          return;
-        }
-        showTextError('');
+        if (!check.ok) { setError('Letters and numbers only, up to 10'); textInput.focus(); return; }
+        setError('');
       }
 
-      const result = addLine({ priceId, text, qty });
+      const result = addLine({ priceId, text, qty: Number(data.get('qty') ?? 1) });
       if (!result.ok) {
         if (formError) formError.textContent = result.message;
         return;
       }
       if (added) added.hidden = false;
-      added?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     });
   }
 
-  // Gallery thumbnails.
   const mainShot = document.querySelector<HTMLImageElement>('#main-shot');
   for (const btn of document.querySelectorAll<HTMLButtonElement>('.thumbs button')) {
     btn.addEventListener('click', () => {
@@ -179,38 +206,77 @@ const only = product.variants[0];
 </script>
 
 <style>
-  .crumbs { margin-bottom: var(--s-4); font-size: var(--fs-sm); }
-  .crumbs a { text-decoration: none; font-weight: 600; }
-  .layout { display: grid; gap: var(--s-6); align-items: start; }
-  @media (min-width: 50rem) { .layout { grid-template-columns: 1fr 1fr; gap: var(--s-7); } }
+  .pdp { padding-top: var(--sw-4); }
+  .crumb { font-weight: 600; font-size: 14px; color: var(--sw-ink-soft); margin-bottom: var(--sw-4); }
+  .pdp__grid { display: grid; gap: var(--sw-5); align-items: start; }
 
-  .shot { width: 100%; aspect-ratio: 1; object-fit: cover; background: var(--c-surface-alt); border-radius: var(--r-lg); border: 1px solid var(--c-line); }
-  .shot--none { display: grid; place-items: center; font-size: 3rem; opacity: 0.3; }
-  .thumbs { display: flex; gap: var(--s-2); list-style: none; padding: 0; margin: var(--s-3) 0 0; flex-wrap: wrap; }
-  .thumbs li { max-width: none; }
-  .thumbs button { padding: 0; border: 2px solid var(--c-line); border-radius: var(--r-md); background: none; cursor: pointer; overflow: hidden; line-height: 0; }
-  .thumbs button[aria-pressed='true'] { border-color: var(--c-brand); }
-  .thumbs img { width: 66px; height: 66px; object-fit: cover; }
+  /* Mobile: full-bleed square photo, then a horizontal thumbnail row. */
+  .gallery__main { aspect-ratio: 1; border-radius: var(--sw-r-lg); overflow: hidden; background: var(--sw-bg); }
+  .gallery__main img { width: 100%; height: 100%; object-fit: cover; }
+  .thumbs { display: flex; gap: var(--sw-2); list-style: none; margin: 0 0 var(--sw-3); padding: 0; overflow-x: auto; }
+  .thumbs li { flex: none; }
+  .thumbs button { padding: 0; border: 2px solid var(--sw-border); border-radius: 12px; background: none; cursor: pointer; overflow: hidden; line-height: 0; }
+  .thumbs button[aria-pressed='true'] { border-color: var(--sw-ink); }
+  .thumbs img { width: 56px; height: 56px; object-fit: cover; }
 
-  .price { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: 800; color: var(--c-brand-dark); }
-  .desc { color: var(--c-ink-soft); }
+  .buy { display: grid; gap: var(--sw-3); }
+  .pdp__title { margin-top: var(--sw-1); }
+  .pdp__price { font-weight: 800; font-size: 24px; color: var(--sw-accent); }
+  .pdp__desc { color: var(--sw-ink-soft); }
 
-  #add-form { display: grid; gap: var(--s-4); margin-top: var(--s-2); }
-  .variants { border: 0; padding: 0; margin: 0; display: grid; gap: var(--s-2); }
-  .variants legend { font-weight: 600; font-size: var(--fs-sm); padding: 0; margin-bottom: var(--s-2); }
+  #add-form { display: grid; gap: var(--sw-4); margin-top: var(--sw-2); }
+
+  /* --- Variant tiles -------------------------------------------------------- */
+  .variants { border: 0; padding: 0; margin: 0; }
+  .variants legend { font-weight: 800; font-size: 14px; padding: 0; margin-bottom: var(--sw-2); }
+  .variants__row { display: flex; flex-wrap: wrap; gap: var(--sw-2); }
   .variant {
-    display: flex; align-items: center; gap: var(--s-3);
-    padding: var(--s-3) var(--s-4); min-height: 52px;
-    border: 2px solid var(--c-line); border-radius: var(--r-md);
-    background: var(--c-surface); cursor: pointer;
+    display: grid; gap: 2px; cursor: pointer; text-align: center;
+    padding: 14px 22px; border-radius: 12px;
+    background: var(--sw-surface); border: 2px solid var(--sw-border);
   }
-  .variant:hover { border-color: var(--c-ink-soft); }
-  .variant:has(input:checked) { border-color: var(--c-brand); background: var(--c-brand-tint); }
-  .variant:has(input:focus-visible) { outline: 3px solid var(--c-accent); outline-offset: 2px; }
-  .variant input { accent-color: var(--c-brand); width: 1.15rem; height: 1.15rem; }
-  .variant__label { font-weight: 600; }
-  .variant__price { margin-left: auto; font-weight: 700; color: var(--c-brand-dark); }
+  .variant__label { font-weight: 800; font-size: 14px; }
+  .variant__price { font-weight: 600; font-size: 13px; color: var(--sw-ink-soft); }
+  .variant:has(input:checked) { background: var(--sw-ink); border-color: var(--sw-ink); color: var(--sw-surface); }
+  .variant:has(input:checked) .variant__price { color: var(--sw-surface); opacity: .75; }
+  .variant:has(input:focus-visible) { outline: 2px solid var(--sw-accent); outline-offset: 2px; }
 
-  .qty .input { max-width: 7rem; }
-  .made { font-size: var(--fs-sm); color: var(--c-ink-soft); border-top: 1px solid var(--c-line); padding-top: var(--s-4); }
+  /* --- Quantity stepper ------------------------------------------------------ */
+  .buy__row { display: flex; gap: var(--sw-3); align-items: stretch; }
+  .stepper {
+    display: flex; align-items: stretch; flex: none;
+    background: var(--sw-surface); border: 2px solid var(--sw-border);
+    border-radius: var(--sw-r-pill); overflow: hidden;
+  }
+  .stepper button {
+    width: 44px; border: 0; background: none; cursor: pointer;
+    font-size: 20px; font-weight: 800; line-height: 1; color: var(--sw-ink);
+  }
+  .stepper button:disabled { color: var(--sw-ink-soft); cursor: default; }
+  .stepper input {
+    width: 40px; border: 0; background: none; text-align: center;
+    font-weight: 800; -moz-appearance: textfield; appearance: textfield;
+  }
+  .stepper input::-webkit-outer-spin-button, .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .buy__add { flex: 1; }
+
+  .made { margin-top: var(--sw-2); }
+  .made strong { margin-bottom: var(--sw-1); }
+  .added a { font-weight: 800; }
+
+  /* --- Desktop --------------------------------------------------------------- */
+  @media (min-width: 900px) {
+    .pdp { padding-top: var(--sw-5); }
+    .pdp__grid { grid-template-columns: 1.1fr 1fr; gap: 56px; }
+    /* Two columns only when there is a thumbnail strip to fill the first one —
+       otherwise the main photo lands in the 80px column. */
+    .gallery:has(.thumbs) { display: grid; grid-template-columns: 80px 1fr; gap: var(--sw-3); align-items: start; }
+    .thumbs { flex-direction: column; margin: 0; overflow: visible; }
+    .thumbs img { width: 76px; height: 76px; }
+    .gallery__main { aspect-ratio: 4 / 5; }
+    .buy { gap: var(--sw-4); }
+    .pdp__price { font-size: 28px; }
+    .stepper button { width: 48px; }
+    .stepper input { height: 56px; }
+  }
 </style>

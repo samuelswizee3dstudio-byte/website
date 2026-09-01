@@ -5,66 +5,179 @@ import { getCatalogue } from '../lib/catalogue.mjs';
 import { getEntry, render } from 'astro:content';
 
 const products = await getCatalogue();
-const featured = (products.filter((p) => p.featured).length ? products.filter((p) => p.featured) : products).slice(0, 6);
+const featuredPool = products.filter((p) => p.featured);
+const featured = (featuredPool.length ? featuredPool : products).slice(0, 4);
+const heroShots = products.flatMap((p) => (p.images[0] ? [{ src: p.images[0], name: p.name }] : [])).slice(0, 2);
 
 const home = await getEntry('copy', 'home');
+const headlineLines = home!.data.title.split('\n');
 const { Content } = await render(home!);
 ---
 <Base title="home" description={home!.data.description}>
-  <section class="hero wrap">
-    <div class="hero__text stack">
-      <p class="badge">Made to order · Collection from Warrington</p>
-      <h1>{home!.data.title}</h1>
-      <div class="lede prose"><Content /></div>
-      <p class="cta">
-        <a class="btn btn--primary" href="/shop">See what we make</a>
-        <a class="btn btn--secondary" href="/about">How it works</a>
-      </p>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero__blobs" aria-hidden="true">
+      <div class="hero__blob hero__blob--sky"></div>
+      <div class="hero__blob hero__blob--pink"></div>
     </div>
-    <div class="hero__art" aria-hidden="true">
-      <img src="/images/hero.svg" alt="" width="520" height="420" />
+
+    <div class="wrap hero__grid">
+      <div class="hero__text">
+        <h1 class="t-headline">
+          {headlineLines.map((line: string, i: number) => (
+            <>{i > 0 && <br />}{line}</>
+          ))}
+        </h1>
+        <div class="lede prose"><Content /></div>
+        <p class="hero__cta">
+          <a class="btn btn--primary" href="/shop">Shop the fidgets <span aria-hidden="true">→</span></a>
+          <span class="doodle" aria-hidden="true">✦</span>
+        </p>
+      </div>
+
+      <div class="hero__shots">
+        {heroShots.length > 0
+          ? heroShots.map((shot, i) => (
+              <div class={`hero__shot hero__shot--${i + 1}`}>
+                <img src={shot.src} alt={shot.name} width="520" height="640" fetchpriority={i === 0 ? 'high' : undefined} />
+              </div>
+            ))
+          : [0, 1].map((i) => (
+              <div class={`hero__shot hero__shot--${i + 1}`}><span class="shot-placeholder">photo</span></div>
+            ))}
+      </div>
     </div>
   </section>
 
-  <section class="wrap section">
-    <div class="section__head">
-      <h2>Popular right now</h2>
-      <a href="/shop">See everything →</a>
+  <!-- New & awesome -->
+  <section class="wrap band">
+    <div class="band__head">
+      <h2 class="t-section">New &amp; awesome <span class="doodle" aria-hidden="true">✦</span></h2>
+      {products.length > featured.length && (
+        <a class="band__more" href="/shop">See all {products.length} <span aria-hidden="true">→</span></a>
+      )}
     </div>
     {featured.length === 0 ? (
       <p class="notice">Nothing in the shop just yet — check back very soon.</p>
     ) : (
       <ul class="grid-products">
-        {featured.map((p, i) => <ProductCard product={p} eager={i < 3} />)}
+        {featured.map((p, i) => <ProductCard product={p} eager={i < 2} />)}
       </ul>
     )}
   </section>
 
-  <section class="wrap section">
-    <ul class="steps">
-      <li><span aria-hidden="true">1</span><h3>Pick and pay</h3><p>Choose your item, type a name if it takes one, and pay securely.</p></li>
-      <li><span aria-hidden="true">2</span><h3>We print it</h3><p>Yours is printed specially for you. Allow 7 days.</p></li>
-      <li><span aria-hidden="true">3</span><h3>Collect it</h3><p>We email you and arrange collection from Great Sankey, Warrington.</p></li>
-    </ul>
+  <!-- Video tile + our story -->
+  <section class="wrap band tiles">
+    <a class="tile tile--video" href="/about">
+      <span class="badge badge--sky">See how it's made</span>
+      <span class="tile__play" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M8 5.5v13l11-6.5z" /></svg>
+      </span>
+      <span class="shot-placeholder">how it's made — video still</span>
+      <span class="visually-hidden">Watch how we print, on the about page</span>
+    </a>
+
+    <div class="tile tile--story">
+      <span class="badge badge--mint">Our story</span>
+      <h2 class="t-section story__head">A ten-year-old, a printer and a lot of test prints.</h2>
+      <p class="story__more"><a href="/about">Read it <span aria-hidden="true">→</span></a></p>
+    </div>
+  </section>
+
+  <!-- Instagram bar -->
+  <section class="wrap band">
+    <a class="iglink" href="https://www.instagram.com/swizee3dstudio" rel="me noopener" target="_blank">
+      <span>New prints go up on Instagram first — @swizee3dstudio</span>
+      <span class="iglink__arrow" aria-hidden="true">→</span>
+    </a>
   </section>
 </Base>
 
 <style>
-  .hero { display: grid; gap: var(--s-6); align-items: center; padding-block: var(--s-5) var(--s-7); }
-  @media (min-width: 52rem) { .hero { grid-template-columns: 1.1fr 1fr; } }
-  .lede p { font-size: var(--fs-lg); color: var(--c-ink-soft); }
-  .cta { display: flex; gap: var(--s-3); flex-wrap: wrap; max-width: none; }
-  .hero__art img { width: 100%; }
-  .section { padding-block: var(--s-6); }
-  .section__head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-4); margin-bottom: var(--s-5); }
-  .section__head a { font-weight: 700; text-decoration: none; white-space: nowrap; }
-  .steps { display: grid; gap: var(--s-5); list-style: none; margin: 0; padding: 0; }
-  @media (min-width: 42rem) { .steps { grid-template-columns: repeat(3, 1fr); } }
-  .steps li { background: var(--c-surface-alt); border-radius: var(--r-lg); padding: var(--s-5); max-width: none; }
-  .steps span {
-    display: grid; place-items: center; width: 2.25rem; height: 2.25rem;
-    background: var(--c-brand); color: #fff; border-radius: var(--r-pill);
-    font-family: var(--font-display); font-weight: 800; margin-bottom: var(--s-3);
+  /* --- Hero ---------------------------------------------------------------- */
+  /* No overflow clipping here: in the design the blobs run up behind the nav and
+     off the left edge. body{overflow-x:clip} stops that causing a sideways
+     scrollbar, and z-index:-1 keeps them under the nav pill. */
+  .hero { position: relative; padding-block: var(--sw-6) var(--sw-7); }
+  /* Blob geometry is copied from the design file. The layer is clamped to the
+     1280 frame the design was drawn in, so the blobs keep their relationship to
+     the content instead of drifting to the corners on a wide screen. */
+  .hero__blobs {
+    position: absolute; top: -96px; right: 0; bottom: 0; left: 0; z-index: -1;
+    max-width: var(--sw-wrap); margin-inline: auto; pointer-events: none;
   }
-  .steps p { color: var(--c-ink-soft); font-size: var(--fs-sm); margin-top: var(--s-2); }
+  .hero__blob { position: absolute; }
+  .hero__blob--sky {
+    background: var(--sw-sky); opacity: .75;
+    top: -40px; right: -60px; width: 220px; height: 200px;
+    border-radius: 60% 40% 55% 45% / 50% 60% 40% 50%;
+  }
+  .hero__blob--pink {
+    background: var(--sw-pink); opacity: .8;
+    bottom: 20px; left: -70px; width: 180px; height: 160px;
+    border-radius: 55% 45% 40% 60% / 45% 55% 45% 55%;
+  }
+  .hero__grid { position: relative; display: grid; gap: var(--sw-5); }
+  .hero__text { display: grid; gap: var(--sw-4); }
+  .hero__cta { display: flex; align-items: center; gap: var(--sw-3); margin-top: var(--sw-2); }
+  .hero__cta .doodle { font-size: 20px; vertical-align: 0; }
+
+  .hero__shots { display: grid; grid-template-columns: 6fr 4fr; gap: var(--sw-3); align-items: start; }
+  .hero__shot {
+    border-radius: 20px; overflow: hidden; background: var(--sw-bg);
+    box-shadow: var(--sw-shadow-card); aspect-ratio: 4 / 5;
+  }
+  .hero__shot img { width: 100%; height: 100%; object-fit: cover; }
+  .hero__shot--2 { margin-top: var(--sw-5); }
+
+  @media (min-width: 900px) {
+    .hero { padding-block: var(--sw-8) var(--sw-9); }
+    .hero__blobs { top: -116px; }
+    .hero__grid { grid-template-columns: 1fr 1fr; gap: var(--sw-7); align-items: center; }
+    .hero__blob--sky { opacity: .7; top: -60px; right: 120px; width: 420px; height: 380px; }
+    .hero__blob--pink { bottom: -80px; left: -120px; width: 360px; height: 320px; }
+    .hero__shot { border-radius: 28px; }
+    .hero__shot--2 { margin-top: 40px; }
+  }
+
+  /* --- Bands --------------------------------------------------------------- */
+  .band { margin-top: var(--sw-8); }
+  .band__head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sw-4); margin-bottom: var(--sw-4); }
+  .band__more { font-weight: 800; font-size: 14px; white-space: nowrap; }
+
+  /* --- Video + story tiles -------------------------------------------------- */
+  .tiles { display: grid; gap: var(--sw-4); }
+  @media (min-width: 900px) { .tiles { grid-template-columns: 1.15fr 1fr; gap: var(--sw-5); } }
+
+  .tile { position: relative; border-radius: var(--sw-r-lg); overflow: hidden; }
+  .tile .badge { position: absolute; top: var(--sw-4); left: var(--sw-4); z-index: 2; }
+
+  .tile--video { display: block; aspect-ratio: 16 / 10; background: var(--sw-bg); }
+  @media (min-width: 900px) { .tile--video { aspect-ratio: 16 / 9; } }
+  .tile__play {
+    position: absolute; inset: 0; margin: auto; z-index: 2;
+    width: 64px; height: 64px; border-radius: 50%;
+    background: var(--sw-surface); color: var(--sw-ink);
+    display: grid; place-items: center; box-shadow: var(--sw-shadow-card);
+  }
+  .tile--video:hover .tile__play { background: var(--sw-accent); color: var(--sw-accent-ink); }
+
+  .tile--story {
+    background: var(--sw-surface); box-shadow: var(--sw-shadow-card);
+    padding: var(--sw-5); padding-top: var(--sw-8);
+    display: grid; align-content: center; gap: var(--sw-3);
+  }
+  .story__head { text-transform: none; font-family: var(--sw-font-body); font-weight: 800; line-height: 1.2; }
+  .story__more a { font-weight: 800; font-size: 15px; }
+
+  /* --- Instagram bar -------------------------------------------------------- */
+  .iglink {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--sw-4);
+    background: var(--sw-ink); color: var(--sw-surface);
+    border-radius: var(--sw-r-lg); padding: var(--sw-5);
+    font-weight: 800; font-size: 15px;
+  }
+  .iglink:hover { color: var(--sw-surface); }
+  .iglink__arrow { color: var(--sw-pink); font-size: 22px; }
+  @media (min-width: 900px) { .iglink { padding: var(--sw-5) var(--sw-6); font-size: 18px; } }
 </style>

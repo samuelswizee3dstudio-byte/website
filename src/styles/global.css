@@ -1,124 +1,211 @@
 @import './tokens.css';
 
+/* ---------------------------------------------------------------------------
+   Swizee 3D Studio — global styles, built from the Claude Design handoff.
+   Single breakpoint at 900px between the mobile and desktop layouts, as the
+   handoff specifies. Grids flex 2 -> 3 -> 4 columns in between.
+   --------------------------------------------------------------------------- */
+
 *, *::before, *::after { box-sizing: border-box; }
 * { margin: 0; }
 
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
 
 body {
-  font-family: var(--font-body);
-  font-size: var(--fs-md);
+  font-family: var(--sw-font-body);
+  font-size: var(--sw-text-body);
   line-height: 1.6;
-  color: var(--c-ink);
-  background: var(--c-bg);
+  color: var(--sw-ink);
+  background: var(--sw-bg);
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
   -webkit-font-smoothing: antialiased;
+  /* Decorative hero blobs deliberately overflow the left edge. `clip` hides the
+     overflow without turning body into a scroll container the way `hidden` does. */
+  overflow-x: clip;
 }
 
-img, picture, svg, video { display: block; max-width: 100%; height: auto; }
+img, picture, svg, video, iframe { display: block; max-width: 100%; }
+img, video { height: auto; }
 input, button, textarea, select { font: inherit; color: inherit; }
 
-h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; font-weight: 700; letter-spacing: -0.01em; }
-h1 { font-size: var(--fs-2xl); }
-h2 { font-size: var(--fs-xl); }
-h3 { font-size: var(--fs-lg); }
-p, li { max-width: 62ch; }
+h1, h2, h3 { font-family: var(--sw-font-display); font-weight: 400; text-transform: uppercase; line-height: .92; letter-spacing: -.01em; }
 
-a { color: var(--c-brand-dark); text-underline-offset: 3px; }
-a:hover { color: var(--c-ink); }
+a { color: var(--sw-accent); text-decoration: none; }
+a:hover { color: var(--sw-ink); }
 
-:where(a, button, input, textarea, select, [tabindex]):focus-visible {
-  outline: 3px solid var(--c-accent);
+/* The handoff asks for a 2px accent outline at 2px offset on everything. */
+:where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--sw-accent);
   outline-offset: 2px;
-  border-radius: var(--r-sm);
+  border-radius: var(--sw-r-sm);
 }
 
-.wrap { width: 100%; max-width: var(--wrap); margin-inline: auto; padding-inline: var(--s-4); }
-.wrap--narrow { max-width: var(--wrap-narrow); }
-.stack > * + * { margin-top: var(--s-4); }
+main { flex: 1; }
+
+.wrap { width: 100%; max-width: var(--sw-wrap); margin-inline: auto; padding-inline: var(--sw-gutter); }
+/* The desktop nav is a floating pill, so text pages need room to clear it.
+   Home, shop and the product page set their own top spacing. */
+.wrap--narrow { max-width: 720px; padding-top: var(--sw-6); }
+@media (min-width: 900px) { .wrap--narrow { padding-top: var(--sw-7); } }
+
+/* Vertical rhythm helper used by the copy and checkout pages. */
+.stack > * + * { margin-top: var(--sw-4); }
+
 .visually-hidden {
   position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden;
   clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
 .skip-link {
-  position: absolute; left: var(--s-4); top: -4rem; z-index: 100;
-  background: var(--c-ink); color: #fff; padding: var(--s-3) var(--s-4);
-  border-radius: var(--r-sm); text-decoration: none; transition: top 0.15s;
+  position: absolute; left: var(--sw-4); top: -4rem; z-index: 100;
+  background: var(--sw-ink); color: #fff; padding: var(--sw-3) var(--sw-4);
+  border-radius: var(--sw-r-sm); font-weight: 800; transition: top .15s;
 }
-.skip-link:focus { top: var(--s-4); color: #fff; }
+.skip-link:focus { top: var(--sw-4); color: #fff; }
 
-main { flex: 1; padding-block: var(--s-6) var(--s-8); }
+/* --- Type roles ------------------------------------------------------------ */
+.t-headline { font-family: var(--sw-font-display); font-weight: 400; text-transform: uppercase; line-height: .92; letter-spacing: -.01em; font-size: var(--sw-text-headline-m); }
+.t-page-title { font-family: var(--sw-font-display); font-weight: 400; text-transform: uppercase; line-height: .92; letter-spacing: -.01em; font-size: 40px; }
+.t-section { font-family: var(--sw-font-display); font-weight: 400; text-transform: uppercase; line-height: 1; font-size: 24px; }
+.t-small { font-size: var(--sw-text-small); font-weight: 600; }
+@media (min-width: 900px) {
+  .t-headline { font-size: var(--sw-text-headline); }
+  .t-page-title { font-size: 64px; }
+  .t-section { font-size: var(--sw-text-section); }
+}
 
-/* --- Buttons --------------------------------------------------------------- */
+.lede { font-size: var(--sw-text-body); color: var(--sw-ink-soft); max-width: 46ch; }
+@media (min-width: 900px) { .lede { font-size: 18px; } }
+
+/* A small sparkle used beside section titles and the hero button. */
+.doodle { color: var(--sw-accent); font-size: .7em; vertical-align: .35em; }
+
+/* --- Buttons: all pill, Nunito 800 ----------------------------------------- */
 .btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2);
-  padding: var(--s-3) var(--s-5);
-  min-height: 48px; /* thumb target — most traffic is a parent's phone */
-  border: 2px solid transparent; border-radius: var(--r-pill);
-  font-family: var(--font-display); font-weight: 700; font-size: var(--fs-md);
-  text-decoration: none; cursor: pointer;
-  transition: transform 0.1s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sw-2);
+  font-family: var(--sw-font-body); font-weight: 800; font-size: 15px;
+  border: 2px solid transparent; border-radius: var(--sw-r-pill);
+  cursor: pointer; text-align: center;
+  min-height: 44px; /* handoff minimum touch target */
+  transition: background-color .15s ease, transform .15s ease, box-shadow .15s ease;
 }
-.btn:active { transform: translateY(1px); }
-.btn[disabled], .btn[aria-disabled='true'] { opacity: 0.55; cursor: not-allowed; transform: none; }
-.btn--primary { background: var(--c-brand); color: #fff; box-shadow: var(--shadow-sm); }
-.btn--primary:hover:not([disabled]) { background: var(--c-brand-dark); color: #fff; }
-.btn--secondary { background: var(--c-surface); color: var(--c-ink); border-color: var(--c-line); }
-.btn--secondary:hover { border-color: var(--c-ink); color: var(--c-ink); }
-.btn--ghost { background: transparent; color: var(--c-ink-soft); padding-inline: var(--s-3); min-height: 40px; }
-.btn--ghost:hover { color: var(--c-error); }
+.btn--primary {
+  background: var(--sw-accent); color: var(--sw-accent-ink);
+  padding: 15px 26px; box-shadow: var(--sw-shadow-accent);
+}
+.btn--primary:hover { background: var(--sw-accent-hover); color: var(--sw-accent-ink); }
+.btn--secondary {
+  background: transparent; border-color: var(--sw-ink); color: var(--sw-ink);
+  padding: 14px 26px;
+}
+.btn--secondary:hover { background: var(--sw-ink); color: var(--sw-surface); }
 .btn--block { width: 100%; }
-
-/* --- Cards and grid -------------------------------------------------------- */
-.card {
-  background: var(--c-surface); border: 1px solid var(--c-line);
-  border-radius: var(--r-lg); overflow: hidden;
+/* Quiet destructive action — "Remove" in the basket. */
+.btn--ghost {
+  background: transparent; color: var(--sw-ink-soft);
+  padding: var(--sw-2) var(--sw-3); min-height: 40px;
+  font-size: 14px; text-decoration: underline; text-underline-offset: 3px;
 }
-.grid-products {
-  display: grid; gap: var(--s-5);
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
-  padding: 0; list-style: none; margin: 0;
+.btn--ghost:hover { color: var(--sw-error); background: transparent; }
+.btn[disabled], .btn[aria-disabled='true'] {
+  background: var(--sw-disabled); color: var(--sw-disabled-ink);
+  border-color: transparent; box-shadow: none; pointer-events: none;
 }
-.grid-products li { max-width: none; }
-
-/* --- Forms ----------------------------------------------------------------- */
-.field { display: flex; flex-direction: column; gap: var(--s-2); }
-.field label { font-weight: 600; font-size: var(--fs-sm); }
-.field .hint { font-size: var(--fs-xs); color: var(--c-ink-soft); max-width: none; }
-.input, .textarea, .select {
-  width: 100%; padding: var(--s-3); min-height: 48px;
-  background: var(--c-surface);
-  border: 2px solid var(--c-line); border-radius: var(--r-md);
+@media (min-width: 900px) {
+  .btn { font-size: 16px; }
+  .btn--primary { padding: 18px 32px; }
 }
-.input:focus, .textarea:focus, .select:focus { border-color: var(--c-accent); }
-.input[aria-invalid='true'], .textarea[aria-invalid='true'] { border-color: var(--c-error); }
-.textarea { min-height: 8rem; resize: vertical; }
-.error-text { color: var(--c-error); font-size: var(--fs-sm); font-weight: 600; max-width: none; }
-.error-text:empty { display: none; }
 
-.notice {
-  padding: var(--s-4); border-radius: var(--r-md); border: 1px solid var(--c-line);
-  background: var(--c-surface-alt); font-size: var(--fs-sm);
+/* --- Product card ---------------------------------------------------------- */
+.grid-products { display: grid; gap: 14px; list-style: none; margin: 0; padding: 0; grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 600px) { .grid-products { grid-template-columns: repeat(3, 1fr); gap: var(--sw-5); } }
+@media (min-width: 900px) { .grid-products { grid-template-columns: repeat(4, 1fr); gap: var(--sw-5); } }
+
+.pcard {
+  position: relative; background: var(--sw-surface);
+  border-radius: var(--sw-r-md); padding: 10px; box-shadow: var(--sw-shadow-card);
+  transition: transform .15s ease-out, box-shadow .15s ease-out;
 }
-.notice p { max-width: none; }
-.notice--error { background: var(--c-error-bg); border-color: var(--c-error); color: var(--c-error); }
-.notice--ok { background: var(--c-ok-bg); border-color: var(--c-ok); color: var(--c-ok); }
-.notice--warn { background: var(--c-warn-bg); border-color: var(--c-warn-line); color: var(--c-ink); }
+.pcard:hover { transform: translateY(-2px); box-shadow: var(--sw-shadow-card-hover); }
+.pcard > a { display: block; color: inherit; }
+.pcard__shot { aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: var(--sw-bg); }
+.pcard__shot img { width: 100%; height: 100%; object-fit: cover; }
+.pcard__title { font-family: var(--sw-font-body); font-weight: 800; font-size: 15px; line-height: 1.25; text-transform: none; letter-spacing: 0; margin-top: 10px; }
+.pcard__price { font-weight: 600; font-size: var(--sw-text-small); color: var(--sw-accent); margin-top: 2px; }
+@media (min-width: 900px) {
+  .pcard { padding: var(--sw-3); }
+  .pcard__title { font-size: var(--sw-text-card); }
+  .pcard__price { font-size: 15px; }
+}
 
+/* --- Badges ---------------------------------------------------------------- */
 .badge {
-  display: inline-block; padding: var(--s-1) var(--s-3);
-  background: var(--c-brand-tint); color: var(--c-brand-dark);
-  border-radius: var(--r-pill); font-size: var(--fs-xs); font-weight: 700;
+  display: inline-block; border-radius: var(--sw-r-pill);
+  padding: 6px 10px; font-weight: 800; font-size: 10px;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--sw-ink);
+}
+@media (min-width: 900px) { .badge { font-size: 11px; } }
+.badge--lilac { background: var(--sw-lilac); }
+.badge--sky { background: var(--sw-sky); }
+.badge--mint { background: var(--sw-mint); }
+
+/* Inset 8px from the card's padding box, per the handoff. */
+.pcard .badge { position: absolute; top: 16px; left: 16px; z-index: 1; }
+@media (min-width: 900px) { .pcard .badge { top: 20px; left: 20px; } }
+
+/* --- Photo placeholder ------------------------------------------------------
+   Used only where no real photo exists yet. The handoff is explicit that these
+   must not ship — check-placeholders.mjs is the backstop for the copy, and a
+   product with no Stripe photo is the only way one appears here. */
+.shot-placeholder {
+  display: grid; place-items: center; height: 100%; width: 100%;
+  background: var(--sw-placeholder);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px; color: var(--sw-mono-ink); text-align: center; padding: var(--sw-2);
 }
 
-/* Markdown copy pages */
-.prose > * + * { margin-top: var(--s-4); }
-.prose h2 { margin-top: var(--s-6); }
-.prose ul, .prose ol { padding-left: var(--s-5); }
-.prose li + li { margin-top: var(--s-2); }
+/* --- Form fields ----------------------------------------------------------- */
+.field { display: grid; gap: var(--sw-2); }
+.field > label { font-weight: 800; font-size: 14px; }
+.input, .textarea {
+  width: 100%; background: var(--sw-surface);
+  border: 2px solid var(--sw-border); border-radius: 12px;
+  padding: 14px 16px; font-size: 16px; font-weight: 400;
+}
+.input:focus, .textarea:focus { border-color: var(--sw-accent); outline-offset: 2px; }
+.textarea { min-height: 9rem; resize: vertical; }
+.field .hint { font-weight: 600; font-size: var(--sw-text-small); color: var(--sw-ink-soft); }
+.field.is-error .input, .field.is-error .textarea { border-color: var(--sw-error); }
+.error-text { font-weight: 700; font-size: var(--sw-text-small); color: var(--sw-error); }
+.error-text:empty { display: none; }
+@media (min-width: 900px) {
+  .field > label { font-size: 15px; }
+  .input, .textarea { border-radius: 14px; font-size: 17px; }
+}
+
+/* --- Notices --------------------------------------------------------------- */
+.notice {
+  background: var(--sw-surface); border: 1px solid var(--sw-border);
+  border-radius: 20px; padding: var(--sw-4); font-size: 15px;
+}
+.notice--error { border-color: var(--sw-error); color: var(--sw-error); font-weight: 700; }
+.notice--ok { border-color: var(--sw-mint); }
+.notice--warn { border-color: var(--sw-accent); }
+.notice strong { display: block; }
+
+/* --- Prose (markdown copy pages) ------------------------------------------- */
+.prose > * + * { margin-top: var(--sw-4); }
+.prose h2 { margin-top: var(--sw-6); }
+.prose ul, .prose ol { padding-left: var(--sw-5); }
+.prose li + li { margin-top: var(--sw-2); }
+.prose p, .prose li { max-width: 62ch; }
+.prose blockquote {
+  border-left: 4px solid var(--sw-accent); background: var(--sw-surface);
+  padding: var(--sw-3) var(--sw-4); border-radius: var(--sw-r-sm);
+}
+.prose code { background: var(--sw-surface); border: 1px solid var(--sw-border); padding: .1em .35em; border-radius: 6px; font-size: .9em; }

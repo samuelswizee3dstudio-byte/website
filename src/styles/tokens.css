@@ -1,54 +1,38 @@
 /* ---------------------------------------------------------------------------
-   DESIGN TOKENS — this is the file to replace when the Claude Design export
-   arrives. Every colour, font, radius and space used anywhere on the site comes
-   from here. Nothing else should contain a raw hex value.
-   Placeholder palette below: friendly, high-contrast, axolotl pink + deep ink.
+   DESIGN TOKENS — from the Claude Design handoff (design_handoff_swizee).
+   Copied verbatim from the :root block of `Swizee Design.dc.html`.
+   Nothing else in the codebase should contain a raw hex value.
    --------------------------------------------------------------------------- */
 :root {
-  /* Brand */
-  --c-brand:        #ff5fa2;
-  --c-brand-dark:   #d63d80;
-  --c-brand-tint:   #ffe9f2;
-  --c-accent:       #00c2b2;
-  --c-accent-dark:  #009e91;
+  /* colour */
+  --sw-bg:#FAF4EC; --sw-surface:#FFFFFF; --sw-ink:#16130F; --sw-ink-soft:#5C554C;
+  --sw-accent:#EF6122; --sw-accent-ink:#FFFFFF;
+  --sw-pink:#F6BFCB; --sw-sky:#A9DCE8; --sw-mint:#7FC98B; --sw-lilac:#C3B2E8;
+  --sw-border:#E7DED0; --sw-disabled:#DED6C9; --sw-error:#C2321B;
+  /* type */
+  --sw-font-display:"Anton",Impact,sans-serif; --sw-font-body:"Nunito",system-ui,sans-serif;
+  --sw-text-headline:76px; --sw-text-headline-m:44px; --sw-text-section:28px;
+  --sw-text-card:17px; --sw-text-body:16px; --sw-text-small:13px;
+  /* space */
+  --sw-1:4px; --sw-2:8px; --sw-3:12px; --sw-4:16px; --sw-5:24px; --sw-6:32px; --sw-7:48px; --sw-8:64px; --sw-9:96px;
+  /* radius + shadow */
+  --sw-r-sm:8px; --sw-r-md:16px; --sw-r-lg:24px; --sw-r-pill:999px;
+  --sw-shadow-sm:0 1px 2px rgba(22,19,15,.06);
+  --sw-shadow-card:0 6px 20px rgba(22,19,15,.08);
 
-  /* Ink and ground */
-  --c-ink:          #191527;
-  --c-ink-soft:     #56506b;
-  --c-ink-faint:    #8a83a0;
-  --c-bg:           #fffdfb;
-  --c-surface:      #ffffff;
-  --c-surface-alt:  #f6f2f8;
-  --c-line:         #e6e0ee;
+  /* --- Derived values the handoff specifies in prose rather than as tokens --- */
+  --sw-accent-hover:#D8501A;
+  --sw-disabled-ink:#8A8073;
+  --sw-mono-ink:#8A8073;
+  --sw-shadow-accent:0 6px 20px rgba(239,97,34,.28);
+  --sw-shadow-card-hover:0 10px 28px rgba(22,19,15,.12);
+  --sw-placeholder:repeating-linear-gradient(135deg,#EDE2D2 0 8px,#F7F0E4 8px 16px);
 
-  /* Feedback */
-  --c-error:        #c02c3c;
-  --c-error-bg:     #fdecee;
-  --c-ok:           #17794a;
-  --c-ok-bg:        #e7f6ee;
-  --c-warn-bg:      #fff4d6;
-  --c-warn-line:    #e0b83a;
+  /* Page gutters: 20px mobile, 40px desktop. */
+  --sw-gutter:20px;
+  --sw-wrap:1280px;
+}
 
-  /* Type */
-  --font-display: 'Baloo 2', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
-  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-
-  --fs-xs: 0.8125rem;
-  --fs-sm: 0.9375rem;
-  --fs-md: 1.0625rem;
-  --fs-lg: 1.25rem;
-  --fs-xl: clamp(1.5rem, 1.1rem + 1.8vw, 2rem);
-  --fs-2xl: clamp(2rem, 1.4rem + 3vw, 3rem);
-
-  /* Space */
-  --s-1: 0.25rem;  --s-2: 0.5rem;   --s-3: 0.75rem;  --s-4: 1rem;
-  --s-5: 1.5rem;   --s-6: 2rem;     --s-7: 3rem;     --s-8: 4rem;
-
-  /* Shape */
-  --r-sm: 8px;  --r-md: 14px;  --r-lg: 22px;  --r-pill: 999px;
-  --shadow-sm: 0 1px 2px rgb(25 21 39 / 0.06), 0 2px 8px rgb(25 21 39 / 0.05);
-  --shadow-md: 0 4px 14px rgb(25 21 39 / 0.10);
-
-  --wrap: 1120px;
-  --wrap-narrow: 46rem;
+@media (min-width: 900px) {
+  :root { --sw-gutter:40px; }
 }

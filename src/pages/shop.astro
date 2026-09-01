@@ -3,81 +3,42 @@ import Base from '../layouts/Base.astro';
 import ProductCard from '../components/ProductCard.astro';
 import { getCatalogue } from '../lib/catalogue.mjs';
 
+// The design handoff is explicit: a plain grid, no filters and no search.
+// `category` metadata is still read by the catalogue and is available if a
+// future brief wants grouping back.
 const products = await getCatalogue();
-
-// Categories come from Stripe product metadata, so adding a new one in the
-// Dashboard adds a filter here with no code change.
-const categories = [...new Set(products.map((p) => p.category).filter(Boolean))].sort();
-const labelFor = (slug: string) => slug.replace(/-/g, ' ').replace(/^./, (c) => c.toUpperCase());
+const count = products.length;
 ---
-<Base title="Shop" description="Every 3D printed axolotl, fidget toy and personalised name item we make. Made to order, collection from Warrington.">
-  <div class="wrap stack">
-    <header class="head">
-      <h1>Shop</h1>
-      <p>Everything is printed to order — allow 7 days. Collection only, from Great Sankey in Warrington.</p>
+<Base title="Shop" description="Everything we print — fidgets, axolotls and personalised name items. Made to order in Warrington, collection only.">
+  <div class="wrap shop">
+    <header class="shop__head">
+      <h1 class="t-page-title">Everything<br />we print</h1>
+      <p class="lede">
+        {count > 0 ? `${count} ${count === 1 ? 'thing' : 'things'}, all under £10, all made after you order.` : 'New things are on the way.'}
+      </p>
+      {count > 0 && <p class="shop__count">{count} {count === 1 ? 'product' : 'products'}</p>}
     </header>
 
-    {categories.length > 1 && (
-      <div class="filters" role="group" aria-label="Filter by type">
-        <button class="chip is-on" type="button" data-filter="all" aria-pressed="true">Everything</button>
-        {categories.map((c) => (
-          <button class="chip" type="button" data-filter={c} aria-pressed="false">{labelFor(c!)}</button>
-        ))}
-      </div>
-    )}
-
-    {products.length === 0 ? (
-      <p class="notice">The shop is empty right now. New things are on the way — follow
-        <a href="https://www.instagram.com/swizee3dstudio" rel="noopener" target="_blank">@swizee3dstudio</a> for updates.</p>
+    {count === 0 ? (
+      <p class="notice">
+        The shop is empty right now. New things are on the way — follow
+        <a href="https://www.instagram.com/swizee3dstudio" rel="noopener" target="_blank">@swizee3dstudio</a> for updates.
+      </p>
     ) : (
-      <>
-        <ul class="grid-products" id="grid">
-          {products.map((p, i) => (
-            <div data-category={p.category ?? ''} style="display: contents">
-              <ProductCard product={p} eager={i < 4} />
-            </div>
-          ))}
-        </ul>
-        <p class="empty notice" hidden>Nothing in that group yet.</p>
-      </>
+      <ul class="grid-products">
+        {products.map((p, i) => <ProductCard product={p} eager={i < 4} />)}
+      </ul>
     )}
   </div>
 </Base>
 
-<script>
-  const chips = document.querySelectorAll<HTMLButtonElement>('.chip');
-  const items = document.querySelectorAll<HTMLElement>('[data-category]');
-  const empty = document.querySelector<HTMLElement>('.empty');
-
-  for (const chip of chips) {
-    chip.addEventListener('click', () => {
-      const want = chip.dataset.filter;
-      for (const c of chips) {
-        const on = c === chip;
-        c.classList.toggle('is-on', on);
-        c.setAttribute('aria-pressed', String(on));
-      }
-      let shown = 0;
-      for (const item of items) {
-        const show = want === 'all' || item.dataset.category === want;
-        // The wrapper is display:contents, so hide the card inside it.
-        const card = item.firstElementChild as HTMLElement | null;
-        if (card) card.hidden = !show;
-        if (show) shown++;
-      }
-      if (empty) empty.hidden = shown > 0;
-    });
-  }
-</script>
-
 <style>
-  .head p { color: var(--c-ink-soft); }
-  .filters { display: flex; gap: var(--s-2); flex-wrap: wrap; }
-  .chip {
-    padding: var(--s-2) var(--s-4); min-height: 40px;
-    background: var(--c-surface); border: 2px solid var(--c-line);
-    border-radius: var(--r-pill); font-weight: 600; font-size: var(--fs-sm); cursor: pointer;
+  .shop { padding-top: var(--sw-6); }
+  .shop__head { position: relative; margin-bottom: var(--sw-5); display: grid; gap: var(--sw-3); }
+  .shop__count { font-weight: 600; font-size: 14px; color: var(--sw-ink-soft); }
+  @media (min-width: 900px) {
+    .shop { padding-top: var(--sw-8); }
+    .shop__head { margin-bottom: var(--sw-6); }
+    .shop__count { position: absolute; right: 0; bottom: 0; }
   }
-  .chip:hover { border-color: var(--c-ink-soft); }
-  .chip.is-on { background: var(--c-ink); border-color: var(--c-ink); color: #fff; }
 </style>
