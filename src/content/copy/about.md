@@ -10,9 +10,12 @@ videos:
     title: "Printing a lizard"
 ---
 
-Swizee 3D Studio is a small 3D printing business run from home in Great Sankey,
-Warrington. Every single thing on this site is printed to order on our own
-printers — nothing sits in a box waiting.
+Swizee 3D Studio is Samuel, who is ten, and his mum Rebecca. We run it from home
+in Great Sankey, Warrington. Samuel picks what to make and does the printing;
+Rebecca handles the orders and the boring bits.
+
+Every single thing on this site is printed to order on our own printers —
+nothing sits in a box waiting.
 
 We mostly make three things: articulated axolotls that actually wiggle, fidget
 toys that are quiet enough for a classroom, and name items where you tell us the
