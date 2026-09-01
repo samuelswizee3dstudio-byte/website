@@ -1,289 +1,118 @@
-# Setting up hosting, payments and the domain
+# Setup: what is done, and what still needs you
 
-One-time setup, for Paul. Work top to bottom — each part assumes the one above is
-done. Roughly 45 minutes end to end, most of it waiting for DNS.
-
-Everything the site needs is already in the repo. Nothing here requires editing
-code.
+Live at **https://swizee.co.uk**. This file tracks the remaining human steps.
+Technical reference is in [README.md](README.md); the family's guide is
+[HOWTO.md](HOWTO.md).
 
 ---
 
-## Part 0 — Hand me the Stripe key (2 min)
+## Done
 
-**Do not paste the key into the chat.** Put it in a file I can read but git
-cannot commit. In a terminal:
+| | |
+|---|---|
+| GitHub | `samuelswizee3dstudio-byte/website`, public, deploys on push |
+| Netlify | project `swizee`, free tier, public, building from GitHub |
+| Domain | `swizee.co.uk` live over HTTPS, `www` redirects to the apex |
+| DNS | A `@` → `75.2.60.5`, CNAME `www` → `swizee.netlify.app`, at IONOS |
+| Contact form | detected, notifications emailing Paul, honeypot verified against a real spam submission |
+| Build hook | "Stripe product change" |
+| Stripe webhook | `product.*` and `price.*` → the build hook, so Dashboard edits go live on their own |
+| Env vars | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NETLIFY_BUILD_HOOK_URL`, `ALLOW_PLACEHOLDERS` |
+| Catalogue | 5 products in Stripe **test mode** with real photos and real prices |
 
-```bash
-cp .env.example .env && open -e .env
-```
+### Why DNS stayed at IONOS
 
-Replace `sk_test_replace_me` with your sandbox secret key from
-**Stripe → Developers → API keys → Secret key**, save, close.
-
-`.env` is in `.gitignore`, so it can never reach GitHub. Tell me when it is
-saved and I will build the real catalogue and create the sample products.
-
-> Stripe's Claude plugin (`/plugin install stripe@claude-plugins-official`) is
-> optional. The site uses the official Stripe SDK directly and does not need it.
-
----
-
-## Part 1 — Netlify account and first deploy (10 min)
-
-### 1.1 Create the account
-
-Go to [app.netlify.com/signup](https://app.netlify.com/signup) and sign up.
-**Choose "Sign up with GitHub"** and authorise the Swizee GitHub account — that
-way Netlify can see the repo without any extra steps.
-
-Stay on the **Free** plan. Skip any team/upgrade prompts.
-
-### 1.2 Import the site
-
-1. **Add new project** → **Import an existing project** → **GitHub**.
-2. Authorise Netlify if asked. If `swizee-site` is not in the list, click
-   **Configure the Netlify app on GitHub** and give it access to that repo.
-3. Pick `swizee-site`.
-4. **Accept every default.** `netlify.toml` in the repo already sets:
-   - Build command: `npm run build`
-   - Publish directory: `dist`
-   - Functions directory: `netlify/functions`
-5. Before clicking Deploy, open **Add environment variables** and add these two:
-
-   | Key | Value |
-   |---|---|
-   | `ALLOW_SAMPLE_CATALOGUE` | `true` |
-   | `ALLOW_PLACEHOLDERS` | `true` |
-
-   These are **temporary**. They let the very first deploy succeed while there is
-   no Stripe key and the legal wording is still a draft. Without them the build
-   deliberately fails rather than shipping fake products or unreviewed terms.
-   Part 5 removes them.
-
-6. **Deploy**.
-
-The build takes under a minute. You will get a URL like
-`https://superb-marzipan-a1b2c3.netlify.app`. **Send it to me** — I need it for
-the Stripe redirect settings.
-
-### 1.3 Give the site a sensible name
-
-**Project configuration → General → Project details → Change project name** →
-`swizee`. The URL becomes `swizee.netlify.app`, which is easier to check on your
-phone while we build.
-
-### 1.4 Confirm deploy-on-push works
-
-Make any trivial edit on GitHub (a typo fix in `src/content/copy/home.md` is
-ideal) and commit it. Netlify should start a new build within seconds. That is
-stage 1 of the brief done.
+The original plan was to move nameservers to Netlify, which is Netlify's own
+recommendation. `swizee.co.uk` turned out to carry a full IONOS mail setup —
+MX, SPF, DMARC, autodiscover and **two DKIM records** (`s1-ionos._domainkey`,
+`s2-ionos._domainkey`) whose selector names cannot be discovered from outside
+the account. Recreating that by hand and missing one would have left mail
+sending but failing authentication, which surfaces weeks later as spam
+foldering. External DNS avoids the whole class of problem. Two records changed,
+everything else untouched.
 
 ---
 
-## Part 2 — Contact form notifications (3 min)
+## Still needs you
 
-The contact form is already wired up in the code. Netlify needs telling to look
-for it, and then telling where submissions go.
+### 1. Review the terms and privacy notice — blocks go-live
 
-1. **Forms** (in the project's own left-hand nav, not the configuration
-   sidebar) → **Enable form detection**. This is off by default and nothing
-   works until it is on.
-2. **Trigger a redeploy** — Deploys → Trigger deploy → Deploy site. Netlify only
-   parses forms at build time, so the form is invisible until a build runs
-   *after* detection is enabled.
-3. **Project configuration → Notifications → Emails and webhooks**.
-   (Netlify renamed "Site configuration" to **Project configuration** — it is the
-   left-hand sidebar item once you have opened the project.)
-4. Under **Form submission notifications**, click **Add notification** →
-   **Email notification**.
+`src/content/copy/terms.md` and `privacy.md` are my drafts and still contain
+`[[REPLACE: ...]]` markers. Search for that string and fill in:
 
-   > If there is no *Form submission notifications* section at all, step 1 or 2
-   > has not happened yet. The section only appears once Netlify has seen a form.
-5. Email to notify: **Paul's email address**. Form: **contact**. Save.
+- the seller's full name (the nephew's mother — she is the seller of record)
+- a trading name, if different
+- how long you keep uncollected orders (I suggested 30 days)
+- how long Netlify keeps contact form submissions (I suggested 90 days)
+- the "last updated" dates
 
-   > Deliberately not written down here — this repo is public, and published
-   > addresses get scraped. The address lives only in Netlify's own settings.
+Then delete the `> **DRAFT — for Paul's review.**` block at the top of each.
 
+**Read them properly rather than skim.** Adding delivery changed the legal
+position: the 14-day cooling-off period now runs from when the customer
+*receives* the item, the seller carries the risk until the parcel arrives, and
+return postage has to be apportioned. I have written that as plainly as I can,
+but I am not a lawyer and this is a real business selling to the public.
 
-Test it: open the site's `/contact` page, send yourself a message, and check it
-arrives. Then check **Forms** in Netlify — the submission should be listed.
+Run `npm run check:placeholders` to see what is left.
 
-> The form has a hidden honeypot field called `fax-number`. Bots fill it in,
-> humans never see it, and Netlify silently bins those submissions. No captcha.
-> Free tier allows 100 submissions a month.
-
----
-
-## Part 2.5 — Make the site publicly visible (1 min)
-
-New Netlify projects can default to **private**, which makes every page return
-`401` and bounce visitors to a Netlify login screen. If you open your
-`.netlify.app` URL and are asked to log in, that is this setting and not a broken
-build.
-
-**Project configuration → General → Visitor access → Project visibility** → set
-to **Public** → save.
-
-Check it worked from a terminal — this should print `200`, not `401`:
-
-```bash
-curl -s -o /dev/null -w "%{http_code}\n" https://swizee.netlify.app
-```
-
-## Part 3 — Stripe settings (10 min)
-
-Do these in your **sandbox** first. You will repeat 3.1–3.3 in live mode at
-go-live, because the two are entirely separate.
-
-### 3.1 Business details
+### 2. Stripe business details — Dashboard only, no API
 
 **Settings → Business → Public details**
 
-- **Public business name**: `Swizee 3D Studio` — this is what customers see at
-  the top of the payment page and on their receipt.
-- **Support email** and **support website**: set these; they appear on receipts.
-- Upload the logo under **Branding** when you have it, and set the brand colour
-  to match the site.
-
-### 3.2 Email receipts
+- **Public business name**: `Swizee 3D Studio` — currently unset, so the payment
+  page shows nothing. This is the single most visible gap.
+- Support email and website.
+- **Branding**: upload the logo and set the brand colour to `#EF6122`.
 
 **Settings → Business → Customer emails** → turn on **Successful payments**.
+Without this, buyers get no receipt.
 
-This is what sends the buyer their receipt. The brief requires it.
+### 3. An axolotl photo
 
-### 3.3 Automatic rebuilds when a product changes
+`Mini Axolotl` is live at £1.50 with a striped placeholder. The only picture I
+have is a frame from the promo video with a thumb across the corner. Any decent
+square photo, uploaded to the product in Stripe, and it appears within a minute.
 
-This is what lets the family add a product in Stripe and see it on the site
-without touching code.
+### 4. The rest of the catalogue
 
-**First, get a build hook from Netlify:**
+Five products are loaded. The brief says about fifteen. The family adds the rest
+in Stripe following [HOWTO.md](HOWTO.md) — no code involved.
 
-1. Netlify → **Project configuration → Build & deploy → Build hooks** → **Add
-   build hook**.
-2. Name it `Stripe product change`. Branch: `main`. Save.
-3. Copy the URL. It looks like
-   `https://api.netlify.com/build_hooks/6512ab...`.
-4. Add it as a Netlify environment variable named `NETLIFY_BUILD_HOOK_URL`.
+### 5. Go live
 
-> Keep a copy of this URL. Pasting it into a browser triggers a rebuild on
-> demand — that is the "Rebuild Swizee site" bookmark referenced in HOWTO.md.
-> Make that bookmark for the family.
+In this order:
 
-**Then, point Stripe at the site:**
+1. Do steps 1 and 2 above.
+2. Delete `ALLOW_PLACEHOLDERS` from Netlify env vars.
+3. Recreate the products in **live** mode (test and live are separate catalogues).
+4. Repeat step 2's Dashboard settings in live mode — they do not carry over.
+5. Create a **live** webhook at `https://swizee.co.uk/api/stripe-rebuild` for the
+   same six events, and put its signing secret in `STRIPE_WEBHOOK_SECRET`.
+6. Swap `STRIPE_SECRET_KEY` to the live key. **Type it straight into Netlify** —
+   it should never touch this machine or a chat window.
+7. Trigger a deploy. The test-mode banner disappears on its own.
+8. One real £1 purchase. Check it reads correctly in the Dashboard, then refund.
 
-1. Stripe → **Developers → Webhooks** → **Add destination**.
-2. Endpoint URL: `https://swizee.netlify.app/api/stripe-rebuild`
-   (swap in the real domain after Part 4).
-3. Events — select exactly these six:
-   `product.created`, `product.updated`, `product.deleted`,
-   `price.created`, `price.updated`, `price.deleted`
-4. Save, then click into the endpoint and **reveal the signing secret**
-   (`whsec_...`).
-5. Add it as a Netlify environment variable named `STRIPE_WEBHOOK_SECRET`.
-6. **Trigger a redeploy** in Netlify so the function picks up the new variables
-   (environment variable changes do not apply to already-built functions).
+### 6. Housekeeping
 
-Test it: change a product's description in Stripe. Netlify should start a build
-within a few seconds.
-
-> **Build minutes.** Netlify's free tier gives 300 minutes a month. This site
-> builds in well under a minute, so that is 300+ product edits a month. Not a
-> concern. Events other than the six above are ignored without starting a build.
-
----
-
-## Part 4 — The domain (15 min, plus up to 24h waiting)
-
-Do this only once the `.netlify.app` site works properly.
-
-### 4.1 Add the domain in Netlify
-
-1. **Domain management → Add a domain** → `swizee.co.uk` → **Verify**.
-2. Netlify will say the domain is registered elsewhere. Choose
-   **Set up Netlify DNS** (this is Netlify's own recommendation for an apex
-   domain — it is faster than A records and handles HTTPS renewal cleanly).
-3. Netlify shows you **four nameservers** like:
-
-   ```
-   dns1.p03.nsone.net
-   dns2.p03.nsone.net
-   dns3.p03.nsone.net
-   dns4.p03.nsone.net
-   ```
-
-   **Use the ones your own screen shows.** The `p03` part differs per site —
-   copying someone else's from a forum post is the single most common way this
-   step goes wrong.
-
-### 4.2 Point IONOS at them
-
-1. Sign in at [ionos.co.uk](https://www.ionos.co.uk) → **Domains & SSL** →
-   click `swizee.co.uk`.
-2. Find **Nameservers** (sometimes under a **DNS** tab) → **Change** /
-   **Use custom nameservers**.
-3. Replace all of IONOS's nameservers with Netlify's four. Save.
-
-> **Before you do this**: if `swizee.co.uk` currently has email on it (an MX
-> record) or any other live record, note them down first. Changing nameservers
-> moves *all* DNS to Netlify, and anything you do not recreate there stops
-> working. For a brand-new domain with nothing on it, there is nothing to lose.
-
-### 4.3 Wait, then check
-
-Nameserver changes usually take 1–4 hours and can take up to 24. You can watch
-progress from a terminal:
-
-```bash
-dig +short NS swizee.co.uk
-```
-
-When that returns the `nsone.net` names, you are through.
-
-Then in Netlify: **Domain management → HTTPS → Verify DNS configuration**, and
-once it is happy, **Provision certificate**. Let's Encrypt issues it free and
-renews it automatically.
-
-### 4.4 Confirm both of these work
-
-- `https://swizee.co.uk` loads with a padlock
-- `https://www.swizee.co.uk` redirects to `https://swizee.co.uk`
-
-The `www` redirect is already in `netlify.toml` — you do not need to configure
-it. Set `swizee.co.uk` as the **primary domain** in Netlify so `www` is treated
-as the alias.
-
-### 4.5 Tell Stripe the new address
-
-Go back and update the webhook endpoint URL from Part 3.3 to
-`https://swizee.co.uk/api/stripe-rebuild`.
-
----
-
-## Part 5 — Before going live
-
-Work through the **Go-live checklist** in [README.md](README.md). The two that
-are easy to forget:
-
-1. **Delete `ALLOW_SAMPLE_CATALOGUE` and `ALLOW_PLACEHOLDERS`** from Netlify's
-   environment variables. Once they are gone, the build refuses to run without a
-   real Stripe key and refuses to ship legal wording that still has
-   `[[REPLACE: ...]]` in it. That is the point of them.
-2. **Swap `STRIPE_SECRET_KEY` to the live key**, then trigger a rebuild.
-
-Then do the real £1 purchase, check it reads correctly in the Dashboard, and
-refund it.
+- The Netlify personal access token in `.env` **expires 8 September 2026**. Revoke
+  it sooner at Netlify → User settings → Applications if you would rather.
+- Remove `pdrutter-alt` as a collaborator on the repo when the build is finished,
+  so the family owns it outright.
+- `.env` holds live-ish credentials. It is gitignored and `chmod 600`; do not
+  copy it anywhere.
 
 ---
 
 ## If a build fails
 
-**Deploys → click the failed deploy → the log tells you which check stopped it.**
+**Deploys → the failed deploy → read the log.**
 
-| Message in the log | What to do |
+| Message | Fix |
 |---|---|
-| `STRIPE_SECRET_KEY is not set` | Add the key, or set `ALLOW_SAMPLE_CATALOGUE=true` while you are still setting up |
-| `BUILD BLOCKED — draft wording still contains placeholders` | Finish reviewing `terms.md` / `privacy.md`, or set `ALLOW_PLACEHOLDERS=true` |
-| `Stripe returned no sellable products` | Not a failure — a warning. Products need to be Active with an active one-off GBP price |
+| `STRIPE_SECRET_KEY is not set` | Add it, or set `ALLOW_SAMPLE_CATALOGUE=true` temporarily |
+| `BUILD BLOCKED — draft wording still contains placeholders` | Step 1 above |
+| `Stripe returned no sellable products` | A warning, not a failure. Products need to be Active with an active one-off GBP price |
 
-Environment variable changes do not affect an existing build. After changing
-one, always **Trigger deploy → Deploy site**.
+Environment variable changes need a fresh deploy: **Deploys → Trigger deploy**.
