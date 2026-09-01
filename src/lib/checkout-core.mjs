@@ -8,9 +8,11 @@ import Stripe from 'stripe';
 import {
   validatePersonalisation,
   validateQuantity,
+  validateColour,
   maxCharsForPrice,
   MAX_LINES,
 } from './validation.mjs';
+import { colourChoicesFrom } from './catalogue.mjs';
 import {
   deliveryFeeFor,
   COLLECTION_LABEL,
@@ -75,10 +77,15 @@ export async function handleCheckout(request, env) {
       text = check.value;
     }
 
-    const key = `${priceId}::${text}`;
+    // Colours are validated later, once Stripe has told us what this product
+    // actually offers. Only the shape is checked here.
+    const colour = typeof raw?.colour === 'string' ? raw.colour.trim().slice(0, 40) : '';
+    const colour2 = typeof raw?.colour2 === 'string' ? raw.colour2.trim().slice(0, 40) : '';
+
+    const key = `${priceId}::${text}::${colour}::${colour2}`;
     const existing = merged.get(key);
     if (existing) existing.qty = Math.min(existing.qty + qty.value, 10);
-    else merged.set(key, { priceId, text, qty: qty.value });
+    else merged.set(key, { priceId, text, colour, colour2, qty: qty.value });
   }
 
   const lines = [...merged.values()];
@@ -133,23 +140,46 @@ export async function handleCheckout(request, env) {
       return fail(400, `"${product.name}" cannot be personalised. Please remove it and add it again.`);
     }
 
+    // Colour choices must be ones this product offers. The browser is not
+    // trusted about which colours exist any more than about prices.
+    const choices = colourChoicesFrom(product.metadata);
+    /** @type {string[]} */
+    const chosenColours = [];
+    for (const choice of choices) {
+      const supplied = choice.key === 'colour' ? line.colour : line.colour2;
+      const check = validateColour(supplied, choice.values);
+      if (!check.ok) return fail(400, `${product.name} — ${choice.label}: ${check.message}`);
+      chosenColours.push(`${choice.label}: ${check.value}`);
+    }
+    // Reject colours on a product that has none, rather than dropping them: the
+    // customer would think they had ordered something we never see.
+    if (choices.length === 0 && (line.colour || line.colour2)) {
+      return fail(400, `"${product.name}" does not come in different colours. Please remove it and add it again.`);
+    }
+    if (choices.length < 2 && line.colour2) {
+      return fail(400, `"${product.name}" only has one colour choice. Please remove it and add it again.`);
+    }
+
     lineItems.push({ price: price.id, quantity: line.qty });
     subtotal += price.unit_amount * line.qty;
 
-    if (line.text) {
+    if (line.text || chosenColours.length) {
       const variant = price.metadata?.variant_label || price.nickname || '';
       const label = variant ? `${product.name} (${variant})` : product.name;
       const qtyNote = line.qty > 1 ? ` ×${line.qty}` : '';
-      // One metadata key per personalised line. This is what the family reads in
-      // the Stripe Dashboard payment view — see README "Reading orders".
-      metadata[`item_${lineItems.length}`] = clip(`${label}${qtyNote}: ${line.text}`);
+      const parts = [];
+      if (line.text) parts.push(line.text);
+      if (chosenColours.length) parts.push(chosenColours.join(', '));
+      // One metadata key per line that needs making to order. This is what the
+      // family reads in the Stripe Dashboard — see README "Reading orders".
+      metadata[`item_${lineItems.length}`] = clip(`${label}${qtyNote}: ${parts.join(' — ')}`);
     }
   }
 
   if (lineItems.length === 0) return fail(400, 'Your basket is empty.');
 
   const personalisedCount = Object.keys(metadata).length;
-  metadata.personalised_items = String(personalisedCount);
+  metadata.items_to_personalise = String(personalisedCount);
 
   // Prefer the deploy's own URL so branch/preview deploys redirect to themselves
   // rather than bouncing the tester to production.
@@ -202,7 +232,7 @@ export async function handleCheckout(request, env) {
         // look, not only on the session.
         metadata,
         description: personalisedCount
-          ? `Swizee order — ${personalisedCount} personalised item(s)`
+          ? `Swizee order — ${personalisedCount} item(s) with choices`
           : 'Swizee order',
       },
       custom_text: {

@@ -28,7 +28,7 @@ let memory = [];
 const storageOk = typeof window !== 'undefined' && hasStorage();
 
 export function lineKey(line) {
-  return `${line.priceId}::${line.text ?? ''}`;
+  return `${line.priceId}::${line.text ?? ''}::${line.colour ?? ''}::${line.colour2 ?? ''}`;
 }
 
 export function readCart() {
@@ -44,6 +44,8 @@ export function readCart() {
       .map((l) => ({
         priceId: l.priceId,
         text: typeof l.text === 'string' ? l.text : '',
+        colour: typeof l.colour === 'string' ? l.colour : '',
+        colour2: typeof l.colour2 === 'string' ? l.colour2 : '',
         qty: Number.isInteger(l.qty) && l.qty > 0 ? Math.min(l.qty, 10) : 1,
       }))
       .slice(0, MAX_LINES);
@@ -68,7 +70,7 @@ function writeCart(lines) {
 /**
  * @returns {{ ok: true, lines: object[] } | { ok: false, message: string }}
  */
-export function addLine({ priceId, text = '', qty = 1 }) {
+export function addLine({ priceId, text = '', colour = '', colour2 = '', qty = 1 }) {
   if (typeof priceId !== 'string' || !priceId.startsWith('price_')) {
     return { ok: false, message: 'Please choose an option first.' };
   }
@@ -83,18 +85,18 @@ export function addLine({ priceId, text = '', qty = 1 }) {
   }
 
   const lines = readCart();
-  const key = lineKey({ priceId, text: cleanText });
+  const key = lineKey({ priceId, text: cleanText, colour, colour2 });
   const existing = lines.find((l) => lineKey(l) === key);
 
   if (existing) {
-    // Same product, same option, same word — bump the quantity rather than
-    // adding a second identical row.
+    // Same product, same option, same word, same colours — bump the quantity
+    // rather than adding a second identical row.
     existing.qty = Math.min(existing.qty + q.value, 10);
   } else {
     if (lines.length >= MAX_LINES) {
       return { ok: false, message: 'Your basket is full. Please check out, then start another order.' };
     }
-    lines.push({ priceId, text: cleanText, qty: q.value });
+    lines.push({ priceId, text: cleanText, colour, colour2, qty: q.value });
   }
   writeCart(lines);
   return { ok: true, lines };

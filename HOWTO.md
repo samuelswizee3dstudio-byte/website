@@ -91,6 +91,51 @@ they have paid for.
 
 The website then shows the options as buttons, and the price changes as they pick.
 
+
+---
+
+## Letting the customer choose a colour
+
+Add one line to the product's **Metadata**, listing the colours separated by
+commas:
+
+| Left box | Right box |
+|---|---|
+| `colours` | `Black, White, Blue, Pink` |
+
+The website turns that into a drop-down. The customer has to pick one before
+they can add it to their basket, and their choice appears on your order.
+
+To change the wording above the drop-down from "Colour":
+
+| Left box | Right box |
+|---|---|
+| `colour_label` | `Base colour` |
+
+### Two colours
+
+Some things have two — like the name clickers, where the base and the letters
+are different colours. Add two more lines:
+
+| Left box | Right box |
+|---|---|
+| `colours` | `Black, White, Blue, Pink` |
+| `colour_label` | `Base colour` |
+| `colours_2` | `Orange, White, Blue, Green` |
+| `colour_2_label` | `Letter colour` |
+
+That gives two drop-downs, and the customer must choose from both.
+
+### Things worth knowing
+
+- **Spell the colours exactly how you want them printed on the order.** Whatever
+  you type is what you will read back.
+- **Colours do not change the price.** If a colour costs more, that needs to be a
+  price option instead — see *Options that cost different amounts* above.
+- **To stop offering a colour**, delete it from the list. Orders already placed
+  keep the colour they were bought with.
+- If you delete the whole `colours` line, the drop-down disappears.
+
 ---
 
 ## Changing a price
@@ -136,9 +181,9 @@ You will see:
 labelled **Metadata**. It looks like this:
 
 ```
-item_1              Name Clicker Keyring (5 letters) ×2: JAKE
-item_2              Name Block (Up to 4 letters): EVIE
-personalised_items  2
+item_1                Name Clicker Keyring (3 letters) ×2: BEN — Base colour: Black, Letter colour: Orange
+item_2                Flexi Lizard: Colour: Purple
+items_to_personalise  2
 ```
 
 That is exactly what to print. `×2` means they ordered two of that one.
@@ -198,6 +243,10 @@ These go in a product's **Metadata** box. All optional — most products need no
 | `sort` | `10` | Controls the order. Lower numbers come first |
 | `hidden` | `true` | Temporarily removes it from the website |
 | `slug` | `flexi-lizard` | Sets the web address to `swizee.co.uk/products/flexi-lizard` |
+| `colours` | `Black, White, Blue` | Gives the customer a colour drop-down |
+| `colour_label` | `Base colour` | Wording above that drop-down |
+| `colours_2` | `Orange, White` | A second drop-down, for things with two colours |
+| `colour_2_label` | `Letter colour` | Wording above the second one |
 
 On a **price** (only when a product has more than one option):
 

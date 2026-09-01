@@ -62,6 +62,20 @@ const first = product.variants[0];
             <input type="hidden" name="priceId" value={first.id} data-amount={first.unitAmount} data-max={first.maxChars} />
           )}
 
+          {product.colourChoices.length > 0 && (
+            <div class="colours">
+              {product.colourChoices.map((c: any) => (
+                <div class="field">
+                  <label for={`col-${c.key}`}>{c.label}</label>
+                  <select class="input select" id={`col-${c.key}`} name={c.key} required>
+                    <option value="">Choose…</option>
+                    {c.values.map((v: string) => <option value={v}>{v}</option>)}
+                  </select>
+                </div>
+              ))}
+            </div>
+          )}
+
           {product.personalise && (
             <div class="field" id="text-field">
               <label for="text">{product.personaliseLabel}</label>
@@ -173,10 +187,21 @@ const first = product.variants[0];
       textField?.classList.toggle('is-error', Boolean(msg));
       textInput?.setAttribute('aria-invalid', msg ? 'true' : 'false');
     };
+    // A colour must be chosen before the item can be added, the same way a name
+    // must. Without this the customer picks nothing and we print our best guess.
+    const colourSelects = [...form.querySelectorAll<HTMLSelectElement>('.colours select')];
+    const coloursChosen = () => colourSelects.every((sel) => sel.value !== '');
+
     const syncSubmit = () => {
-      if (!textInput) return;
-      submit.disabled = !validatePersonalisation(textInput.value, currentMax()).ok;
+      const textOk = !textInput || validatePersonalisation(textInput.value, currentMax()).ok;
+      submit.disabled = !(textOk && coloursChosen());
     };
+    for (const sel of colourSelects) {
+      sel.addEventListener('change', () => {
+        if (formError) formError.textContent = '';
+        syncSubmit();
+      });
+    }
 
     textInput?.addEventListener('input', () => {
       const cleaned = textInput.value.replace(/[^A-Za-z0-9]/g, '').slice(0, currentMax());
@@ -210,7 +235,19 @@ const first = product.variants[0];
         setError('');
       }
 
-      const result = addLine({ priceId, text, qty: Number(data.get('qty') ?? 1) });
+      if (!coloursChosen()) {
+        if (formError) formError.textContent = 'Please choose a colour first.';
+        colourSelects.find((sel) => !sel.value)?.focus();
+        return;
+      }
+
+      const result = addLine({
+        priceId,
+        text,
+        colour: String(data.get('colour') ?? ''),
+        colour2: String(data.get('colour2') ?? ''),
+        qty: Number(data.get('qty') ?? 1),
+      });
       if (!result.ok) {
         if (formError) formError.textContent = result.message;
         return;

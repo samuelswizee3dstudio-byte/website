@@ -67,3 +67,28 @@ export function maxCharsForPrice(price) {
   if (m) return Math.min(Number.parseInt(m[1], 10), PERSONALISATION_MAX);
   return PERSONALISATION_MAX;
 }
+
+/**
+ * A colour choice must be one the product actually offers. Checked against the
+ * list Stripe holds, never against anything the browser claims — same rule as
+ * prices. Comparison is case-insensitive and whitespace-tolerant so a stray
+ * capital does not reject a legitimate order, but the value stored is always
+ * the exact string from Stripe.
+ *
+ * @param {unknown} value
+ * @param {string[]} allowed
+ * @returns {{ ok: true, value: string } | { ok: false, message: string }}
+ */
+export function validateColour(value, allowed) {
+  const options = Array.isArray(allowed) ? allowed : [];
+  if (options.length === 0) {
+    return { ok: false, message: 'That item does not come in different colours.' };
+  }
+  const raw = typeof value === 'string' ? value.trim() : '';
+  if (!raw) return { ok: false, message: 'Please choose a colour.' };
+  const match = options.find((o) => o.toLowerCase() === raw.toLowerCase());
+  if (!match) {
+    return { ok: false, message: `Sorry, we do not have that colour. Please choose from: ${options.join(', ')}.` };
+  }
+  return { ok: true, value: match };
+}

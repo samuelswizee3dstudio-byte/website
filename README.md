@@ -180,6 +180,16 @@ only when it is exactly `true`.
 | `hidden` | `true` | Keeps the product out of the site without archiving it in Stripe |
 | `slug` | `axolotl` | Fixes the URL at `/products/axolotl`. Without it the URL comes from the product name — **set this before sharing a link, or renaming the product will break it** |
 | `image` | `/images/axolotl.jpg` | Uses a photo from `public/` instead of the Stripe photo |
+| `colours` | `Black,White,Blue` | Comma-separated. Renders a dropdown the customer must choose from. `colors` accepted too |
+| `colour_label` | `Base colour` | Label above that dropdown. Defaults to "Colour" |
+| `colours_2` | `Orange,White` | A second dropdown, for items with two colours |
+| `colour_2_label` | `Letter colour` | Label above the second dropdown |
+
+Colours are **not** Stripe prices. Colour does not change what you charge, and a
+price per colour per letter-count would be dozens of prices to keep straight.
+Choices are validated server-side against the product's own metadata — the
+browser is no more trusted about colours than about prices — and reach the
+Dashboard in the same `item_n` line as the personalisation.
 
 On the **Price** (for products with more than one option):
 
@@ -199,9 +209,9 @@ Personalisation text is written into **session metadata and payment metadata**,
 one key per personalised line:
 
 ```
-item_1              Name Plate (5 to 7 letters) ×2: JAKE
-item_2              Personalised Keyring: EVIE
-personalised_items  2
+item_1                Name Clicker Keyring (3 letters) ×2: BEN — Base colour: Black, Letter colour: Orange
+item_2                Flexi Lizard: Colour: Purple
+items_to_personalise  2
 ```
 
 Open the payment in the Stripe Dashboard → **Metadata** panel. No extra tooling.

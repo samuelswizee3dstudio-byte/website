@@ -123,6 +123,8 @@ for (const p of products) {
       const bits: string[] = [];
       if (item.variantLabel) bits.push(item.variantLabel);
       if (line.text) bits.push(`Personalised: ${line.text}`);
+      if (line.colour) bits.push(line.colour);
+      if (line.colour2) bits.push(line.colour2);
       bits.push(`${money(item.unitAmount)} each`);
       li.querySelector<HTMLElement>('.line__meta')!.textContent = bits.join(' · ');
 

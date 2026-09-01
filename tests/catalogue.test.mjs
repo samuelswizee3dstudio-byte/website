@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { normalise, slugify, formatPrice, formatPriceRange } from '../src/lib/catalogue.mjs';
+import { normalise, slugify, formatPrice, formatPriceRange, colourChoicesFrom } from '../src/lib/catalogue.mjs';
 
 const product = (over = {}) => ({ id: 'prod_1', active: true, name: 'Thing', description: '', images: [], metadata: {}, ...over });
 const price = (over = {}) => ({ id: 'price_1', active: true, currency: 'gbp', type: 'one_time', unit_amount: 500, product: 'prod_1', nickname: null, metadata: {}, ...over });
@@ -83,4 +83,34 @@ test('prices format the way a price tag reads', () => {
   assert.equal(formatPrice(1000), '£10');
   assert.equal(formatPrice(350), '£3.50');
   assert.equal(formatPrice(999), '£9.99');
+});
+
+test('colour choices come from metadata, not from prices', () => {
+  const one = colourChoicesFrom({ colours: 'Blue, Pink, Orange' });
+  assert.equal(one.length, 1);
+  assert.deepEqual(one[0].values, ['Blue', 'Pink', 'Orange']);
+  assert.equal(one[0].label, 'Colour');
+
+  const two = colourChoicesFrom({
+    colours: 'Black,White', colour_label: 'Base colour',
+    colours_2: 'Orange,Blue', colour_2_label: 'Letter colour',
+  });
+  assert.equal(two.length, 2);
+  assert.deepEqual(two.map((c) => c.label), ['Base colour', 'Letter colour']);
+  assert.deepEqual(two.map((c) => c.key), ['colour', 'colour2']);
+
+  // Whitespace, blanks and duplicates are the likely hand-typed mistakes.
+  assert.deepEqual(colourChoicesFrom({ colours: ' Blue ,, Blue , Pink ,' })[0].values, ['Blue', 'Pink']);
+  // American spelling is accepted rather than silently ignored.
+  assert.deepEqual(colourChoicesFrom({ colors: 'Red,Green' })[0].values, ['Red', 'Green']);
+  assert.deepEqual(colourChoicesFrom({}), []);
+  assert.deepEqual(colourChoicesFrom(undefined), []);
+});
+
+test('a second colour list without a first is not silently promoted', () => {
+  // colours_2 alone means the family filled the wrong box; better to show one
+  // dropdown labelled correctly than to guess.
+  const r = colourChoicesFrom({ colours_2: 'Red,Blue' });
+  assert.equal(r.length, 1);
+  assert.equal(r[0].key, 'colour2');
 });

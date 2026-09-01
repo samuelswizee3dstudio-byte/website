@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { validatePersonalisation, validateQuantity, maxCharsForPrice } from '../src/lib/validation.mjs';
+import { validatePersonalisation, validateQuantity, maxCharsForPrice, validateColour } from '../src/lib/validation.mjs';
 
 test('personalisation accepts letters and numbers up to 10', () => {
   for (const ok of ['JAKE', 'a', 'Ava2011', 'ABCDEFGHIJ', '1234567890']) {
@@ -57,4 +57,24 @@ test('letter limits are read from price metadata or the variant label', () => {
   assert.equal(maxCharsForPrice({ metadata: {} }), 10);
   // Never allow more than the global maximum.
   assert.equal(maxCharsForPrice({ metadata: { max_chars: '50' } }), 10);
+});
+
+test('a colour must be one the product actually offers', () => {
+  const allowed = ['Blue', 'Pink', 'Glow in the dark'];
+  assert.equal(validateColour('Blue', allowed).ok, true);
+  // Case and whitespace are forgiven, but the stored value is Stripe's exact string.
+  assert.equal(validateColour('  blue ', allowed).value, 'Blue');
+  assert.equal(validateColour('glow in the dark', allowed).value, 'Glow in the dark');
+  // Anything not on the list is refused — the browser does not get to invent colours.
+  assert.equal(validateColour('Chrome', allowed).ok, false);
+  assert.equal(validateColour('', allowed).ok, false);
+  assert.equal(validateColour(null, allowed).ok, false);
+  // A product with no colours cannot take one.
+  assert.equal(validateColour('Blue', []).ok, false);
+});
+
+test('the colour error names the real options, so the customer can fix it', () => {
+  const r = validateColour('Chrome', ['Blue', 'Pink']);
+  assert.equal(r.ok, false);
+  assert.match(r.message, /Blue, Pink/);
 });

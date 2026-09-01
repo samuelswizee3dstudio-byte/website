@@ -44,7 +44,9 @@ const SEED = [
     seed_id: 'name-keyring',
     name: 'Name Clicker Keyring',
     description: 'Chunky letter tiles that click as you flip them. Clips onto a bag or a set of keys. Printed one letter at a time.',
-    metadata: { category: 'name-items', personalise: 'true', personalise_label: 'Name to print', featured: 'true', sort: '10', slug: 'name-clicker-keyring' },
+    metadata: { category: 'name-items', personalise: 'true', personalise_label: 'Name to print', featured: 'true', sort: '10', slug: 'name-clicker-keyring',
+      colours: 'Black,White,Blue,Pink', colour_label: 'Base colour',
+      colours_2: 'Orange,White,Blue,Green', colour_2_label: 'Letter colour' },
     photos: ['jacob-samuel-name-clickers.jpg'],
     // Prices read off the handwritten signs in the family's own promo video:
     // 50p per letter from a three-letter minimum.
@@ -79,7 +81,7 @@ const SEED = [
     seed_id: 'flexi-lizard',
     name: 'Flexi Lizard',
     description: 'An articulated lizard that wriggles along your hand. Printed in one piece — no glue, no batteries, no assembly.',
-    metadata: { category: 'flexis', sort: '30', slug: 'flexi-lizard' },
+    metadata: { category: 'flexis', sort: '30', slug: 'flexi-lizard', colours: 'Orange,Green,Purple,Glow in the dark' },
     photos: ['lizard.jpg', 'lizard-in-hands.jpg'],
     prices: [{ amount: 800 }],
   },
@@ -102,6 +104,7 @@ const SEED = [
 const KNOWN_METADATA_KEYS = [
   'category', 'personalise', 'personalise_label', 'featured', 'sort',
   'hidden', 'slug', 'image',
+  'colours', 'colour_label', 'colours_2', 'colour_2_label',
 ];
 
 const PHOTO_DIR = process.env.PHOTO_DIR

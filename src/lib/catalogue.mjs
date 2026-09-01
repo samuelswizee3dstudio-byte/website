@@ -12,10 +12,49 @@ import { maxCharsForPrice } from './validation.mjs';
 const GBP = 'gbp';
 
 /** @typedef {{ id: string, label: string, unitAmount: number, sort: number, maxChars: number }} Variant */
+/** @typedef {{ key: string, label: string, values: string[] }} ColourChoice */
 /** @typedef {{ id: string, slug: string, name: string, description: string, images: string[],
  *              category: string | null, personalise: boolean, personaliseLabel: string,
  *              featured: boolean, sort: number, variants: Variant[],
  *              priceFrom: number, priceTo: number }} Product */
+
+/**
+ * Colour choices come from product metadata, not from Stripe prices: colour does
+ * not change what we charge, and a price per colour per letter-count would be
+ * dozens of prices for the family to keep straight.
+ *
+ *   colours        Blue, Pink, Orange, Glow
+ *   colour_label   Body colour          (optional, defaults to "Colour")
+ *   colours_2      White, Black         (optional second dropdown)
+ *   colour_2_label Letter colour
+ *
+ * @param {Record<string,string>|undefined} metadata
+ * @returns {ColourChoice[]}
+ */
+export function colourChoicesFrom(metadata) {
+  const list = (raw) =>
+    String(raw ?? '')
+      .split(',')
+      .map((v) => v.trim())
+      .filter(Boolean)
+      // Two products in one basket must not collide on a stray duplicate.
+      .filter((v, i, a) => a.indexOf(v) === i)
+      .slice(0, 40);
+
+  /** @type {ColourChoice[]} */
+  const out = [];
+  // American spelling accepted silently — it is the likelier typo, and a
+  // swallowed colour list would look like the feature is broken.
+  const first = list(metadata?.colours ?? metadata?.colors);
+  if (first.length) {
+    out.push({ key: 'colour', label: metadata?.colour_label?.trim() || 'Colour', values: first });
+  }
+  const second = list(metadata?.colours_2 ?? metadata?.colors_2);
+  if (second.length) {
+    out.push({ key: 'colour2', label: metadata?.colour_2_label?.trim() || 'Second colour', values: second });
+  }
+  return out;
+}
 
 export function slugify(input) {
   return String(input)
@@ -141,6 +180,7 @@ export function normalise(stripeProducts, stripePrices) {
       images,
       category: p.metadata?.category?.trim() || null,
       personalise: truthy(p.metadata?.personalise),
+      colourChoices: colourChoicesFrom(p.metadata),
       personaliseLabel: p.metadata?.personalise_label?.trim() || 'Name or word to print',
       featured: truthy(p.metadata?.featured),
       sort: intOr(p.metadata?.sort, Number.MAX_SAFE_INTEGER),
