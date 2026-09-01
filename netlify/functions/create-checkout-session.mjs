@@ -10,6 +10,13 @@ import {
   validateQuantity,
   MAX_LINES,
 } from '../../src/lib/validation.mjs';
+import {
+  deliveryFeeFor,
+  COLLECTION_LABEL,
+  DELIVERY_LABEL,
+  MAKE_DAYS,
+  POST_DAYS_MAX,
+} from '../../src/lib/shipping.mjs';
 
 const JSON_HEADERS = { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' };
 
@@ -82,6 +89,7 @@ export default async (request) => {
 
   const lineItems = [];
   const metadata = {};
+  let subtotal = 0;
 
   for (const [i, price] of prices.entries()) {
     const line = lines[i];
@@ -106,6 +114,7 @@ export default async (request) => {
     }
 
     lineItems.push({ price: price.id, quantity: line.qty });
+    subtotal += price.unit_amount * line.qty;
 
     if (line.text) {
       const variant = price.metadata?.variant_label || price.nickname || '';
@@ -138,7 +147,35 @@ export default async (request) => {
       // the family would rather have a number for chasing uncollected orders.
       // Set COLLECT_PHONE=false in Netlify to drop it — no code change.
       phone_number_collection: { enabled: process.env.COLLECT_PHONE !== 'false' },
-      // Made to order, collection only — no addresses, no shipping rates.
+      // UK only. Stripe requires an address before it will show shipping
+      // options at all, so collection customers are asked for one too.
+      shipping_address_collection: { allowed_countries: ['GB'] },
+      shipping_options: [
+        {
+          shipping_rate_data: {
+            type: 'fixed_amount',
+            fixed_amount: { amount: 0, currency: 'gbp' },
+            display_name: COLLECTION_LABEL,
+            delivery_estimate: {
+              minimum: { unit: 'business_day', value: 1 },
+              maximum: { unit: 'business_day', value: MAKE_DAYS },
+            },
+          },
+        },
+        {
+          shipping_rate_data: {
+            type: 'fixed_amount',
+            // Free over the threshold. Worked out from Stripe's prices, not
+            // from anything the basket claimed.
+            fixed_amount: { amount: deliveryFeeFor(subtotal), currency: 'gbp' },
+            display_name: DELIVERY_LABEL,
+            delivery_estimate: {
+              minimum: { unit: 'business_day', value: MAKE_DAYS },
+              maximum: { unit: 'business_day', value: MAKE_DAYS + POST_DAYS_MAX },
+            },
+          },
+        },
+      ],
       metadata,
       payment_intent_data: {
         // Surfaced on the payment itself, so the family sees it wherever they
@@ -149,8 +186,11 @@ export default async (request) => {
           : 'Swizee order',
       },
       custom_text: {
+        shipping_address: {
+          message: 'Choosing collection? We still need an address for your receipt — we will email you to arrange a time.',
+        },
         submit: {
-          message: 'Made to order — allow 7 days. We will email you to arrange collection from Great Sankey, Warrington.',
+          message: 'Everything is made to order. Allow 7 days to make, then 2–3 days in the post if you have chosen delivery.',
         },
       },
       locale: 'en-GB',

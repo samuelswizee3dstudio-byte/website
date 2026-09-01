@@ -192,8 +192,12 @@ personalised_items  2
 
 That is exactly what to print. `×2` means they ordered two of that one.
 
-Stripe emails the customer a receipt automatically. When the order is ready,
-email them yourself to arrange collection.
+Stripe emails the customer a receipt automatically.
+
+**Check how they want it.** On the same page, under the payment amount, Stripe
+shows which option they picked — *Collect from Great Sankey, Warrington* or
+*UK delivery*. If they chose delivery, their address is shown there too. If they
+chose collection, email them to arrange a time when it is ready.
 
 **To refund someone**, open the payment and click **Refund** at the top right.
 

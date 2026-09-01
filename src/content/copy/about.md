@@ -16,8 +16,8 @@ word and we print it.
 
 1. You order and pay on the site.
 2. We print your order. This usually takes a few days — allow 7.
-3. We email you when it is ready, and we arrange collection from Great Sankey,
-   Warrington.
+3. We post it to you anywhere in the UK, or you collect it from Great Sankey,
+   Warrington — whichever you chose at checkout. We email you either way.
 
 ## Follow along
 

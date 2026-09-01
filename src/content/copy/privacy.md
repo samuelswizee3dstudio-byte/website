@@ -19,10 +19,13 @@ use the [contact form](/contact).
 Payment is handled by **Stripe**, not by us. You type your card details on
 Stripe's own page — they never touch this website.
 
-Stripe collects your name, email address, phone number and card details, and
-shares your name, email, phone number and order details with us so we can make
-your order and tell you when it is ready. We ask for a phone number so we can
-reach you about collection if email does not get through. If your order includes a
+Stripe collects your name, email address, phone number, delivery address and
+card details, and shares your name, email, phone number, address and order
+details with us so we can make your order and get it to you. We ask for a phone
+number so we can reach you if email does not get through.
+
+If you choose delivery, we give your name and address to **Royal Mail** so they
+can deliver the parcel. We do not share it with anyone else. If your order includes a
 personalised item, the name or word you typed is part of the order.
 
 We keep order records for six years because HMRC requires it. Stripe's own

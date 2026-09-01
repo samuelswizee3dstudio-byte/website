@@ -98,6 +98,27 @@ page's Our Story tile: that needs a real photograph, not a generated person.
 Still needed from the client: axolotl, name sign, bag tag, rainbow slider,
 pencil topper, flexi dragon and maker photos, plus the "how it's made" video.
 
+## Delivery and collection
+
+UK only. Both options are offered at Stripe Checkout as shipping rates:
+
+| Option | Price | Quoted time |
+|---|---|---|
+| Collect from Great Sankey, Warrington | free | up to 7 working days |
+| UK delivery (Royal Mail 2nd Class) | £3.50, free over £20 | 7 days to make, then 2–3 in the post |
+
+Every number lives in `src/lib/shipping.mjs`. The site's copy and the Netlify
+Function both read from it, so changing the price is a one-line edit and the two
+cannot disagree. The free-delivery threshold is worked out server-side from
+Stripe's own prices, never from anything the browser sent.
+
+Stripe will not show shipping options without an address, so collection
+customers are asked for one too. `custom_text.shipping_address` explains why.
+
+> This replaced the original brief's "collection only, no delivery". The Claude
+> Design handoff still says nothing may imply delivery — that instruction is
+> superseded, and the footer copy has changed accordingly.
+
 ## Stripe metadata conventions
 
 Set these in the Stripe Dashboard on the **Product** (Product → Edit → Metadata).

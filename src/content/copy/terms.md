@@ -38,32 +38,49 @@ personalised item unless it is faulty or not what you ordered.
 Names and words are limited to letters and numbers, up to 10 characters. We may
 refuse to print anything offensive and will refund you in full if we do.
 
-## Collection
+## Getting your order
 
-We do not deliver. Once your order is ready we will email you and arrange
-collection from Great Sankey, Warrington. Collection is by arrangement — please
-do not turn up without arranging a time first.
+You choose at checkout, and we only sell within the United Kingdom.
 
-If you have not collected your order within `[[REPLACE: 30]]` days of us telling
-you it is ready, and we cannot reach you, we may treat the order as abandoned.
+**Delivery** costs £3.50 for any UK order, and is free when you spend over £20.
+We send orders by Royal Mail 2nd Class. Allow 7 days for us to make your order,
+then a further 2 to 3 working days in the post.
 
-## Cancelling and refunds
+**Collection** is free, from Great Sankey, Warrington. We email you when your
+order is ready and agree a time. Please do not turn up without arranging a time
+first.
 
-Because everything is made to order, your right to change your mind is limited:
+Until your order reaches you it is our responsibility. If a parcel does not
+arrive, tell us and we will chase it, and re-make or refund your order. Royal
+Mail does not treat an item as lost until 10 working days after the due date, so
+we may have to wait that long before we can act.
 
-- **Before we start printing**, email us and we will cancel and refund in full.
+If you chose collection and have not collected within `[[REPLACE: 30]]` days of
+us telling you it is ready, and we cannot reach you, we may treat the order as
+abandoned.
+
+## Changing your mind
+
+Because everything is made to order, your rights differ by item:
+
+- **Before we start printing**, message us and we will cancel and refund in full,
+  including any delivery you paid.
 - **Personalised items** cannot be cancelled or returned once printing has
   started, unless they are faulty or not what you ordered. This is the exception
-  for made-to-measure and personalised goods in the Consumer Contracts
-  Regulations 2013.
-- **Non-personalised items** can be returned within 14 days of collection for a
-  full refund, as long as they are unused and undamaged.
+  for goods made to your specification or clearly personalised, in the Consumer
+  Contracts Regulations 2013.
+- **Everything else** can be returned for a full refund. You have 14 days from
+  the day you receive or collect it to tell us you have changed your mind, and a
+  further 14 days to get it back to us. It must be unused and undamaged. We
+  refund the item and the basic delivery you paid, but not the cost of sending
+  it back to us.
 
 ## If something is wrong
 
-If your item arrives faulty, damaged, or is not what you ordered, tell us within
-14 days of collecting it and we will repair it, replace it, or refund you. This
-does not affect your legal rights under the Consumer Rights Act 2015.
+If your item is faulty, damaged in the post, or is not what you ordered, tell us
+within 14 days of receiving or collecting it and we will repair it, replace it,
+or refund you — including the postage both ways. This does not affect your legal
+rights under the Consumer Rights Act 2015.
 
 3D printed items have visible print layers and small surface marks. That is
 normal for the process and is not a fault.
