@@ -153,7 +153,7 @@ build command, the `www` → apex redirect and the security headers.
 - [ ] Paul has reviewed and replaced the `[[REPLACE: ...]]` wording in
       `src/content/copy/terms.md` and `privacy.md`, and deleted the DRAFT notes
 - [ ] `ALLOW_PLACEHOLDERS` deleted from Netlify
-- [ ] Real logo at `public/logo.svg` and `public/favicon.svg`
+- [ ] Logo assets checked against the Claude Design export (`public/logo.png`, `favicon.png`, `apple-touch-icon.png` are the supplied circle mark)
 - [ ] Real product photos uploaded in Stripe
 - [ ] `swizee.co.uk` added in Netlify, DNS pointed at it from IONOS, HTTPS live,
       `www` redirecting
