@@ -78,9 +78,12 @@ const { Content } = await render(home!);
     </a>
 
     <div class="tile tile--story">
-      <span class="badge badge--mint">Our story</span>
-      <h2 class="t-section story__head">A ten-year-old, a printer and a lot of test prints.</h2>
-      <p class="story__more"><a href="/about">Read it <span aria-hidden="true">→</span></a></p>
+      <div class="story__text">
+        <span class="badge badge--mint">Our story</span>
+        <h2 class="t-section story__head">A ten-year-old, a printer and a lot of test prints.</h2>
+        <p class="story__more"><a href="/about">Read it <span aria-hidden="true">→</span></a></p>
+      </div>
+      <img class="story__art" src="/images/printed-things.png" alt="" width="380" height="375" loading="lazy" />
     </div>
   </section>
 
@@ -164,8 +167,16 @@ const { Content } = await render(home!);
 
   .tile--story {
     background: var(--sw-surface); box-shadow: var(--sw-shadow-card);
-    padding: var(--sw-5); padding-top: var(--sw-8);
-    display: grid; align-content: center; gap: var(--sw-3);
+    padding: var(--sw-5);
+    display: grid; gap: var(--sw-4); align-items: center;
+    grid-template-columns: 1fr auto;
+  }
+  .story__text { display: grid; gap: var(--sw-3); align-content: center; }
+  .tile--story .badge { position: static; justify-self: start; }
+  .story__art { width: min(38%, 180px); height: auto; justify-self: end; }
+  @media (max-width: 32rem) {
+    .tile--story { grid-template-columns: 1fr; }
+    .story__art { width: min(60%, 200px); justify-self: center; }
   }
   .story__head { text-transform: none; font-family: var(--sw-font-body); font-weight: 800; line-height: 1.2; }
   .story__more a { font-weight: 800; font-size: 15px; }
