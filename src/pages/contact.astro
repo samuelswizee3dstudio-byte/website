@@ -5,10 +5,13 @@ import { getEntry, render } from 'astro:content';
 const page = await getEntry('copy', 'contact');
 const { Content } = await render(page!);
 
-// Web3Forms relays the message to the family's inbox. The access key is public
-// by design — it only identifies which inbox to deliver to, and cannot read
-// past submissions. Set PUBLIC_WEB3FORMS_KEY in the host's env vars.
-const web3formsKey = import.meta.env.PUBLIC_WEB3FORMS_KEY ?? '';
+// Web3Forms relays the message to the family's inbox. This key is public by
+// design — it ships in the page source, only names the destination inbox, and
+// cannot read past submissions. Committed deliberately: keeping it in an env
+// var would mean a fresh clone silently builds a broken contact form, and
+// there is nothing here worth protecting. Override with PUBLIC_WEB3FORMS_KEY.
+const WEB3FORMS_KEY_DEFAULT = 'd165e1c0-b22d-42f3-9bc0-bbf901520c55';
+const web3formsKey = import.meta.env.PUBLIC_WEB3FORMS_KEY || WEB3FORMS_KEY_DEFAULT;
 ---
 <Base title={page!.data.title} description={page!.data.description}>
   <div class="wrap wrap--narrow stack">

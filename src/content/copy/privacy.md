@@ -33,9 +33,9 @@ keep business records.
 
 ## When you use the contact form
 
-The form is handled by **Netlify**, our website host. Your name, email address
-and message are emailed to us and stored in Netlify for
-90 days, then deleted.
+The form is handled by **Web3Forms**, which passes your message to us by email.
+Your name, email address and message go through their service and into our
+inbox. We keep the email as long as we need it to answer you.
 
 **Legal basis:** our legitimate interest in answering your question.
 
@@ -52,8 +52,9 @@ prevent fraud.
 
 ## Who else sees your data
 
-Only Stripe (payments) and Netlify (hosting and the contact form). We do not
-sell, share or rent your details to anyone.
+Only Stripe (payments), Cloudflare (hosting) and Web3Forms (the contact form) —
+plus Royal Mail if you choose delivery. We do not sell, share or rent your
+details to anyone.
 
 ## Children
 
