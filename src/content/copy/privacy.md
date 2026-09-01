@@ -69,4 +69,4 @@ delete it — though we have to keep order records for six years. Use the
 If you are not happy with how we handle your data you can complain to the
 Information Commissioner's Office at [ico.org.uk](https://ico.org.uk).
 
-*Last updated: `[[REPLACE: date]]`*
+*Last updated: 1 September 2026*
