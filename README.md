@@ -98,6 +98,22 @@ page's Our Story tile: that needs a real photograph, not a generated person.
 Still needed from the client: axolotl, name sign, bag tag, rainbow slider,
 pencil topper, flexi dragon and maker photos, plus the "how it's made" video.
 
+## DNS and email
+
+DNS is on Cloudflare. `swizee.co.uk` has no mailbox, but IONOS's mail records
+(MX, SPF, DMARC, autodiscover) came across with the zone and are left in place.
+
+**The two DKIM records were deliberately not migrated**:
+`s1-ionos._domainkey -> s1.dkim.ionos.com` and `s2-ionos._domainkey ->
+s2.dkim.ionos.com`. They were in the IONOS zone but Cloudflare's scan could not
+find them — DKIM selector names are not discoverable, you have to know them.
+With no mailbox they do nothing, so recreating them was not worth the effort.
+
+**If anyone ever sets up email on this domain**, add those two CNAMEs back as
+*DNS only* (grey cloud) or outgoing mail will fail DKIM and tend to land in
+spam. That failure is silent and shows up weeks later, so it is worth knowing
+about in advance.
+
 ## Delivery and collection
 
 UK only. Both options are offered at Stripe Checkout as shipping rates:
