@@ -1,7 +1,13 @@
 ---
 title: "About Swizee 3D Studio"
 description: "A small 3D printing studio in Warrington making axolotls, fidgets and personalised name items."
-videos: []
+videos:
+  - id: SptHTpVKGew
+    title: "A look around the studio"
+  - id: k3Fd5xHrOBE
+    title: "Printing a name block"
+  - id: 3Wm5umcKaOc
+    title: "Printing a lizard"
 ---
 
 Swizee 3D Studio is a small 3D printing business run from home in Great Sankey,

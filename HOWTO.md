@@ -155,20 +155,24 @@ Videos are not stored on the website — they live on YouTube.
 4. Near the top you will see:
 
    ```
-   videos: []
+   videos:
+     - id: SptHTpVKGew
+       title: "A look around the studio"
    ```
 
-   Put the ID inside the brackets, in quotes:
+   Add another video by copying those two lines and changing them. Keep the
+   spacing exactly as it is — the dashes and indents matter:
 
    ```
-   videos: ["dQw4w9WgXcQ"]
+   videos:
+     - id: SptHTpVKGew
+       title: "A look around the studio"
+     - id: dQw4w9WgXcQ
+       title: "Printing a dragon"
    ```
 
-   For more than one, separate with commas:
-
-   ```
-   videos: ["dQw4w9WgXcQ", "9bZkp7q19f0"]
-   ```
+   The title is the caption under the video. You can leave it out if you do not
+   want one.
 
 5. Commit the change. The videos appear at the bottom of the About page.
 
