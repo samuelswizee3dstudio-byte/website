@@ -58,15 +58,23 @@ Run `npm run check:placeholders` to see what is left.
 
 ### 2. Stripe business details — Dashboard only, no API
 
-**Settings → Business → Public details**
+Go to **https://dashboard.stripe.com/settings/public** (sign in first if asked).
 
-- **Public business name**: `Swizee 3D Studio` — currently unset, so the payment
-  page shows nothing. This is the single most visible gap.
-- Support email and website.
-- **Branding**: upload the logo and set the brand colour to `#EF6122`.
+- **Public business name** → type `Swizee 3D Studio`. It is currently blank, so
+  the Stripe payment page shows no shop name at all. Most visible gap on the site.
+- **Support email** → an address you actually read.
+- Save.
 
-**Settings → Business → Customer emails** → turn on **Successful payments**.
-Without this, buyers get no receipt.
+Then **https://dashboard.stripe.com/settings/branding**
+
+- Upload `public/logo.png` from the repo as the logo.
+- Set the brand colour to `#EF6122`.
+- Save.
+
+Then **https://dashboard.stripe.com/settings/emails**
+
+- Turn on **Successful payments**. Without this, buyers get no receipt at all.
+- Save.
 
 ### 3. An axolotl photo
 

@@ -108,24 +108,29 @@ On a **price** (only needed when a product has more than one):
 The About page, the front page blurb, the Contact page, the Terms and the Privacy
 notice are all normal text files you can edit in a web browser.
 
-1. Go to the website's GitHub page and sign in.
-2. Click the **src** folder, then **content**, then **copy**.
-3. Click the file you want:
+**Click the link for the page you want to change.** Each one opens the file
+straight into GitHub's editor — you do not need to find any folders.
 
-   | File | What it is |
-   |---|---|
-   | `home.md` | The big heading and blurb on the front page |
-   | `about.md` | The whole About page |
-   | `contact.md` | The words above the contact form |
-   | `terms.md` | Terms of sale |
-   | `privacy.md` | Privacy notice |
+| Page on the website | Click this |
+|---|---|
+| Front page heading and blurb | [edit home](https://github.com/samuelswizee3dstudio-byte/website/edit/main/src/content/copy/home.md) |
+| About page | [edit about](https://github.com/samuelswizee3dstudio-byte/website/edit/main/src/content/copy/about.md) |
+| Words above the contact form | [edit contact](https://github.com/samuelswizee3dstudio-byte/website/edit/main/src/content/copy/contact.md) |
+| Terms of sale | [edit terms](https://github.com/samuelswizee3dstudio-byte/website/edit/main/src/content/copy/terms.md) |
+| Privacy notice | [edit privacy](https://github.com/samuelswizee3dstudio-byte/website/edit/main/src/content/copy/privacy.md) |
 
-4. Click the **pencil** icon at the top right.
-5. Change the words. Leave the bit at the very top between the `---` lines alone
-   unless you mean to change the page's title.
-6. Scroll to the bottom, type a short note about what you changed (e.g. "fix
-   typo on about page"), and click **Commit changes**.
-7. Wait about a minute, then refresh the website.
+1. Sign in to GitHub if it asks you to.
+2. The file opens ready to type in. If it does not, click the **pencil** icon at
+   the top right.
+3. Change the words. Leave the bit at the very top between the two `---` lines
+   alone unless you mean to change the page's title.
+4. Click the green **Commit changes...** button at the top right.
+5. A box appears. Type a short note about what you changed (e.g. "fix typo on
+   about page") and click the green **Commit changes** button in the box.
+6. Wait about a minute, then refresh the website.
+
+> **Nothing can be broken permanently.** Every change is saved separately, and
+> Paul can put any file back the way it was.
 
 Formatting, if you want it:
 
@@ -152,7 +157,7 @@ Videos are not stored on the website — they live on YouTube.
    findable on YouTube itself. Unlisted videos still play fine on the website.
 2. Copy the video's ID. It is the jumble of letters after `v=` in the address:
    `https://www.youtube.com/watch?v=`**`dQw4w9WgXcQ`**
-3. On GitHub, open `src/content/copy/about.md` and click the pencil.
+3. Open the About page in the editor: [edit about](https://github.com/samuelswizee3dstudio-byte/website/edit/main/src/content/copy/about.md)
 4. Near the top you will see:
 
    ```
