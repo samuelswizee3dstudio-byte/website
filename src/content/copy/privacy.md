@@ -3,14 +3,11 @@ title: "Privacy notice"
 description: "What we collect when you order or contact us, and what we do with it."
 ---
 
-> **DRAFT — for Paul's review.** Replace the details marked `[[REPLACE: ...]]`
-> and delete this note before go-live.
-
 This is a very small business and we collect as little as we can.
 
 ## Who is responsible
 
-`[[REPLACE: seller's full name]]`, trading as Swizee 3D Studio, Great Sankey,
+Rebecca and Samuel Dagger, trading as Swizee 3D Studio, Great Sankey,
 Warrington, is the data controller for this site. To contact us about your data,
 use the [contact form](/contact).
 
@@ -38,7 +35,7 @@ keep business records.
 
 The form is handled by **Netlify**, our website host. Your name, email address
 and message are emailed to us and stored in Netlify for
-`[[REPLACE: 90]]` days, then deleted.
+90 days, then deleted.
 
 **Legal basis:** our legitimate interest in answering your question.
 
