@@ -1,0 +1,8 @@
+# Cloudflare Pages configuration.
+#
+# nodejs_compat is required: the Stripe SDK resolves its `workerd` entrypoint
+# automatically, but still expects a few Node built-ins.
+name = "swizee"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-09-01"
+compatibility_flags = ["nodejs_compat"]
