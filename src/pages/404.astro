@@ -3,17 +3,20 @@ import Base from '../layouts/Base.astro';
 ---
 <Base title="Page not found" noindex>
   <div class="wrap wrap--narrow centre">
-    <h1>We cannot find that page</h1>
-    <p>It may have moved, or the link might be wrong.</p>
+    <img src="/images/lost-lizard.png" alt="" width="450" height="248" />
+    <h1 class="t-page-title">This one got away</h1>
+    <p class="lede">We cannot find that page. It may have moved, or the link might be wrong.</p>
     <p class="buttons">
-      <a class="btn btn--primary" href="/shop">Go to the shop</a>
+      <a class="btn btn--primary" href="/shop">Go to the shop <span aria-hidden="true">→</span></a>
       <a class="btn btn--secondary" href="/">Back to the start</a>
     </p>
   </div>
 </Base>
 
 <style>
-  .centre { text-align: center; padding-block: var(--sw-7); }
-  .centre p { margin-inline: auto; margin-top: var(--sw-4); }
-  .buttons { display: flex; gap: var(--sw-3); justify-content: center; flex-wrap: wrap; max-width: none; }
+  .centre { text-align: center; padding-block: var(--sw-6) var(--sw-8); }
+  .centre img { margin-inline: auto; max-width: min(100%, 420px); height: auto; }
+  .centre h1 { margin-top: var(--sw-3); }
+  .centre .lede { margin: var(--sw-4) auto 0; }
+  .buttons { display: flex; gap: var(--sw-3); justify-content: center; flex-wrap: wrap; margin-top: var(--sw-5); }
 </style>

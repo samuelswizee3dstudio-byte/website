@@ -25,9 +25,10 @@ for (const p of products) {
   <div class="wrap wrap--narrow stack cart">
     <h1>Your basket</h1>
 
-    <div id="empty" hidden>
-      <p class="notice">Your basket is empty.</p>
-      <p><a class="btn btn--primary" href="/shop">Have a look in the shop</a></p>
+    <div id="empty" class="empty-state" hidden>
+      <img src="/images/empty-basket.png" alt="" width="420" height="231" />
+      <p class="lede">Your basket is empty.</p>
+      <p><a class="btn btn--primary" href="/shop">Have a look in the shop <span aria-hidden="true">&#8594;</span></a></p>
     </div>
 
     <div id="dropped" class="notice notice--warn" hidden role="status">
@@ -182,6 +183,9 @@ for (const p of products) {
   #checkout { margin-top: var(--sw-5); }
   .pay { text-align: center; margin-top: var(--sw-2); }
   #dropped { margin-bottom: var(--sw-4); }
+  .empty-state { text-align: center; padding-block: var(--sw-4) var(--sw-7); }
+  .empty-state img { margin-inline: auto; max-width: min(100%, 380px); height: auto; }
+  .empty-state .lede { margin: var(--sw-3) auto var(--sw-5); }
 </style>
 
 <!-- The basket rows are created by the script above, so they never receive

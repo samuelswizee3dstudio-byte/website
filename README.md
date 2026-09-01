@@ -80,6 +80,21 @@ asks for.
   product has no photo in Stripe. The handoff is explicit that these must not
   ship — upload real photos to Stripe before go-live.
 
+### Generated illustrations
+
+Three decorative images were generated (Nano Banana) and composited locally:
+
+| File | Where | Notes |
+|---|---|---|
+| `public/og-image.jpg` | Social share card | Illustration generated; the type is real Anton/Nunito composited over it in a browser, not drawn by the model |
+| `public/images/lost-lizard.png` | 404 page | Cream background keyed to transparent so it sits on any surface |
+| `public/images/empty-basket.png` | Empty basket state | Same treatment |
+
+**No product photography is generated, and none should be.** Every image on a
+shop or product page is a promise about what arrives in the bag — those come
+from real photos in Stripe. The same goes for the "maker photo" on the home
+page's Our Story tile: that needs a real photograph, not a generated person.
+
 Still needed from the client: axolotl, name sign, bag tag, rainbow slider,
 pencil topper, flexi dragon and maker photos, plus the "how it's made" video.
 
