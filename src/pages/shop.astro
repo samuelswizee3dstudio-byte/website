@@ -1,20 +1,25 @@
 ---
 import Base from '../layouts/Base.astro';
 import ProductCard from '../components/ProductCard.astro';
-import { getCatalogue } from '../lib/catalogue.mjs';
+import { getCatalogue, formatPrice } from '../lib/catalogue.mjs';
 
 // The design handoff is explicit: a plain grid, no filters and no search.
 // `category` metadata is still read by the catalogue and is available if a
 // future brief wants grouping back.
 const products = await getCatalogue();
 const count = products.length;
+// Derived, not asserted: "all under £10" silently became untrue the moment a
+// £10 variant existed.
+const ceiling = count ? formatPrice(Math.max(...products.map((p) => p.priceTo))) : null;
 ---
 <Base title="Shop" description="Everything we print — fidgets, axolotls and personalised name items. Made to order in Warrington. UK delivery or free collection.">
   <div class="wrap shop">
     <header class="shop__head">
       <h1 class="t-page-title">Everything<br />we print</h1>
       <p class="lede">
-        {count > 0 ? `${count} ${count === 1 ? 'thing' : 'things'}, all under £10, all made after you order.` : 'New things are on the way.'}
+        {count > 0
+          ? `${count} ${count === 1 ? 'thing' : 'things'}, all ${ceiling} or less, all made after you order.`
+          : 'New things are on the way.'}
       </p>
       {count > 0 && <p class="shop__count">{count} {count === 1 ? 'product' : 'products'}</p>}
     </header>

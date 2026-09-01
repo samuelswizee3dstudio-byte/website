@@ -6,6 +6,7 @@
 
 import Stripe from 'stripe';
 import { FIXTURE_PRODUCTS } from './fixtures.mjs';
+import { loadEnv } from './load-env.mjs';
 
 const GBP = 'gbp';
 
@@ -160,6 +161,7 @@ let cached = null;
 export async function getCatalogue() {
   if (cached) return cached;
 
+  loadEnv();
   const key = process.env.STRIPE_SECRET_KEY;
 
   if (!key) {

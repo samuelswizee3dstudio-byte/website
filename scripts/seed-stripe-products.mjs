@@ -9,7 +9,7 @@
 // product rather than making a second one. Refuses to touch a live account.
 
 import Stripe from 'stripe';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 
 // Load .env without a dependency — the file is a handful of KEY=value lines.
 try {
@@ -35,46 +35,85 @@ const stripe = new Stripe(key, { maxNetworkRetries: 3 });
 
 // The four cases from the brief: a plain item, an item with price variants, a
 // personalisable item with variants, and a personalisable item without.
+// Modelled on the real product lines, with the family's own photos. Prices are
+// indicative except the two the design handoff confirms (Name Clicker Keyring
+// from £3.50, Infinity Cube £5.00) — the family sets the rest in the Dashboard.
+// Photos are uploaded to Stripe from PHOTO_DIR so the family can swap them there.
 const SEED = [
   {
-    seed_id: 'axolotl-buddy',
-    name: 'Axolotl Fidget Buddy',
-    description: 'A wiggly articulated axolotl that actually moves. Printed in one piece — no glue, no batteries.',
-    metadata: { category: 'axolotls', featured: 'true', sort: '10', slug: 'axolotl-buddy', image: '/images/samples/axolotl.svg' },
-    prices: [{ amount: 600 }],
-  },
-  {
-    seed_id: 'hex-spinner',
-    name: 'Hex Fidget Spinner',
-    description: 'Smooth six-sided spinner, quiet enough for the back of the classroom. Two sizes.',
-    metadata: { category: 'fidgets', featured: 'true', sort: '20', slug: 'hex-spinner', image: '/images/samples/hex.svg' },
-    prices: [
-      { amount: 400, label: 'Small (50mm)', sort: '1' },
-      { amount: 550, label: 'Large (70mm)', sort: '2' },
-    ],
-  },
-  {
-    seed_id: 'name-plate',
-    name: 'Name Plate',
-    description: 'Your name printed big and bold, standing up on a shelf or a desk.',
-    metadata: {
-      category: 'name-items', personalise: 'true', personalise_label: 'Name to print',
-      featured: 'true', sort: '30', slug: 'name-plate', image: '/images/samples/nameplate.svg',
-    },
-    prices: [
-      { amount: 500, label: 'Up to 4 letters', sort: '1' },
-      { amount: 700, label: '5 to 7 letters', sort: '2' },
-      { amount: 900, label: '8 to 10 letters', sort: '3' },
-    ],
-  },
-  {
     seed_id: 'name-keyring',
-    name: 'Personalised Keyring',
-    description: 'A chunky keyring with your name on it. Comes with a split ring.',
-    metadata: { category: 'name-items', personalise: 'true', sort: '40', slug: 'name-keyring', image: '/images/samples/keyring.svg' },
-    prices: [{ amount: 350 }],
+    name: 'Name Clicker Keyring',
+    description: 'Chunky letter tiles that click as you flip them. Clips onto a bag or a set of keys. Printed one letter at a time.',
+    metadata: { category: 'name-items', personalise: 'true', personalise_label: 'Name to print', featured: 'true', sort: '10', slug: 'name-clicker-keyring' },
+    photos: ['jacob-samuel-name-clickers.jpg'],
+    prices: [
+      { amount: 350, label: '3 letters', sort: '1' },
+      { amount: 450, label: '4 letters', sort: '2' },
+      { amount: 550, label: '5 letters', sort: '3' },
+      { amount: 650, label: '6 letters', sort: '4' },
+    ],
+  },
+  {
+    seed_id: 'infinity-cube',
+    name: 'Infinity Cube',
+    description: 'Folds over and over, forever. Quiet enough for the back of the classroom and small enough for a pocket.',
+    metadata: { category: 'fidgets', featured: 'true', sort: '20', slug: 'infinity-cube' },
+    photos: ['infinity-cubes.jpg', 'infinity-cubes-at-the-beach.jpg'],
+    prices: [{ amount: 500 }],
+  },
+  {
+    seed_id: 'flexi-lizard',
+    name: 'Flexi Lizard',
+    description: 'An articulated lizard that wriggles along your hand. Printed in one piece — no glue, no batteries, no assembly.',
+    metadata: { category: 'flexis', featured: 'true', sort: '30', slug: 'flexi-lizard' },
+    photos: ['lizard.jpg', 'lizard-in-hands.jpg'],
+    prices: [{ amount: 800 }],
+  },
+  {
+    seed_id: 'name-block',
+    name: 'Name Block',
+    description: 'Your name printed big and bold, standing up on a shelf or a desk.',
+    metadata: { category: 'name-items', personalise: 'true', personalise_label: 'Name to print', sort: '40', slug: 'name-block' },
+    photos: ['name-block-swizee.jpg'],
+    prices: [
+      { amount: 600, label: 'Up to 4 letters', sort: '1' },
+      { amount: 800, label: '5 to 7 letters', sort: '2' },
+      { amount: 1000, label: '8 to 10 letters', sort: '3' },
+    ],
   },
 ];
+
+// Every metadata key this project understands — see README. Listed so a re-seed
+// can clear stale values rather than leaving them merged in.
+const KNOWN_METADATA_KEYS = [
+  'category', 'personalise', 'personalise_label', 'featured', 'sort',
+  'hidden', 'slug', 'image',
+];
+
+const PHOTO_DIR = process.env.PHOTO_DIR
+  || `${process.env.HOME}/Desktop/swizee-for-stripe`;
+
+/**
+ * Upload a local photo to Stripe and return a public URL for it. Stripe's
+ * `images` field takes URLs, not uploads, so every file needs a file link.
+ * Cached per run so re-seeding does not re-upload the same picture.
+ */
+const uploadedPhotos = new Map();
+async function photoUrl(filename) {
+  if (uploadedPhotos.has(filename)) return uploadedPhotos.get(filename);
+  const path = `${PHOTO_DIR}/${filename}`;
+  if (!existsSync(path)) {
+    console.warn(`  ! photo not found, skipping: ${path}`);
+    return null;
+  }
+  const file = await stripe.files.create({
+    purpose: 'product_image',
+    file: { data: readFileSync(path), name: filename, type: 'image/jpeg' },
+  });
+  const link = await stripe.fileLinks.create({ file: file.id });
+  uploadedPhotos.set(filename, link.url);
+  return link.url;
+}
 
 async function findBySeedId(seedId) {
   // Stripe search is eventually consistent on new objects, so list and filter —
@@ -105,11 +144,21 @@ async function run() {
 
   for (const spec of SEED) {
     const existing = await findBySeedId(spec.seed_id);
+    const images = [];
+    for (const photo of spec.photos ?? []) {
+      const url = dry ? null : await photoUrl(photo);
+      if (url) images.push(url);
+    }
+
     const body = {
       name: spec.name,
       description: spec.description,
-      metadata: { ...spec.metadata, seed_id: spec.seed_id },
+      // Stripe MERGES metadata on update, so a key this seed no longer sets would
+      // survive from a previous run and quietly keep winning. Blank every key we
+      // know about, then apply the ones we actually want.
+      metadata: { ...Object.fromEntries(KNOWN_METADATA_KEYS.map((k) => [k, ''])), ...spec.metadata, seed_id: spec.seed_id },
       active: true,
+      ...(images.length ? { images } : {}),
     };
 
     if (dry) {
