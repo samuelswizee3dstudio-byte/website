@@ -71,7 +71,9 @@ const SEED = [
     description: 'Folds over and over, forever. Quiet enough for the back of the classroom and small enough for a pocket.',
     metadata: { category: 'fidgets', featured: 'true', sort: '20', slug: 'infinity-cube' },
     photos: ['infinity-cubes.jpg', 'infinity-cubes-at-the-beach.jpg'],
-    prices: [{ amount: 500 }],
+    // £2.50, confirmed by Paul against the stall sign in the promo video. The
+    // design handoff's "from £5.00" was out of date.
+    prices: [{ amount: 250 }],
   },
   {
     seed_id: 'flexi-lizard',
