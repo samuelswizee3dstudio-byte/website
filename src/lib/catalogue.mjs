@@ -153,6 +153,15 @@ export function normalise(stripeProducts, stripePrices) {
   return products.sort((a, b) => a.sort - b.sort || a.name.localeCompare(b.name));
 }
 
+/**
+ * True on any hosted build. `CI` covers Cloudflare Pages, Netlify and GitHub
+ * Actions; the others are belt and braces in case a provider stops setting it.
+ */
+function isHostedBuild() {
+  const e = process.env;
+  return Boolean(e.CI || e.CF_PAGES || e.NETLIFY || e.VERCEL || e.GITHUB_ACTIONS || e.CONTEXT);
+}
+
 let cached = null;
 
 /**
@@ -167,19 +176,19 @@ export async function getCatalogue() {
   const key = process.env.STRIPE_SECRET_KEY;
 
   if (!key) {
-    // Netlify sets CONTEXT on every build. A production deploy must never ship
-    // placeholder products, so fail loudly rather than build something plausible.
-    // The one exception is proving the deploy pipeline works before the Stripe
-    // account exists — see ALLOW_SAMPLE_CATALOGUE in README.md. Temporary.
-    if (process.env.CONTEXT === 'production' && process.env.ALLOW_SAMPLE_CATALOGUE !== 'true') {
+    // A hosted build must never ship placeholder products. This originally
+    // keyed off Netlify's CONTEXT variable, which meant it did nothing at all
+    // on Cloudflare Pages — the first Pages deploy silently published four
+    // invented products. Detect any hosted build instead of one host's.
+    if (isHostedBuild() && process.env.ALLOW_SAMPLE_CATALOGUE !== 'true') {
       throw new Error(
-        'STRIPE_SECRET_KEY is not set. Set it in Netlify > Project configuration > Environment variables ' +
-        'before deploying to production, or set ALLOW_SAMPLE_CATALOGUE=true to deploy the sample ' +
-        'catalogue while the Stripe account is still being set up.'
+        'STRIPE_SECRET_KEY is not set. Add it to the hosting environment variables before ' +
+        'deploying, or set ALLOW_SAMPLE_CATALOGUE=true to deploy the sample catalogue ' +
+        'deliberately while the Stripe account is still being set up.'
       );
     }
-    if (process.env.CONTEXT === 'production') {
-      console.warn('[catalogue] ALLOW_SAMPLE_CATALOGUE is on — this PRODUCTION deploy is shipping SAMPLE products. Remove it once STRIPE_SECRET_KEY is set.');
+    if (isHostedBuild()) {
+      console.warn('[catalogue] ALLOW_SAMPLE_CATALOGUE is on — this deploy is shipping SAMPLE products. Remove it once STRIPE_SECRET_KEY is set.');
     }
     console.warn(
       '\n[catalogue] STRIPE_SECRET_KEY is not set — building with SAMPLE products from src/lib/fixtures.mjs.\n' +
