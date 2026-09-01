@@ -82,21 +82,28 @@ stage 1 of the brief done.
 
 ## Part 2 — Contact form notifications (3 min)
 
-The contact form is already wired up. Netlify finds it automatically during the
-build; you only need to say where submissions go.
+The contact form is already wired up in the code. Netlify needs telling to look
+for it, and then telling where submissions go.
 
-1. **Project configuration → Notifications → Emails and webhooks**.
+1. **Forms** (in the project's own left-hand nav, not the configuration
+   sidebar) → **Enable form detection**. This is off by default and nothing
+   works until it is on.
+2. **Trigger a redeploy** — Deploys → Trigger deploy → Deploy site. Netlify only
+   parses forms at build time, so the form is invisible until a build runs
+   *after* detection is enabled.
+3. **Project configuration → Notifications → Emails and webhooks**.
    (Netlify renamed "Site configuration" to **Project configuration** — it is the
    left-hand sidebar item once you have opened the project.)
-2. Under **Form submission notifications**, click **Add notification** →
+4. Under **Form submission notifications**, click **Add notification** →
    **Email notification**.
-3. Email to notify: **Paul's email address**. Form: **contact**. Save.
+
+   > If there is no *Form submission notifications* section at all, step 1 or 2
+   > has not happened yet. The section only appears once Netlify has seen a form.
+5. Email to notify: **Paul's email address**. Form: **contact**. Save.
 
    > Deliberately not written down here — this repo is public, and published
    > addresses get scraped. The address lives only in Netlify's own settings.
 
-   If no form called **contact** is offered, the site has not finished a deploy
-   that contains the form yet — deploy first, then come back.
 
 Test it: open the site's `/contact` page, send yourself a message, and check it
 arrives. Then check **Forms** in Netlify — the submission should be listed.
@@ -120,7 +127,7 @@ to **Public** → save.
 Check it worked from a terminal — this should print `200`, not `401`:
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}\n" https://sprightly-twilight-171df0.netlify.app
+curl -s -o /dev/null -w "%{http_code}\n" https://swizee.netlify.app
 ```
 
 ## Part 3 — Stripe settings (10 min)
