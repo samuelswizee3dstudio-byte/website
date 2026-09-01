@@ -7,7 +7,7 @@ This is a very small business and we collect as little as we can.
 
 ## Who is responsible
 
-Rebecca and Samuel Dagger, trading as Swizee 3D Studio, Great Sankey,
+Rebecca Dagger, trading as Swizee 3D Studio, Great Sankey,
 Warrington, is the data controller for this site. To contact us about your data,
 use the [contact form](/contact).
 
