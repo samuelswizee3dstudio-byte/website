@@ -92,7 +92,8 @@ On a **price** (only needed when a product has more than one):
 
 | Type this | ...and this | What happens |
 |---|---|---|
-| `variant_label` | `Up to 4 letters` | The wording of that choice |
+| `variant_label` | `4 letters` | The wording of that choice |
+| `max_chars` | `4` | How many letters that choice allows. You usually do not need this — if the wording says "4 letters" the website works it out |
 | `sort` | `1` | Which choice appears first |
 
 > **A note on web addresses.** If you do not set `slug`, the address comes from

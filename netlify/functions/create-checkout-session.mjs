@@ -8,6 +8,7 @@ import Stripe from 'stripe';
 import {
   validatePersonalisation,
   validateQuantity,
+  maxCharsForPrice,
   MAX_LINES,
 } from '../../src/lib/validation.mjs';
 import {
@@ -100,6 +101,14 @@ export default async (request) => {
     }
     if (!product || typeof product === 'string' || product.deleted || !product.active) {
       return fail(400, 'Something in your basket is no longer available. Please empty your basket and try again.');
+    }
+
+    // Re-validate against this specific price's letter limit. The earlier pass
+    // only knew the global cap, so without this a customer could select the
+    // 3-letter price and submit an 8-letter word.
+    if (line.text) {
+      const check = validatePersonalisation(line.text, maxCharsForPrice(price));
+      if (!check.ok) return fail(400, `${product.name}: ${check.message}`);
     }
 
     const wantsText = String(product.metadata?.personalise ?? '').toLowerCase() === 'true';

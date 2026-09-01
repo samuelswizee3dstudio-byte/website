@@ -46,12 +46,24 @@ const SEED = [
     description: 'Chunky letter tiles that click as you flip them. Clips onto a bag or a set of keys. Printed one letter at a time.',
     metadata: { category: 'name-items', personalise: 'true', personalise_label: 'Name to print', featured: 'true', sort: '10', slug: 'name-clicker-keyring' },
     photos: ['jacob-samuel-name-clickers.jpg'],
+    // Prices read off the handwritten signs in the family's own promo video:
+    // 50p per letter from a three-letter minimum.
     prices: [
-      { amount: 350, label: '3 letters', sort: '1' },
-      { amount: 450, label: '4 letters', sort: '2' },
-      { amount: 550, label: '5 letters', sort: '3' },
-      { amount: 650, label: '6 letters', sort: '4' },
+      { amount: 350, label: '3 letters', sort: '1', maxChars: '3' },
+      { amount: 400, label: '4 letters', sort: '2', maxChars: '4' },
+      { amount: 450, label: '5 letters', sort: '3', maxChars: '5' },
+      { amount: 500, label: '6 letters', sort: '4', maxChars: '6' },
+      { amount: 550, label: '7 letters', sort: '5', maxChars: '7' },
+      { amount: 600, label: '8 letters', sort: '6', maxChars: '8' },
     ],
+  },
+  {
+    seed_id: 'axolotl',
+    name: 'Mini Axolotl',
+    description: 'A tiny articulated axolotl that wiggles from nose to tail. Fits in a pocket. Printed in one piece.',
+    // No photo yet — the only picture is a video frame with a thumb in it.
+    metadata: { category: 'flexis', featured: 'true', sort: '15', slug: 'mini-axolotl' },
+    prices: [{ amount: 150 }],
   },
   {
     seed_id: 'infinity-cube',
@@ -65,7 +77,7 @@ const SEED = [
     seed_id: 'flexi-lizard',
     name: 'Flexi Lizard',
     description: 'An articulated lizard that wriggles along your hand. Printed in one piece — no glue, no batteries, no assembly.',
-    metadata: { category: 'flexis', featured: 'true', sort: '30', slug: 'flexi-lizard' },
+    metadata: { category: 'flexis', sort: '30', slug: 'flexi-lizard' },
     photos: ['lizard.jpg', 'lizard-in-hands.jpg'],
     prices: [{ amount: 800 }],
   },
@@ -76,9 +88,9 @@ const SEED = [
     metadata: { category: 'name-items', personalise: 'true', personalise_label: 'Name to print', sort: '40', slug: 'name-block' },
     photos: ['name-block-swizee.jpg'],
     prices: [
-      { amount: 600, label: 'Up to 4 letters', sort: '1' },
-      { amount: 800, label: '5 to 7 letters', sort: '2' },
-      { amount: 1000, label: '8 to 10 letters', sort: '3' },
+      { amount: 600, label: 'Up to 4 letters', sort: '1', maxChars: '4' },
+      { amount: 800, label: '5 to 7 letters', sort: '2', maxChars: '7' },
+      { amount: 1000, label: '8 to 10 letters', sort: '3', maxChars: '10' },
     ],
   },
 ];
@@ -177,7 +189,7 @@ async function run() {
       const want = wanted.get(price.unit_amount);
       if (want && price.currency === 'gbp' && price.type === 'one_time') {
         await stripe.prices.update(price.id, {
-          metadata: { ...(want.label ? { variant_label: want.label } : {}), ...(want.sort ? { sort: want.sort } : {}) },
+          metadata: { ...(want.label ? { variant_label: want.label } : {}), ...(want.sort ? { sort: want.sort } : {}), ...(want.maxChars ? { max_chars: want.maxChars } : {}) },
         });
         wanted.delete(price.unit_amount);
       } else {
@@ -189,7 +201,7 @@ async function run() {
         product: product.id,
         currency: 'gbp',
         unit_amount: amount,
-        metadata: { ...(want.label ? { variant_label: want.label } : {}), ...(want.sort ? { sort: want.sort } : {}) },
+        metadata: { ...(want.label ? { variant_label: want.label } : {}), ...(want.sort ? { sort: want.sort } : {}), ...(want.maxChars ? { max_chars: want.maxChars } : {}) },
       });
     }
 

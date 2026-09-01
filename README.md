@@ -140,7 +140,8 @@ On the **Price** (for products with more than one option):
 
 | Key | Example | What it does |
 |---|---|---|
-| `variant_label` | `Up to 4 letters` | The text in the option selector. Falls back to the price nickname, then to the amount |
+| `variant_label` | `4 letters` | The text in the option selector. Falls back to the price nickname, then to the amount |
+| `max_chars` | `4` | Letters allowed in the personalisation box for this option. If unset, it is read from `variant_label` — "4 letters" gives 4, "8 to 10 letters" gives 10. Enforced in the browser **and** on the server |
 | `sort` | `1` | Order of the options. Otherwise cheapest first |
 
 **A product only appears on the site if** it is Active, not `hidden`, and has at

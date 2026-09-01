@@ -7,10 +7,11 @@
 import Stripe from 'stripe';
 import { FIXTURE_PRODUCTS } from './fixtures.mjs';
 import { loadEnv } from './load-env.mjs';
+import { maxCharsForPrice } from './validation.mjs';
 
 const GBP = 'gbp';
 
-/** @typedef {{ id: string, label: string, unitAmount: number, sort: number }} Variant */
+/** @typedef {{ id: string, label: string, unitAmount: number, sort: number, maxChars: number }} Variant */
 /** @typedef {{ id: string, slug: string, name: string, description: string, images: string[],
  *              category: string | null, personalise: boolean, personaliseLabel: string,
  *              featured: boolean, sort: number, variants: Variant[],
@@ -108,6 +109,7 @@ export function normalise(stripeProducts, stripePrices) {
         label: price.metadata?.variant_label?.trim() || price.nickname?.trim() || '',
         unitAmount: price.unit_amount,
         sort: intOr(price.metadata?.sort, Number.MAX_SAFE_INTEGER),
+        maxChars: maxCharsForPrice(price),
       }))
       .sort((a, b) => a.sort - b.sort || a.unitAmount - b.unitAmount || a.id.localeCompare(b.id));
 

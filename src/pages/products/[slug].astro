@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { getCatalogue, formatPrice } from '../../lib/catalogue.mjs';
-import { PERSONALISATION_PATTERN, PERSONALISATION_MAX } from '../../lib/validation.mjs';
+import { PERSONALISATION_PATTERN } from '../../lib/validation.mjs';
 
 export async function getStaticPaths() {
   const products = await getCatalogue();
@@ -51,7 +51,7 @@ const first = product.variants[0];
               <div class="variants__row">
                 {product.variants.map((v: any, i: number) => (
                   <label class="variant">
-                    <input type="radio" name="priceId" value={v.id} data-amount={v.unitAmount} checked={i === 0} class="visually-hidden" />
+                    <input type="radio" name="priceId" value={v.id} data-amount={v.unitAmount} data-max={v.maxChars} checked={i === 0} class="visually-hidden" />
                     <span class="variant__label">{v.label}</span>
                     <span class="variant__price">{formatPrice(v.unitAmount)}</span>
                   </label>
@@ -59,7 +59,7 @@ const first = product.variants[0];
               </div>
             </fieldset>
           ) : (
-            <input type="hidden" name="priceId" value={first.id} data-amount={first.unitAmount} />
+            <input type="hidden" name="priceId" value={first.id} data-amount={first.unitAmount} data-max={first.maxChars} />
           )}
 
           {product.personalise && (
@@ -68,10 +68,10 @@ const first = product.variants[0];
               <input
                 class="input" id="text" name="text" type="text"
                 autocomplete="off" autocapitalize="characters" spellcheck="false"
-                maxlength={PERSONALISATION_MAX} pattern={PERSONALISATION_PATTERN} required
+                maxlength={first.maxChars} pattern={PERSONALISATION_PATTERN} required
                 aria-describedby="text-hint text-error"
               />
-              <p class="hint" id="text-hint"><span data-counter>0</span> of {PERSONALISATION_MAX} characters</p>
+              <p class="hint" id="text-hint"><span data-counter>0</span> of <span data-max-label>{first.maxChars}</span> characters</p>
               <p class="error-text" id="text-error" role="alert" aria-live="polite"></p>
             </div>
           )}
@@ -107,7 +107,7 @@ const first = product.variants[0];
 
 <script>
   import { addLine } from '../../lib/cart.mjs';
-  import { validatePersonalisation, PERSONALISATION_MAX } from '../../lib/validation.mjs';
+  import { validatePersonalisation } from '../../lib/validation.mjs';
 
   const form = document.querySelector<HTMLFormElement>('#add-form');
   if (form) {
@@ -123,10 +123,31 @@ const first = product.variants[0];
 
     const money = (p: number) => (p % 100 === 0 ? `£${p / 100}` : `£${(p / 100).toFixed(2)}`);
 
+    const maxLabel = form.querySelector<HTMLElement>('[data-max-label]');
+    const currentMax = () => {
+      const chosen = form.querySelector<HTMLInputElement>('input[name="priceId"]:checked')
+        ?? form.querySelector<HTMLInputElement>('input[name="priceId"]');
+      const n = Number(chosen?.dataset.max);
+      return Number.isInteger(n) && n > 0 ? n : 10;
+    };
+
     for (const radio of form.querySelectorAll<HTMLInputElement>('input[name="priceId"]')) {
       radio.addEventListener('change', () => {
         const amount = Number(radio.dataset.amount);
         if (priceEl && Number.isFinite(amount)) priceEl.textContent = money(amount);
+
+        // The letter allowance changes with the variant. Trim anything that no
+        // longer fits rather than letting them pay for fewer letters than typed.
+        const max = currentMax();
+        if (textInput) {
+          textInput.maxLength = max;
+          if (textInput.value.length > max) textInput.value = textInput.value.slice(0, max);
+          if (maxLabel) maxLabel.textContent = String(max);
+          if (counter) counter.textContent = String(textInput.value.length);
+          const check = validatePersonalisation(textInput.value, max);
+          setError(textInput.value && !check.ok ? check.message : '');
+          syncSubmit();
+        }
       });
     }
 
@@ -154,22 +175,22 @@ const first = product.variants[0];
     };
     const syncSubmit = () => {
       if (!textInput) return;
-      submit.disabled = !validatePersonalisation(textInput.value).ok;
+      submit.disabled = !validatePersonalisation(textInput.value, currentMax()).ok;
     };
 
     textInput?.addEventListener('input', () => {
-      const cleaned = textInput.value.replace(/[^A-Za-z0-9]/g, '').slice(0, PERSONALISATION_MAX);
+      const cleaned = textInput.value.replace(/[^A-Za-z0-9]/g, '').slice(0, currentMax());
       const stripped = cleaned !== textInput.value;
       textInput.value = cleaned;
       if (counter) counter.textContent = String(cleaned.length);
       // Live counter while typing; the full message only once they have tried
       // something we cannot print.
-      setError(stripped ? 'Letters and numbers only, up to 10' : '');
+      setError(stripped ? `Letters and numbers only, up to ${currentMax()}` : '');
       syncSubmit();
     });
     textInput?.addEventListener('blur', () => {
-      const check = validatePersonalisation(textInput.value);
-      setError(check.ok ? '' : 'Letters and numbers only, up to 10');
+      const check = validatePersonalisation(textInput.value, currentMax());
+      setError(check.ok ? '' : check.message);
       syncSubmit();
     });
     syncSubmit();
@@ -184,8 +205,8 @@ const first = product.variants[0];
       const text = textInput ? String(data.get('text') ?? '') : '';
 
       if (textInput) {
-        const check = validatePersonalisation(text);
-        if (!check.ok) { setError('Letters and numbers only, up to 10'); textInput.focus(); return; }
+        const check = validatePersonalisation(text, currentMax());
+        if (!check.ok) { setError(check.message); textInput.focus(); return; }
         setError('');
       }
 
