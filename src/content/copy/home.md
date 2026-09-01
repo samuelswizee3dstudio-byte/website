@@ -1,5 +1,5 @@
 ---
-title: "Fidgets made\none at a time."
+title: "Fidgets made\njust for you."
 description: "3D printed fidgets, axolotls and personalised name items. Printed to order in Warrington. UK delivery or free collection."
 ---
 
