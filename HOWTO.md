@@ -219,13 +219,20 @@ chose collection, email them to arrange a time when it is ready.
 
 Work down this list:
 
-1. **Wait two minutes and refresh.** The website rebuilds itself after a change
-   in Stripe; it is not instant.
+1. **Wait five minutes and refresh.** The website rebuilds itself after a change
+   in Stripe, but it waits until you have stopped editing before it does — so a
+   batch of changes becomes one update rather than twenty. It is not instant,
+   and that is on purpose.
 2. **Is the product Active?** Archived products do not show.
 3. **Does it have a price, in GBP, as a one-off payment?** A product with no
    price, or a price in dollars, or a subscription price, will not show.
 4. **Did you add `hidden` = `true` by mistake?**
-5. **Force a rebuild.** Open the bookmark Paul set up called *Rebuild Swizee
+5. **Are you looking at the right Stripe?** Stripe has a separate practice mode
+   called a **sandbox**. A product added there never appears on the real website.
+   Look at the top-left of the Stripe page: it should say **Swizee 3D studio**.
+   If it says *sandbox*, click it and choose **Exit sandbox**, then add the
+   product again.
+6. **Force a rebuild.** Open the bookmark Paul set up called *Rebuild Swizee
    site* and wait a minute. (If you do not have it, ask Paul — it is a link that
    makes the site rebuild on demand.)
 

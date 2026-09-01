@@ -19,8 +19,7 @@ const json = (status, body) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 
 /**
- * Host-agnostic rebuild webhook. `env` is Cloudflare's binding object or
- * process.env, depending on who is hosting.
+ * Rebuild webhook. `env` is Cloudflare's binding object.
  * @param {Request} request
  * @param {Record<string, string|undefined>} env
  */
@@ -28,7 +27,7 @@ export async function handleRebuild(request, env) {
   if (request.method !== 'POST') return json(405, { message: 'Method not allowed.' });
 
   const signingSecret = env.STRIPE_WEBHOOK_SECRET;
-  const buildHook = env.DEPLOY_HOOK_URL || env.NETLIFY_BUILD_HOOK_URL;
+  const buildHook = env.DEPLOY_HOOK_URL;
   if (!signingSecret || !buildHook) {
     console.error('Rebuild webhook is not configured (STRIPE_WEBHOOK_SECRET / DEPLOY_HOOK_URL).');
     return json(500, { message: 'Not configured.' });
@@ -72,7 +71,7 @@ export async function handleRebuild(request, env) {
     return json(200, { queued: true, event: event.type });
   }
 
-  // No KV bound (e.g. the Netlify deploy): fall back to building immediately.
+  // No KV bound: fall back to building immediately rather than losing the event.
   return triggerDeploy(buildHook, `Stripe: ${event.type}`);
 }
 

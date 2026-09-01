@@ -1,10 +1,10 @@
 # Swizee 3D Studio
 
-The shop at [swizee.co.uk](https://swizee.co.uk). Astro (static) on Netlify, with
-Stripe Checkout for payments and Stripe as the product catalogue.
+The shop at [swizee.co.uk](https://swizee.co.uk). Astro (static) on Cloudflare
+Pages, with Stripe Checkout for payments and Stripe as the product catalogue.
 
 - **Adding a product or changing some words?** → [HOWTO.md](HOWTO.md)
-- **Setting up Netlify, Stripe or the domain?** → [SETUP.md](SETUP.md)
+- **Setting up hosting, Stripe or the domain?** → [SETUP.md](SETUP.md)
 - **Working on the code?** → you are in the right place.
 
 ---
@@ -12,12 +12,17 @@ Stripe Checkout for payments and Stripe as the product catalogue.
 ## How it fits together
 
 ```
-Stripe Dashboard ──(build-time fetch)──> Astro build ──> static site on Netlify
+Stripe Dashboard ──(build-time fetch)──> Astro build ──> Cloudflare Pages
       ▲                                                          │
       │                                                   basket in the browser
       │                                                          │
-      └──── Checkout Session <── netlify/functions/create-checkout-session.mjs
+      └──── Checkout Session <──────── functions/api/checkout.js
 ```
+
+Product edits in Stripe fire a webhook at `functions/api/stripe-rebuild.js`,
+which records that a rebuild is due in KV. A scheduled worker
+(`workers/rebuild-drain.js`) spends one deploy once edits have been quiet for
+three minutes — see **Deploy budget** below.
 
 - **No product data is hard-coded.** Everything on the shop and product pages
   comes from the Stripe API at build time (`src/lib/catalogue.mjs`).
@@ -37,7 +42,7 @@ npm run dev
 
 Without `STRIPE_SECRET_KEY` the build uses the sample catalogue in
 `src/lib/fixtures.mjs` so you can work on the site with no Stripe account. A
-Netlify **production** build refuses to start without the key, so placeholder
+hosted build refuses to start without the key, so placeholder
 products can never reach the live site.
 
 To work against real Stripe test data:
@@ -47,10 +52,10 @@ cp .env.example .env    # then paste your sk_test_... key
 npm run dev
 ```
 
-Netlify Functions do not run under `astro dev`. To exercise checkout locally:
+Pages Functions do not run under `astro dev`. To exercise checkout locally:
 
 ```bash
-npx netlify dev
+npm run build && npx wrangler pages dev dist
 ```
 
 Other commands:
@@ -123,8 +128,8 @@ UK only. Both options are offered at Stripe Checkout as shipping rates:
 | Collect from Great Sankey, Warrington | free | up to 7 working days |
 | UK delivery (Royal Mail 2nd Class) | £3.50, free over £20 | 7 days to make, then 2–3 in the post |
 
-Every number lives in `src/lib/shipping.mjs`. The site's copy and the Netlify
-Function both read from it, so changing the price is a one-line edit and the two
+Every number lives in `src/lib/shipping.mjs`. The site's copy and the checkout
+function both read from it, so changing the price is a one-line edit and the two
 cannot disagree. The free-delivery threshold is worked out server-side from
 Stripe's own prices, never from anything the browser sent.
 
@@ -182,58 +187,81 @@ at three, which does not work for a multi-item basket.
 
 > If the family finds the Metadata panel awkward in practice, the fallback in the
 > brief is a Stripe webhook that emails an order summary. The webhook plumbing in
-> `netlify/functions/stripe-rebuild.mjs` is the pattern to copy.
+> `functions/api/stripe-rebuild.js` is the pattern to copy.
 
 ## Environment variables
 
-See [.env.example](.env.example). On Netlify: **Project configuration → Environment
-variables**.
+See [.env.example](.env.example). On Cloudflare: **Pages project → Settings → Variables and secrets**
+(<https://dash.cloudflare.com/?to=/:account/pages/view/website/settings>).
 
 | Variable | Needed for |
 |---|---|
 | `STRIPE_SECRET_KEY` | Everything. Build-time catalogue and checkout |
-| `NETLIFY_BUILD_HOOK_URL` | Automatic rebuilds when Stripe changes |
+| `DEPLOY_HOOK_URL` | Set as a **worker secret**, not a Pages variable. Lets the drain worker trigger a build |
 | `STRIPE_WEBHOOK_SECRET` | Verifying those Stripe webhook calls |
 | `COLLECT_PHONE` | Set to `false` to stop asking for a phone number at checkout. On by default, and required once on — Stripe has no optional setting |
-| `ALLOW_PLACEHOLDERS` | Temporary. Lets a production build succeed while the legal wording is still a draft. **Delete this before go-live** |
+| `PUBLIC_WEB3FORMS_KEY` | Optional. Overrides the committed contact-form key |
 | `ALLOW_SAMPLE_CATALOGUE` | Temporary. Lets a production build ship the sample catalogue while there is no Stripe key yet. **Delete this before go-live** |
 
 ## Automatic rebuilds
 
 Product edits in Stripe go live via a rebuild. Preferred setup:
 
-1. Netlify → Project configuration → Build & deploy → **Build hooks** → Add build
-   hook. Copy the URL into `NETLIFY_BUILD_HOOK_URL`.
+1. Cloudflare → Pages project → **Settings** → scroll to **Deploy Hooks** → the
+   small **`+`** at the right of that row. Name it `stripe-product-change`,
+   branch `main`. Copy the URL.
 2. Stripe → Developers → **Webhooks** → Add endpoint:
    `https://swizee.co.uk/api/stripe-rebuild`
 3. Select events: `product.created`, `product.updated`, `product.deleted`,
    `price.created`, `price.updated`, `price.deleted`.
-4. Copy the endpoint's signing secret into `STRIPE_WEBHOOK_SECRET`.
+4. Copy the endpoint's signing secret into `STRIPE_WEBHOOK_SECRET` (Pages
+   variable), and the deploy hook URL into the worker:
+   `npx wrangler secret put DEPLOY_HOOK_URL --config workers/wrangler.toml`
 
 Other event types are acknowledged and ignored, so they do not burn build
-minutes. A build takes well under a minute; Netlify's free tier includes 300
-build minutes a month, which is hundreds of product edits.
+minutes. Cloudflare's free tier allows 500 builds a month, and the debounce
+below keeps a burst of edits to one.
 
-Fallback if the webhook is not wanted: the build hook URL can be bookmarked and
+Fallback if the webhook is not wanted: the deploy hook URL can be bookmarked and
 opened to trigger a rebuild by hand. See HOWTO.md.
+
+## Deploy budget
+
+This matters more than it sounds. **Netlify's free plan allows 20 production
+deploys a month, and small frequent pushes exhausted a whole month in an
+afternoon**, which is why the site moved to Cloudflare Pages (500 builds/month).
+
+The webhook therefore does **not** deploy on every Stripe edit. It records that a
+rebuild is due; `workers/rebuild-drain.js` runs every two minutes and spends one
+deploy once edits have been quiet for three. Fifteen product edits cost one
+build, not fifteen.
+
+It is a *trailing* debounce on purpose. A leading throttle would build on the
+first edit and drop the rest, so the family would watch one product appear and
+the others not. `tests/rebuild.test.mjs` covers that case explicitly.
 
 ## Deploying
 
-Netlify builds and deploys on every push to `main`. `netlify.toml` holds the
-build command, the `www` → apex redirect and the security headers.
+Cloudflare Pages builds and deploys on every push to `main`. `public/_redirects`
+holds the `www` → apex redirect and `public/_headers` the security headers;
+`wrangler.toml` sets `nodejs_compat`, which the Stripe SDK needs.
+
+The rebuild worker is deployed separately:
+
+```bash
+npx wrangler deploy --config workers/wrangler.toml
+```
 
 ## Go-live checklist
 
 - [ ] Paul has reviewed and replaced the `[[REPLACE: ...]]` wording in
       `src/content/copy/terms.md` and `privacy.md`, and deleted the DRAFT notes
-- [ ] `ALLOW_PLACEHOLDERS` deleted from Netlify
 - [ ] Logo assets checked against the Claude Design export (`public/logo.png`, `favicon.png`, `apple-touch-icon.png` are the supplied circle mark)
 - [ ] Real product photos uploaded in Stripe
-- [ ] `swizee.co.uk` added in Netlify, DNS pointed at it from IONOS, HTTPS live,
-      `www` redirecting
+- [ ] `swizee.co.uk` and `www` active on Cloudflare Pages, HTTPS live
 - [ ] Stripe email receipts turned on (Stripe → Settings → Customer emails)
 - [ ] Stripe branding and public business name set (shown on the Checkout page)
-- [ ] Netlify form notification for `contact` set to Paul's email address
+- [ ] Contact form delivering (Web3Forms) — send a test message
 - [ ] `STRIPE_SECRET_KEY` swapped to the live key, site rebuilt
 - [ ] One real £1 purchase, checked in the Dashboard, then refunded
 
@@ -245,6 +273,7 @@ src/lib/cart.mjs        Browser basket
 src/lib/validation.mjs  Personalisation + quantity rules, shared by browser AND server
 src/content/copy/       Site text as markdown, edited on GitHub by the family
 src/styles/tokens.css   Every colour, font and spacing value, verbatim from the design handoff
-netlify/functions/      The only server-side code
+functions/api/          Cloudflare Pages Functions (thin wrappers)
+workers/                Scheduled worker that debounces rebuilds
 tests/                  node --test, no framework
 ```

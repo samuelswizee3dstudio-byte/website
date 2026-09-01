@@ -1,4 +1,4 @@
-// Delivery rules, in one place. The Netlify Function charges from these and the
+// Delivery rules, in one place. The checkout function charges from these and the
 // site's copy is written from them, so a price change is a one-line edit and the
 // two can never disagree.
 //

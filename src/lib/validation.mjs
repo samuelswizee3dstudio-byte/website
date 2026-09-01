@@ -1,4 +1,4 @@
-// Shared by the browser (cart UI), the Astro build, and the Netlify Function.
+// Shared by the browser (cart UI), the Astro build, and the checkout function.
 // Plain .mjs so all three can import the *same* source — the brief requires the
 // personalisation rule to be enforced client side and again server side, and a
 // second copy of the regex is a bug waiting to happen.

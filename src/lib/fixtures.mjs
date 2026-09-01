@@ -1,6 +1,6 @@
 // SAMPLE DATA ONLY — used when STRIPE_SECRET_KEY is absent so the site can be
 // built and worked on locally before the real Stripe account exists.
-// A Netlify production build with no key fails instead of using this.
+// A hosted build with no key fails instead of using this.
 // Shape mirrors the Stripe API responses that catalogue.mjs normalises.
 
 const img = (n) => `/images/samples/${n}.svg`;

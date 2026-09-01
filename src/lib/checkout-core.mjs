@@ -30,10 +30,10 @@ const clip = (s) => (s.length <= META_VALUE_MAX ? s : `${s.slice(0, META_VALUE_M
 /**
  * Host-agnostic checkout handler.
  *
- * Cloudflare Pages passes configuration in an `env` object; Netlify uses
- * process.env. Keeping the logic here means the validation rules — which are
- * the part that actually protects the family from mispriced orders — exist in
- * exactly one place regardless of who is hosting.
+ * Cloudflare Pages passes configuration in an `env` object. Keeping the logic
+ * here rather than in the Pages Function means the validation rules — the part
+ * that actually protects the family from mispriced orders — stay portable and
+ * unit-testable, and survived one hosting move already.
  *
  * @param {Request} request
  * @param {Record<string, string|undefined>} env
@@ -165,7 +165,7 @@ export async function handleCheckout(request, env) {
       billing_address_collection: 'auto',
       // On by design: Stripe makes the phone field required once enabled, and
       // the family would rather have a number for chasing uncollected orders.
-      // Set COLLECT_PHONE=false in Netlify to drop it — no code change.
+      // Set COLLECT_PHONE=false in the hosting env vars to drop it.
       phone_number_collection: { enabled: env.COLLECT_PHONE !== 'false' },
       // UK only. Stripe requires an address before it will show shipping
       // options at all, so collection customers are asked for one too.

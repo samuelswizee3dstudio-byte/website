@@ -4,8 +4,8 @@
 // even when a real key is sitting in .env — which looks like the key not
 // working rather than not being read.
 //
-// No-ops on Netlify, where there is no .env file and the real environment is
-// already populated.
+// No-ops on Cloudflare Pages and in CI, where there is no .env file and the
+// real environment is already populated.
 
 import { readFileSync } from 'node:fs';
 
@@ -22,6 +22,6 @@ export function loadEnv() {
       if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, '');
     }
   } catch {
-    // No .env — expected on Netlify and in CI.
+    // No .env — expected on Cloudflare Pages and in CI.
   }
 }

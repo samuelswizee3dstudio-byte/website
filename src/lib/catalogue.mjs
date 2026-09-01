@@ -154,8 +154,9 @@ export function normalise(stripeProducts, stripePrices) {
 }
 
 /**
- * True on any hosted build. `CI` covers Cloudflare Pages, Netlify and GitHub
- * Actions; the others are belt and braces in case a provider stops setting it.
+ * True on any hosted build. `CI` covers Cloudflare Pages and GitHub Actions;
+ * the rest are belt and braces in case a provider stops setting it, and because
+ * this guard once did nothing on a host it had not heard of.
  */
 function isHostedBuild() {
   const e = process.env;
@@ -177,7 +178,7 @@ export async function getCatalogue() {
 
   if (!key) {
     // A hosted build must never ship placeholder products. This originally
-    // keyed off Netlify's CONTEXT variable, which meant it did nothing at all
+    // keyed off one host's CONTEXT variable, which meant it did nothing at all
     // on Cloudflare Pages — the first Pages deploy silently published four
     // invented products. Detect any hosted build instead of one host's.
     if (isHostedBuild() && process.env.ALLOW_SAMPLE_CATALOGUE !== 'true') {
