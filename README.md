@@ -140,6 +140,30 @@ customers are asked for one too. `custom_text.shipping_address` explains why.
 > Design handoff still says nothing may imply delivery — that instruction is
 > superseded, and the footer copy has changed accordingly.
 
+## Editing site copy
+
+Paul does this, not the family — their guide is Stripe-only. Each link opens
+the file straight into GitHub's editor.
+
+| Page | Edit |
+|---|---|
+| Home heading and blurb | [home.md](https://github.com/samuelswizee3dstudio-byte/website/edit/main/src/content/copy/home.md) |
+| About | [about.md](https://github.com/samuelswizee3dstudio-byte/website/edit/main/src/content/copy/about.md) |
+| Contact intro | [contact.md](https://github.com/samuelswizee3dstudio-byte/website/edit/main/src/content/copy/contact.md) |
+| Terms of sale | [terms.md](https://github.com/samuelswizee3dstudio-byte/website/edit/main/src/content/copy/terms.md) |
+| Privacy notice | [privacy.md](https://github.com/samuelswizee3dstudio-byte/website/edit/main/src/content/copy/privacy.md) |
+
+**terms.md and privacy.md are legal documents** naming Rebecca Dagger as the
+seller. Do not let an AI rewrite them unreviewed.
+
+Videos on the About page are YouTube IDs in its frontmatter:
+
+```yaml
+videos:
+  - id: SptHTpVKGew
+    title: "A look around the studio"
+```
+
 ## Stripe metadata conventions
 
 Set these in the Stripe Dashboard on the **Product** (Product → Edit → Metadata).
