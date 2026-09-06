@@ -2,8 +2,6 @@
 title: "About Swizee 3D Studio"
 description: "A small 3D printing studio in Warrington making sensory fidgets and personalised name keyrings."
 videos:
-  - id: SptHTpVKGew
-    title: "A look around the studio"
   - id: k3Fd5xHrOBE
     title: "Printing a name block"
 ---
