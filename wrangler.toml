@@ -6,3 +6,12 @@ name = "swizee"
 pages_build_output_dir = "dist"
 compatibility_date = "2026-09-01"
 compatibility_flags = ["nodejs_compat"]
+
+# The rebuild queue. Stripe's webhook (functions/api/stripe-rebuild.js) writes
+# a "rebuild pending" flag here; workers/rebuild-drain.js spends the deploy.
+# Bindings declared here are applied to every Pages build; the Dashboard's
+# bindings screen is ignored once this file exists, which is why the binding
+# set up there on 1 Sept never took effect.
+[[kv_namespaces]]
+binding = "REBUILD_STATE"
+id = "de81dfb106124b4a98cf5e71f703e194"

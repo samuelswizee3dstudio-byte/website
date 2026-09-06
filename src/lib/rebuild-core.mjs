@@ -26,10 +26,14 @@ const json = (status, body) =>
 export async function handleRebuild(request, env) {
   if (request.method !== 'POST') return json(405, { message: 'Method not allowed.' });
 
+  // Two ways to be configured: a KV namespace to queue into (the drain worker
+  // holds the deploy hook), or a deploy hook here for the no-KV fallback.
+  // Demanding both was the bug that silently broke rebuilds for a week — the
+  // Pages project only ever had the signing secret.
   const signingSecret = env.STRIPE_WEBHOOK_SECRET;
   const buildHook = env.DEPLOY_HOOK_URL;
-  if (!signingSecret || !buildHook) {
-    console.error('Rebuild webhook is not configured (STRIPE_WEBHOOK_SECRET / DEPLOY_HOOK_URL).');
+  if (!signingSecret || (!env.REBUILD_STATE && !buildHook)) {
+    console.error('Rebuild webhook is not configured: needs STRIPE_WEBHOOK_SECRET and either a REBUILD_STATE KV binding or DEPLOY_HOOK_URL.');
     return json(500, { message: 'Not configured.' });
   }
 

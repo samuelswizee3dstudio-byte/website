@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { drainPendingRebuild, PENDING_KEY, QUIET_PERIOD_MS } from '../src/lib/rebuild-core.mjs';
+import { drainPendingRebuild, handleRebuild, PENDING_KEY, QUIET_PERIOD_MS } from '../src/lib/rebuild-core.mjs';
 
 /** Minimal stand-in for a Cloudflare KV namespace. */
 const fakeKV = (initial = null) => {
@@ -90,4 +90,16 @@ test('unreadable state is cleared rather than looping forever', async () => {
 test('missing configuration is a no-op, not a crash', async () => {
   assert.deepEqual(await drainPendingRebuild({}), { skipped: 'not configured' });
   assert.deepEqual(await drainPendingRebuild({ REBUILD_STATE: fakeKV('x') }), { skipped: 'not configured' });
+});
+
+test('the webhook is configured with a signing secret plus KV, no deploy hook needed', async () => {
+  // Wrong signature is fine here: the point is that it gets past the config
+  // check (400 invalid signature, not 500 not configured).
+  const req = new Request('https://swizee.co.uk/api/stripe-rebuild', {
+    method: 'POST', headers: { 'stripe-signature': 't=1,v1=bad' }, body: '{}',
+  });
+  const withKV = await handleRebuild(req.clone(), { STRIPE_WEBHOOK_SECRET: 'whsec_x', REBUILD_STATE: fakeKV(null) });
+  assert.equal(withKV.status, 400);
+  const nothing = await handleRebuild(req.clone(), { STRIPE_WEBHOOK_SECRET: 'whsec_x' });
+  assert.equal(nothing.status, 500);
 });
