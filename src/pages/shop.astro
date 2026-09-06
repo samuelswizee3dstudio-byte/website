@@ -1,27 +1,24 @@
 ---
 import Base from '../layouts/Base.astro';
 import ProductCard from '../components/ProductCard.astro';
-import { getCatalogue, formatPrice } from '../lib/catalogue.mjs';
+import { getCatalogue } from '../lib/catalogue.mjs';
 
 // The design handoff is explicit: a plain grid, no filters and no search.
 // `category` metadata is still read by the catalogue and is available if a
 // future brief wants grouping back.
 const products = await getCatalogue();
 const count = products.length;
-// Derived, not asserted: "all under £10" silently became untrue the moment a
-// £10 variant existed.
-const ceiling = count ? formatPrice(Math.max(...products.map((p) => p.priceTo))) : null;
+// No price ceiling or product count in the header: the family asked for them
+// to go, since new products and prices are coming and neither should read as
+// a promise.
 ---
 <Base title="Shop" description="Everything we print — sensory fidgets and personalised name keyrings. Made to order in Warrington. UK delivery or free collection.">
   <div class="wrap shop">
     <header class="shop__head">
       <h1 class="t-page-title">Everything<br />we print</h1>
       <p class="lede">
-        {count > 0
-          ? `${count} ${count === 1 ? 'thing' : 'things'}, all ${ceiling} or less, all made after you order.`
-          : 'New things are on the way.'}
+        {count > 0 ? 'Sensory fidgets and name keyrings, all made after you order.' : 'New things are on the way.'}
       </p>
-      {count > 0 && <p class="shop__count">{count} {count === 1 ? 'product' : 'products'}</p>}
     </header>
 
     {count === 0 ? (
@@ -40,10 +37,8 @@ const ceiling = count ? formatPrice(Math.max(...products.map((p) => p.priceTo)))
 <style>
   .shop { padding-top: var(--sw-6); }
   .shop__head { position: relative; margin-bottom: var(--sw-5); display: grid; gap: var(--sw-3); }
-  .shop__count { font-weight: 600; font-size: 14px; color: var(--sw-ink-soft); }
   @media (min-width: 900px) {
     .shop { padding-top: var(--sw-8); }
     .shop__head { margin-bottom: var(--sw-6); }
-    .shop__count { position: absolute; right: 0; bottom: 0; }
   }
 </style>

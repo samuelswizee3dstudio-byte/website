@@ -3,7 +3,7 @@ title: "About Swizee 3D Studio"
 description: "A small 3D printing studio in Warrington making sensory fidgets and personalised name keyrings."
 videos:
   - id: k3Fd5xHrOBE
-    title: "Printing a name block"
+    title: "Printing a name clicker base, ready for your custom order"
 ---
 
 Swizee 3D Studio is Samuel, who is ten, and his mum Rebecca. We run it from home

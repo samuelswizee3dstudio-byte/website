@@ -34,6 +34,13 @@ const first = product.variants[0];
           {product.images.length > 0
             ? <img id="main-shot" src={product.images[0]} alt={product.name} width="800" height="1000" fetchpriority="high" />
             : <span class="shot-placeholder">{product.name.toLowerCase()} photo</span>}
+          {product.images.length > 1 && (
+            <>
+              <button type="button" class="gallery__arrow gallery__arrow--prev" data-step="-1" aria-label="Previous photo">‹</button>
+              <button type="button" class="gallery__arrow gallery__arrow--next" data-step="1" aria-label="Next photo">›</button>
+              <p class="gallery__pos" aria-live="polite"><span data-pos>1</span> / {product.images.length}</p>
+            </>
+          )}
         </div>
         {product.video && (
           <video class="gallery__video" controls muted loop playsinline preload="metadata" poster={product.videoPoster ?? undefined} aria-label={`${product.name} in someone's hands`}>
@@ -261,11 +268,36 @@ const first = product.variants[0];
     });
   }
 
+  // Gallery: thumbnails, arrows, arrow keys and a swipe all move the same index.
   const mainShot = document.querySelector<HTMLImageElement>('#main-shot');
-  for (const btn of document.querySelectorAll<HTMLButtonElement>('.thumbs button')) {
-    btn.addEventListener('click', () => {
-      if (mainShot && btn.dataset.src) mainShot.src = btn.dataset.src;
-      for (const b of document.querySelectorAll('.thumbs button')) b.setAttribute('aria-pressed', String(b === btn));
+  const thumbs = [...document.querySelectorAll<HTMLButtonElement>('.thumbs button')];
+  const posEl = document.querySelector<HTMLElement>('[data-pos]');
+  let current = 0;
+  const show = (i: number) => {
+    if (!thumbs.length) return;
+    current = (i + thumbs.length) % thumbs.length;
+    const src = thumbs[current].dataset.src;
+    if (mainShot && src) mainShot.src = src;
+    thumbs.forEach((b, j) => b.setAttribute('aria-pressed', String(j === current)));
+    if (posEl) posEl.textContent = String(current + 1);
+  };
+  thumbs.forEach((btn, i) => btn.addEventListener('click', () => show(i)));
+  for (const arrow of document.querySelectorAll<HTMLButtonElement>('.gallery__arrow')) {
+    arrow.addEventListener('click', () => show(current + Number(arrow.dataset.step)));
+  }
+  const gallery = document.querySelector<HTMLElement>('.gallery__main');
+  if (gallery && thumbs.length > 1) {
+    gallery.tabIndex = 0;
+    gallery.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); show(current - 1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); show(current + 1); }
+    });
+    let startX: number | null = null;
+    gallery.addEventListener('pointerdown', (e) => { startX = e.clientX; });
+    gallery.addEventListener('pointerup', (e) => {
+      if (startX === null) return;
+      const dx = e.clientX - startX; startX = null;
+      if (Math.abs(dx) > 40) show(current + (dx < 0 ? 1 : -1));
     });
   }
 </script>
@@ -277,7 +309,23 @@ const first = product.variants[0];
 
   /* Mobile: full-bleed square photo, then a horizontal thumbnail row. */
   .gallery__main { aspect-ratio: 1; border-radius: var(--sw-r-lg); overflow: hidden; background: var(--sw-bg); }
-  .gallery__main img { width: 100%; height: 100%; object-fit: cover; }
+  .gallery__main img { width: 100%; height: 100%; object-fit: cover; touch-action: pan-y; user-select: none; -webkit-user-drag: none; }
+  .gallery__main { position: relative; }
+  .gallery__main:focus-visible { outline: 3px solid var(--sw-ink); outline-offset: 2px; }
+  .gallery__arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 40px; height: 40px; border-radius: 50%; border: 0; cursor: pointer;
+    background: var(--sw-surface); color: var(--sw-ink); box-shadow: var(--sw-shadow-card);
+    font-size: 26px; line-height: 1; font-weight: 800; padding: 0 0 3px;
+  }
+  .gallery__arrow--prev { left: var(--sw-3); }
+  .gallery__arrow--next { right: var(--sw-3); }
+  .gallery__arrow:hover { background: var(--sw-bg); }
+  .gallery__pos {
+    position: absolute; right: var(--sw-3); bottom: var(--sw-3); margin: 0;
+    padding: 2px 10px; border-radius: 999px; font-size: 13px; font-weight: 700;
+    background: var(--sw-surface); color: var(--sw-ink-soft);
+  }
   .gallery__video { display: block; width: 100%; margin-top: var(--sw-3); border-radius: var(--sw-r-lg); background: var(--sw-bg); }
   .thumbs { display: flex; gap: var(--sw-2); list-style: none; margin: 0 0 var(--sw-3); padding: 0; overflow-x: auto; }
   .thumbs li { flex: none; }
