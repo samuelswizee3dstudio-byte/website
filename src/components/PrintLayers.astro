@@ -1,0 +1,136 @@
+---
+// A quiet background that draws itself the way the printer does: horizontal
+// layer lines, laid down bottom to top, each sweeping across like the nozzle.
+// It settles and stops — this is a shop, not a screensaver.
+---
+<canvas id="print-layers" aria-hidden="true"></canvas>
+
+<script>
+  const canvas = document.getElementById('print-layers') as HTMLCanvasElement | null;
+  const ctx = canvas?.getContext('2d');
+  if (canvas && ctx) {
+    const css = getComputedStyle(document.documentElement);
+    const token = (name: string, fallback: string) =>
+      css.getPropertyValue(name).trim() || fallback;
+
+    // Filament colours, from the brand palette. Most layers are a barely-there
+    // darkening of the cream; every so often the "filament" changes.
+    const PASTELS = [
+      token('--sw-pink', '#F6BFCB'),
+      token('--sw-sky', '#A9DCE8'),
+      token('--sw-mint', '#7FC98B'),
+      token('--sw-lilac', '#C3B2E8'),
+    ];
+
+    const LAYER_GAP = 9;      // roughly a print layer, scaled up to be visible
+    const BASE_ALPHA = 0.10;  // the plain layer lines
+    const PASTEL_ALPHA = 0.34;
+    const SWEEP_MS = 2600;    // whole build, bottom to top
+
+    type Layer = { y: number; wobble: number; colour: string; alpha: number };
+    let layers: Layer[] = [];
+    let dpr = 1;
+
+    // A fixed seed keeps the pattern identical between the animated build and
+    // any later redraw, so a resize does not reshuffle the wall behind you.
+    let seed = 20260901;
+    const rand = () => {
+      seed = (seed * 1664525 + 1013904223) % 4294967296;
+      return seed / 4294967296;
+    };
+
+    function build(width: number, height: number) {
+      seed = 20260901;
+      layers = [];
+      let filament = 0;
+      for (let y = height; y > -LAYER_GAP; y -= LAYER_GAP) {
+        // Occasional filament change, in runs rather than at random, the way a
+        // real spool swap looks.
+        if (rand() < 0.045) filament = filament === 0 ? 1 + Math.floor(rand() * PASTELS.length) : 0;
+        const pastel = filament > 0;
+        layers.push({
+          y,
+          wobble: (rand() - 0.5) * 2.2,
+          colour: pastel ? PASTELS[(filament - 1) % PASTELS.length] : token('--sw-ink', '#16130F'),
+          alpha: pastel ? PASTEL_ALPHA : BASE_ALPHA,
+        });
+      }
+    }
+
+    function drawUpTo(count: number, width: number) {
+      ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
+      ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx!.lineWidth = 1;
+      for (let i = 0; i < count && i < layers.length; i++) {
+        const l = layers[i];
+        ctx!.globalAlpha = l.alpha;
+        ctx!.strokeStyle = l.colour;
+        ctx!.beginPath();
+        // Each line droops very slightly in the middle, like a bridged layer.
+        // The .5 offset puts a 1px stroke on a whole device pixel.
+        const y = Math.round(l.y + l.wobble) + 0.5;
+        ctx!.moveTo(0, y);
+        ctx!.quadraticCurveTo(width / 2, y + 1.6, width, y);
+        ctx!.stroke();
+      }
+      ctx!.globalAlpha = 1;
+    }
+
+    function size() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      canvas!.width = Math.floor(w * dpr);
+      canvas!.height = Math.floor(h * dpr);
+      canvas!.style.width = `${w}px`;
+      canvas!.style.height = `${h}px`;
+      build(w, h);
+      return { w, h };
+    }
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Build once per visit. Clicking through five product pages should not mean
+    // watching the same animation five times.
+    const alreadyBuilt = sessionStorage.getItem('swizee.printed') === '1';
+
+    let { w } = size();
+
+    if (reduced || alreadyBuilt) {
+      drawUpTo(layers.length, w);
+    } else {
+      const started = performance.now();
+      const step = (now: number) => {
+        const t = Math.min((now - started) / SWEEP_MS, 1);
+        // Ease out, so it slows as the print finishes rather than stopping dead.
+        const eased = 1 - Math.pow(1 - t, 2.2);
+        drawUpTo(Math.ceil(eased * layers.length), w);
+        if (t < 1) requestAnimationFrame(step);
+        else {
+          try { sessionStorage.setItem('swizee.printed', '1'); } catch { /* private mode */ }
+        }
+      };
+      requestAnimationFrame(step);
+    }
+
+    // Redraw on resize, but never re-animate — and ignore the height-only
+    // changes a mobile browser makes when its address bar hides.
+    let lastW = window.innerWidth;
+    let t: number | undefined;
+    window.addEventListener('resize', () => {
+      if (window.innerWidth === lastW) return;
+      lastW = window.innerWidth;
+      window.clearTimeout(t);
+      t = window.setTimeout(() => { const s = size(); w = s.w; drawUpTo(layers.length, w); }, 150);
+    });
+  }
+</script>
+
+<style>
+  #print-layers {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    display: block;
+  }
+</style>
