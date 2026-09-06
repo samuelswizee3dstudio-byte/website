@@ -1,6 +1,6 @@
 ---
 title: "Fidgets made\njust for you."
-description: "3D printed fidgets, axolotls and personalised name items. Printed to order in Warrington. UK delivery or free collection."
+description: "3D printed sensory fidgets and personalised name keyrings. Printed to order in Warrington. UK delivery or free collection."
 ---
 
 Printed in Warrington by Samuel, who is ten, and his mum Rebecca. Pick a colour,

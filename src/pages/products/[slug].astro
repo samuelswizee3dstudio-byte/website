@@ -35,6 +35,11 @@ const first = product.variants[0];
             ? <img id="main-shot" src={product.images[0]} alt={product.name} width="800" height="1000" fetchpriority="high" />
             : <span class="shot-placeholder">{product.name.toLowerCase()} photo</span>}
         </div>
+        {product.video && (
+          <video class="gallery__video" controls muted loop playsinline preload="metadata" poster={product.videoPoster ?? undefined} aria-label={`${product.name} in someone's hands`}>
+            <source src={product.video} type="video/mp4" />
+          </video>
+        )}
       </div>
 
       <!-- Buy column -->
@@ -273,6 +278,7 @@ const first = product.variants[0];
   /* Mobile: full-bleed square photo, then a horizontal thumbnail row. */
   .gallery__main { aspect-ratio: 1; border-radius: var(--sw-r-lg); overflow: hidden; background: var(--sw-bg); }
   .gallery__main img { width: 100%; height: 100%; object-fit: cover; }
+  .gallery__video { display: block; width: 100%; margin-top: var(--sw-3); border-radius: var(--sw-r-lg); background: var(--sw-bg); }
   .thumbs { display: flex; gap: var(--sw-2); list-style: none; margin: 0 0 var(--sw-3); padding: 0; overflow-x: auto; }
   .thumbs li { flex: none; }
   .thumbs button { padding: 0; border: 2px solid var(--sw-border); border-radius: 12px; background: none; cursor: pointer; overflow: hidden; line-height: 0; }
@@ -331,6 +337,7 @@ const first = product.variants[0];
     /* Two columns only when there is a thumbnail strip to fill the first one —
        otherwise the main photo lands in the 80px column. */
     .gallery:has(.thumbs) { display: grid; grid-template-columns: 80px 1fr; gap: var(--sw-3); align-items: start; }
+    .gallery__video { grid-column: 2; margin-top: 0; }
     .thumbs { flex-direction: column; margin: 0; overflow: visible; }
     .thumbs img { width: 76px; height: 76px; }
     .gallery__main { aspect-ratio: 4 / 5; }

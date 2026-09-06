@@ -14,6 +14,7 @@ const GBP = 'gbp';
 /** @typedef {{ id: string, label: string, unitAmount: number, sort: number, maxChars: number }} Variant */
 /** @typedef {{ key: string, label: string, values: string[] }} ColourChoice */
 /** @typedef {{ id: string, slug: string, name: string, description: string, images: string[],
+ *              video: string | null, videoPoster: string | null,
  *              category: string | null, personalise: boolean, personaliseLabel: string,
  *              featured: boolean, sort: number, variants: Variant[],
  *              priceFrom: number, priceTo: number }} Product */
@@ -178,6 +179,9 @@ export function normalise(stripeProducts, stripePrices) {
       name: p.name,
       description: (p.description ?? '').trim(),
       images,
+      // Optional short clip under the photos, served from public/ (Stripe has no video slot).
+      video: p.metadata?.video?.trim() || null,
+      videoPoster: p.metadata?.video_poster?.trim() || null,
       category: p.metadata?.category?.trim() || null,
       personalise: truthy(p.metadata?.personalise),
       colourChoices: colourChoicesFrom(p.metadata),

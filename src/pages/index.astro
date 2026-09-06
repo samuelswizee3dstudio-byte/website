@@ -98,6 +98,15 @@ const { Content } = await render(home!);
       </div>
       <img class="story__art" src="/images/printed-things.png" alt="" width="380" height="375" loading="lazy" />
     </div>
+
+    <div class="tile tile--delivery">
+      <img class="delivery__photo" src="/images/delivered-to-your-door.jpg" alt="A Swizee order in a paper bag on a doorstep" width="1200" height="900" loading="lazy" />
+      <div class="delivery__text">
+        <span class="badge badge--lilac">Delivery</span>
+        <h2 class="t-section delivery__head">Every order delivered to your door.</h2>
+        <p>Royal Mail to anywhere in the UK for £3.50, free when you spend over £20. Or collect for free from Great Sankey, Warrington.</p>
+      </div>
+    </div>
   </section>
 
   <!-- Instagram bar -->
@@ -195,6 +204,20 @@ const { Content } = await render(home!);
   }
   .story__head { text-transform: none; font-family: var(--sw-font-body); font-weight: 800; line-height: 1.2; }
   .story__more a { font-weight: 800; font-size: 15px; }
+
+  /* Delivery tile: the doorstep photo, full width under the other two tiles. */
+  .tile--delivery {
+    background: var(--sw-surface); box-shadow: var(--sw-shadow-card);
+    display: grid; gap: var(--sw-4); align-items: center;
+  }
+  .delivery__photo { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 4 / 3; }
+  .delivery__text { display: grid; gap: var(--sw-3); padding: 0 var(--sw-5) var(--sw-5); }
+  .tile--delivery .badge { position: static; justify-self: start; }
+  .delivery__head { text-transform: none; font-family: var(--sw-font-body); font-weight: 800; line-height: 1.2; }
+  @media (min-width: 900px) {
+    .tile--delivery { grid-column: 1 / -1; grid-template-columns: minmax(0, 420px) 1fr; }
+    .delivery__text { padding: var(--sw-5); }
+  }
 
   /* --- Instagram bar -------------------------------------------------------- */
   .iglink {

@@ -1,6 +1,6 @@
 ---
 title: "About Swizee 3D Studio"
-description: "A small 3D printing studio in Warrington making axolotls, fidgets and personalised name items."
+description: "A small 3D printing studio in Warrington making sensory fidgets and personalised name keyrings."
 videos:
   - id: SptHTpVKGew
     title: "A look around the studio"
@@ -17,9 +17,8 @@ Rebecca handles the orders and the boring bits.
 Every single thing on this site is printed to order on our own printers —
 nothing sits in a box waiting.
 
-We mostly make three things: articulated axolotls that actually wiggle, fidget
-toys that are quiet enough for a classroom, and name items where you tell us the
-word and we print it.
+We mostly make two things: sensory fidgets that are quiet enough for a
+classroom, and name keyrings where you tell us the word and we print it.
 
 ## How it works
 
