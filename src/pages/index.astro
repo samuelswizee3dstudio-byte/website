@@ -66,30 +66,8 @@ const { Content } = await render(home!);
     )}
   </section>
 
-  <!-- Video tile + our story -->
+  <!-- Our story + delivery -->
   <section class="wrap band tiles">
-    <div class="tile--videowrap">
-      <div class="tile tile--video">
-        <span class="badge badge--sky">See how it's made</span>
-        <video
-          class="tile__vid"
-          controls
-          preload="metadata"
-          playsinline
-          poster="/images/how-its-made-poster.jpg"
-          width="1280"
-          height="720"
-        >
-          <source src="/videos/how-its-made.mp4" type="video/mp4" />
-          <!-- Available, but not forced on: the video already carries the same
-               words on screen, so defaulting them visible just double-prints. -->
-          <track kind="captions" src="/videos/how-its-made.vtt" srclang="en" label="English" />
-          <a href="/about">Your browser cannot play this video — read how we print instead.</a>
-        </video>
-      </div>
-      <p class="tile__under"><a href="/about">More about how we work <span aria-hidden="true">→</span></a></p>
-    </div>
-
     <div class="tile tile--story">
       <div class="story__text">
         <span class="badge badge--mint">Our story</span>
@@ -170,20 +148,11 @@ const { Content } = await render(home!);
   .band__head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sw-4); margin-bottom: var(--sw-4); }
   .band__more { font-weight: 800; font-size: 14px; white-space: nowrap; }
 
-  /* --- Video + story tiles -------------------------------------------------- */
+  /* --- Story + delivery tiles ---------------------------------------------- */
   .tiles { display: grid; gap: var(--sw-4); }
-  @media (min-width: 900px) { .tiles { grid-template-columns: 1.15fr 1fr; gap: var(--sw-5); } }
+  @media (min-width: 900px) { .tiles { grid-template-columns: 1fr 1fr; gap: var(--sw-5); } }
 
   .tile { position: relative; border-radius: var(--sw-r-lg); overflow: hidden; }
-  .tile .badge { position: absolute; top: var(--sw-4); left: var(--sw-4); z-index: 2; }
-
-  /* The video is a real 16:9 file, so the tile matches it at every width. */
-  .tile--videowrap { display: grid; gap: var(--sw-3); align-content: start; }
-  .tile--video { aspect-ratio: 16 / 9; background: var(--sw-bg); }
-  .tile__vid { display: block; width: 100%; height: 100%; object-fit: cover; }
-  /* The badge sits over the poster; it must not swallow clicks on the player. */
-  .tile--video .badge { pointer-events: none; }
-  .tile__under a { font-weight: 800; font-size: 15px; }
 
   .tile--story {
     background: var(--sw-surface); box-shadow: var(--sw-shadow-card);
@@ -205,28 +174,13 @@ const { Content } = await render(home!);
   .story__head { text-transform: none; font-family: var(--sw-font-body); font-weight: 800; line-height: 1.2; }
   .story__more a { font-weight: 800; font-size: 15px; }
 
-  /* Delivery tile: the doorstep photo, full width under the other two tiles. */
+  /* Delivery tile: the doorstep photo with the promise under it. */
   .tile--delivery {
     background: var(--sw-surface); box-shadow: var(--sw-shadow-card);
-    display: grid; gap: var(--sw-4); align-items: center;
+    display: grid; grid-template-rows: auto 1fr; align-content: start;
   }
-  .delivery__photo { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 4 / 3; }
-  .delivery__text { display: grid; gap: var(--sw-3); padding: 0 var(--sw-5) var(--sw-5); }
+  .delivery__photo { width: 100%; height: auto; object-fit: cover; aspect-ratio: 16 / 9; }
+  .delivery__text { display: grid; gap: var(--sw-3); padding: var(--sw-4) var(--sw-5) var(--sw-5); }
   .tile--delivery .badge { position: static; justify-self: start; }
   .delivery__head { text-transform: none; font-family: var(--sw-font-body); font-weight: 800; line-height: 1.2; }
-  @media (min-width: 900px) {
-    .tile--delivery { grid-column: 1 / -1; grid-template-columns: minmax(0, 420px) 1fr; }
-    .delivery__text { padding: var(--sw-5); }
-  }
-
-  /* --- Instagram bar -------------------------------------------------------- */
-  .iglink {
-    display: flex; align-items: center; justify-content: space-between; gap: var(--sw-4);
-    background: var(--sw-ink); color: var(--sw-surface);
-    border-radius: var(--sw-r-lg); padding: var(--sw-5);
-    font-weight: 800; font-size: 15px;
-  }
-  .iglink:hover { color: var(--sw-surface); }
-  .iglink__arrow { color: var(--sw-pink); font-size: 22px; }
-  @media (min-width: 900px) { .iglink { padding: var(--sw-5) var(--sw-6); font-size: 18px; } }
 </style>

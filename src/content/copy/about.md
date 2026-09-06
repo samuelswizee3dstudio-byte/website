@@ -6,8 +6,6 @@ videos:
     title: "A look around the studio"
   - id: k3Fd5xHrOBE
     title: "Printing a name block"
-  - id: 3Wm5umcKaOc
-    title: "Printing a lizard"
 ---
 
 Swizee 3D Studio is Samuel, who is ten, and his mum Rebecca. We run it from home
