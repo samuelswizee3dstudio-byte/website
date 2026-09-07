@@ -5,15 +5,24 @@ import { getEntry, render } from 'astro:content';
 const page = await getEntry('copy', 'about');
 const { Content } = await render(page!);
 const videos = page!.data.videos;
+const film = page!.data.film;
 ---
 <Base title={page!.data.title} description={page!.data.description}>
   <div class="wrap wrap--narrow stack">
     <h1>{page!.data.title}</h1>
     <div class="prose"><Content /></div>
 
-    {videos.length > 0 && (
+    {(film || videos.length > 0) && (
       <section class="videos">
         <h2>Watch</h2>
+        {film && (
+          <figure class:list={['film', { 'film--portrait': film.portrait }]}>
+            <video controls playsinline preload="metadata" poster={film.poster ?? undefined} aria-label={film.title}>
+              <source src={film.src} type="video/mp4" />
+            </video>
+            <figcaption class="video-title">{film.title}</figcaption>
+          </figure>
+        )}
         <ul class="video-list">
           {videos.map((v: { id: string; title?: string }) => (
             <li>
@@ -39,6 +48,11 @@ const videos = page!.data.videos;
 <style>
   .videos { margin-top: var(--sw-7); }
   .video-list { display: grid; gap: var(--sw-5); margin-top: var(--sw-4); list-style: none; padding: 0; }
+  .film { margin: var(--sw-4) 0 0; }
+  .film video { display: block; width: 100%; border-radius: var(--sw-r-md); background: var(--sw-ink); }
+  /* a phone-shaped film should not fill a desktop column */
+  .film--portrait video { max-width: 360px; aspect-ratio: 9 / 16; margin: 0 auto; }
+  .film--portrait .video-title { text-align: center; }
   .video-list li { max-width: none; }
   .video-title { font-weight: 800; font-size: 15px; margin-top: var(--sw-2); }
   .embed { position: relative; aspect-ratio: 16 / 9; border-radius: var(--sw-r-md); overflow: hidden; background: var(--sw-ink); }

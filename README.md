@@ -164,6 +164,18 @@ videos:
     title: "A look around the studio"
 ```
 
+One film can also be served from the site itself, above the YouTube list, for
+the phone-shaped cuts made in `~/swizee-video`. The mp4 goes in `public/videos/`
+(Cloudflare Pages caps a file at 25 MiB, so encode for the web), the poster in
+`public/images/`:
+
+```yaml
+film:
+  src: /videos/interview.mp4
+  poster: /images/interview-poster.jpg
+  title: "The interview: Samuel talks to Paul about Swizee"
+```
+
 ## Stripe metadata conventions
 
 Set these in the Stripe Dashboard on the **Product** (Product → Edit → Metadata).

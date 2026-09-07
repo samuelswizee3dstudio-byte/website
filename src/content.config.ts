@@ -26,6 +26,17 @@ const copy = defineCollection({
       )
       .default([])
       .transform((list) => list.map((v) => (typeof v === 'string' ? { id: v } : v))),
+    // About page only: one film served from this site rather than YouTube, for
+    // the phone-shaped cuts made in ~/swizee-video. Paths are under public/.
+    //   film: { src: "/videos/interview.mp4", poster: "/images/interview-poster.jpg", title: "The interview" }
+    film: z
+      .object({
+        src: z.string().startsWith('/videos/'),
+        poster: z.string().startsWith('/images/').optional(),
+        title: z.string(),
+        portrait: z.boolean().default(true),
+      })
+      .optional(),
   }),
 });
 
