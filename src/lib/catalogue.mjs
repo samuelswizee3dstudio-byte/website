@@ -8,6 +8,7 @@ import Stripe from 'stripe';
 import { FIXTURE_PRODUCTS } from './fixtures.mjs';
 import { loadEnv } from './load-env.mjs';
 import { maxCharsForPrice } from './validation.mjs';
+import { isFamilyDiscountItem } from './shipping.mjs';
 
 const GBP = 'gbp';
 
@@ -16,6 +17,7 @@ const GBP = 'gbp';
 /** @typedef {{ id: string, slug: string, name: string, description: string, images: string[],
  *              video: string | null, videoPoster: string | null,
  *              category: string | null, personalise: boolean, personaliseLabel: string,
+ *              familyDiscount: boolean, colourChoices: ColourChoice[],
  *              featured: boolean, sort: number, variants: Variant[],
  *              priceFrom: number, priceTo: number }} Product */
 
@@ -184,6 +186,7 @@ export function normalise(stripeProducts, stripePrices) {
       videoPoster: p.metadata?.video_poster?.trim() || null,
       category: p.metadata?.category?.trim() || null,
       personalise: truthy(p.metadata?.personalise),
+      familyDiscount: isFamilyDiscountItem(p.metadata),
       colourChoices: colourChoicesFrom(p.metadata),
       personaliseLabel: p.metadata?.personalise_label?.trim() || 'Name or word to print',
       featured: truthy(p.metadata?.featured),

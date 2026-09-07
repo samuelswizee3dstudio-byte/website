@@ -1,6 +1,6 @@
 ---
 title: "Terms of sale"
-description: "How ordering, payment, collection and refunds work at Swizee 3D Studio."
+description: "How ordering, payment, delivery and refunds work at Swizee 3D Studio."
 ---
 
 These terms apply to everything you buy from Swizee 3D Studio on this website.
@@ -8,7 +8,7 @@ By placing an order you agree to them.
 
 ## Who you are buying from
 
-Swizee 3D Studio is a small home business based in Great Sankey, Warrington.
+Swizee 3D Studio is a small home business based in Warrington.
 The seller is Rebecca Dagger. We are not VAT registered.
 
 ## Everything is made to order
@@ -37,22 +37,24 @@ refuse to print anything offensive and will refund you in full if we do.
 
 You choose at checkout, and we only sell within the United Kingdom.
 
-**Delivery** costs £3.50 for any UK order, and is free when you spend over £20.
-We send orders by Royal Mail 2nd Class. Allow 7 days for us to make your order,
+**Free local delivery** is for WA5 postcodes. We deliver those ourselves, by
+hand, usually within a couple of days of your order being made. It is only for
+WA5: if you choose it with an address outside that area we will contact you and
+either ask for the postage or refund the order.
+
+**UK delivery** costs £3.50 for any order, and is free when you spend over £40.
+We send those by Royal Mail 2nd Class. Allow 7 days for us to make your order,
 then a further 2 to 3 working days in the post.
 
-**Collection** is free, from Great Sankey, Warrington. We email you when your
-order is ready and agree a time. Please do not turn up without arranging a time
-first.
+We do not offer collection.
 
 Until your order reaches you it is our responsibility. If a parcel does not
 arrive, tell us and we will chase it, and re-make or refund your order. Royal
 Mail does not treat an item as lost until 10 working days after the due date, so
 we may have to wait that long before we can act.
 
-If you chose collection and have not collected within 30 days of
-us telling you it is ready, and we cannot reach you, we may treat the order as
-abandoned.
+If we cannot deliver your order and cannot reach you for 30 days after telling
+you it is ready, we may treat the order as abandoned.
 
 ## Changing your mind
 
@@ -65,7 +67,7 @@ Because everything is made to order, your rights differ by item:
   for goods made to your specification or clearly personalised, in the Consumer
   Contracts Regulations 2013.
 - **Everything else** can be returned for a full refund. You have 14 days from
-  the day you receive or collect it to tell us you have changed your mind, and a
+  the day you receive it to tell us you have changed your mind, and a
   further 14 days to get it back to us. It must be unused and undamaged. We
   refund the item and the basic delivery you paid, but not the cost of sending
   it back to us.
@@ -73,7 +75,7 @@ Because everything is made to order, your rights differ by item:
 ## If something is wrong
 
 If your item is faulty, damaged in the post, or is not what you ordered, tell us
-within 14 days of receiving or collecting it and we will repair it, replace it,
+within 14 days of receiving it and we will repair it, replace it,
 or refund you — including the postage both ways. This does not affect your legal
 rights under the Consumer Rights Act 2015.
 

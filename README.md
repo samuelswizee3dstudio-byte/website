@@ -184,6 +184,7 @@ only when it is exactly `true`.
 | `colour_label` | `Base colour` | Label above that dropdown. Defaults to "Colour" |
 | `colours_2` | `Orange,White` | A second dropdown, for items with two colours |
 | `colour_2_label` | `Letter colour` | Label above the second dropdown |
+| `family_discount` | `true` | Joins the 10% family discount: three or more units of products carrying this flag, counted across the basket, take the discount at checkout |
 | `video` | `/videos/sensory-clicky-cube.mp4` | A short clip shown under the photos on the product page. The file lives in `public/videos/` — Stripe has no video slot |
 | `video_poster` | `/images/sensory-clicky-cube-poster.jpg` | Still frame shown before the clip plays |
 

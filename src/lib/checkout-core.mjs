@@ -15,10 +15,17 @@ import {
 import { colourChoicesFrom } from './catalogue.mjs';
 import {
   deliveryFeeFor,
-  COLLECTION_LABEL,
+  LOCAL_LABEL,
+  LOCAL_DAYS_MAX,
+  LOCAL_POSTCODE_AREA,
   DELIVERY_LABEL,
   MAKE_DAYS,
   POST_DAYS_MAX,
+  FAMILY_DISCOUNT_PERCENT,
+  FAMILY_DISCOUNT_MIN_ITEMS,
+  FAMILY_DISCOUNT_NAME,
+  isFamilyDiscountItem,
+  qualifiesForFamilyDiscount,
 } from './shipping.mjs';
 
 const JSON_HEADERS = { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' };
@@ -109,6 +116,8 @@ export async function handleCheckout(request, env) {
   const lineItems = [];
   const metadata = {};
   let subtotal = 0;
+  // Counted from Stripe's own product metadata, never from the basket.
+  let familyUnits = 0;
 
   for (const [i, price] of prices.entries()) {
     const line = lines[i];
@@ -162,6 +171,7 @@ export async function handleCheckout(request, env) {
 
     lineItems.push({ price: price.id, quantity: line.qty });
     subtotal += price.unit_amount * line.qty;
+    if (isFamilyDiscountItem(product.metadata)) familyUnits += line.qty;
 
     if (line.text || chosenColours.length) {
       const variant = price.metadata?.variant_label || price.nickname || '';
@@ -177,6 +187,33 @@ export async function handleCheckout(request, env) {
   }
 
   if (lineItems.length === 0) return fail(400, 'Your basket is empty.');
+
+  // The family discount. Stripe coupons can express a minimum spend but not
+  // "three or more units", so the count happens here and a one-shot coupon is
+  // attached to this session only. Created per session rather than reused, so
+  // the percentage can be changed in shipping.mjs without anyone having to
+  // remember to edit a coupon in the Dashboard.
+  let discounts;
+  if (qualifiesForFamilyDiscount(familyUnits)) {
+    try {
+      const coupon = await stripe.coupons.create({
+        percent_off: FAMILY_DISCOUNT_PERCENT,
+        duration: 'once',
+        name: FAMILY_DISCOUNT_NAME,
+        max_redemptions: 1,
+        // An hour is the session's own lifetime; an unused coupon then expires
+        // rather than accumulating in the Dashboard.
+        redeem_by: Math.floor(Date.now() / 1000) + 60 * 60,
+      });
+      discounts = [{ coupon: coupon.id }];
+      metadata.family_discount = `${FAMILY_DISCOUNT_PERCENT}% off, ${familyUnits} name clickers`;
+    } catch (err) {
+      // A discount that cannot be created must not stop the sale. The customer
+      // pays full price and the order records that it should not have.
+      console.error('Family discount coupon failed:', err);
+      metadata.family_discount = `NOT APPLIED (${familyUnits} name clickers) — check with the customer`;
+    }
+  }
 
   const personalisedCount = Object.keys(metadata).length;
   metadata.items_to_personalise = String(personalisedCount);
@@ -197,18 +234,18 @@ export async function handleCheckout(request, env) {
       // the family would rather have a number for chasing uncollected orders.
       // Set COLLECT_PHONE=false in the hosting env vars to drop it.
       phone_number_collection: { enabled: env.COLLECT_PHONE !== 'false' },
-      // UK only. Stripe requires an address before it will show shipping
-      // options at all, so collection customers are asked for one too.
+      // UK only.
       shipping_address_collection: { allowed_countries: ['GB'] },
+      ...(discounts ? { discounts } : {}),
       shipping_options: [
         {
           shipping_rate_data: {
             type: 'fixed_amount',
             fixed_amount: { amount: 0, currency: 'gbp' },
-            display_name: COLLECTION_LABEL,
+            display_name: LOCAL_LABEL,
             delivery_estimate: {
               minimum: { unit: 'business_day', value: 1 },
-              maximum: { unit: 'business_day', value: MAKE_DAYS },
+              maximum: { unit: 'business_day', value: MAKE_DAYS + LOCAL_DAYS_MAX },
             },
           },
         },
@@ -237,10 +274,10 @@ export async function handleCheckout(request, env) {
       },
       custom_text: {
         shipping_address: {
-          message: 'Choosing collection? We still need an address for your receipt — we will email you to arrange a time.',
+          message: `Free local delivery is for ${LOCAL_POSTCODE_AREA} postcodes only. Anywhere else in the UK, please choose Royal Mail.`,
         },
         submit: {
-          message: 'Everything is made to order. Allow 7 days to make, then 2–3 days in the post if you have chosen delivery.',
+          message: 'Everything is made to order. Allow 7 days to make, then 2 to 3 days in the post.',
         },
       },
       locale: 'en-GB',

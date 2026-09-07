@@ -7,7 +7,7 @@ videos:
 ---
 
 Swizee 3D Studio is Samuel, who is ten, and his mum Rebecca. We run it from home
-in Great Sankey, Warrington. Samuel picks what to make and does the printing;
+in Warrington. Samuel picks what to make and does the printing;
 Rebecca handles the orders and the boring bits.
 
 Every single thing on this site is printed to order on our own printers —
@@ -20,8 +20,8 @@ classroom, and name keyrings where you tell us the word and we print it.
 
 1. You order and pay on the site.
 2. We print your order. This usually takes a few days — allow 7.
-3. We post it to you anywhere in the UK, or you collect it from Great Sankey,
-   Warrington — whichever you chose at checkout. We email you either way.
+3. If you are local to us in WA5 we drop it round ourselves, free. Anywhere else
+   in the UK we post it. We email you either way.
 
 ## Follow along
 

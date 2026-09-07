@@ -247,6 +247,7 @@ These go in a product's **Metadata** box. All optional — most products need no
 | `colour_label` | `Base colour` | Wording above that drop-down |
 | `colours_2` | `Orange, White` | A second drop-down, for things with two colours |
 | `colour_2_label` | `Letter colour` | Wording above the second one |
+| `family_discount` | `true` | Counts towards the family discount: 10% off when someone buys three or more of these between them |
 
 On a **price** (only when a product has more than one option):
 
@@ -254,6 +255,11 @@ On a **price** (only when a product has more than one option):
 |---|---|---|
 | `variant_label` | `3 letters` | The wording of that choice |
 | `sort` | `1` | Which choice appears first |
+
+**A note on the family discount.** Both name clickers already have
+`family_discount` set. If you add another clicker and want it to count towards
+the 10%, give it the same setting — otherwise it will not, and nobody will be
+told why.
 
 **A note on web addresses.** If you do not set `slug`, the address comes from the
 product's name — so renaming "Axolotl" to "Axolotl Buddy" changes its address and
