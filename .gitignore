@@ -7,3 +7,7 @@ dist/
 !.env.example
 .DS_Store
 npm-debug.log*
+
+# Handover PDF and Stripe screenshots hold personal details; the repo is public
+HANDOVER.pdf
+handover/shots/

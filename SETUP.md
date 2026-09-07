@@ -1,7 +1,8 @@
-# Setup: what is done, and what still needs you
+# Setup: what is done, and what is left
 
 Live at **https://swizee.co.uk**. Technical reference is in [README.md](README.md);
-the family's guide is [HOWTO.md](HOWTO.md).
+the family's guide is [HOWTO.md](HOWTO.md), and the printed handover for Rebecca
+is `HANDOVER.pdf`, built from `handover/` and deliberately not committed (personal details, public repo).
 
 Every instruction below names the service and gives a full URL, because several
 of these dashboards have similarly-named screens.
@@ -17,9 +18,10 @@ of these dashboards have similarly-named screens.
 | Domain | `swizee.co.uk` live over HTTPS on Cloudflare |
 | DNS | Cloudflare nameservers; IONOS is registrar only |
 | Contact form | Web3Forms — tested, delivers, honeypot rejects bots |
-| Rebuild | Stripe webhook -> KV -> scheduled worker -> deploy hook |
-| Catalogue | 5 products with real photos and prices |
+| Rebuild | Stripe webhook -> KV -> scheduled worker -> deploy hook, live account (6 Sept 2026) |
+| Catalogue | Live Stripe catalogue with real photos and prices; site builds from the live key |
 | Legal pages | Terms and privacy reviewed, no placeholders left |
+| Go-live | Live key in Cloudflare; £2.50 test purchase made and refunded 1 Sept 2026 |
 
 ### Why the hosting moved
 
@@ -39,49 +41,48 @@ adds email later.
 
 ---
 
-## Still needs you
+## Who owns what
 
-### 1. Go live: swap to the live Stripe key
+Every service is registered to **samuel.swizee.3d.studio@gmail.com**, except the
+domain, which Paul registered and pays for.
 
-The site currently builds from the **sandbox** catalogue. Test and live are
-separate catalogues in Stripe — a product photo added in one does not appear in
-the other.
+| Service | Owner | Rebecca hands-on? |
+|---|---|---|
+| Stripe live `acct_1UAnyN2WfwtXYi2f` | Rebecca (account owner) | Yes — daily |
+| Google account | Family | Yes — it owns everything below |
+| Instagram `@swizee3dstudio` | Family | Yes |
+| YouTube | Family, same Gmail | Yes — videos embed on the About page |
+| GitHub `samuelswizee3dstudio-byte/website` | Family; Paul collaborator | Only for wording changes |
+| Cloudflare (Pages, DNS, KV, worker) | Family | No |
+| IONOS (domain registration only) | **Paul** — renews August 2027 | No, but see below |
+| Web3Forms (contact form relay) | Family | No |
 
-**In Stripe** — <https://dashboard.stripe.com/apikeys>
+Paul does not hold a Stripe team seat; he signs in as Rebecca when asked to.
 
-Check the top-left says **Swizee 3D studio**, not "Swizee 3D studio sandbox". If
-there is a Sandbox banner, click the account name and choose **Exit sandbox**.
+**Domain renewal.** Paul's card pays IONOS. Before August 2027 either move the
+registration to Rebecca (IONOS -> Domains -> transfer of ownership) or make sure
+Paul renews it. A lapsed domain takes the shop and the contact form down.
 
-On the **Secret key** row click **More options** (`...`) -> **Rotate key**, and
-copy the new key immediately. Stripe shows a secret key once and never again,
-which is why there is no "reveal" option on an existing one.
+---
 
-**In Cloudflare** —
-<https://dash.cloudflare.com/?to=/:account/pages/view/website/settings>
+## Handover checklist
 
-Scroll to **Variables and secrets**, click the pencil on the
-`STRIPE_SECRET_KEY` row, paste the new key, Save.
+Do these when the handover is complete, not before.
 
-Then the **Deployments** tab -> `...` on the newest deployment -> **Retry
-deployment**. Environment variables only apply to new builds.
-
-You will know it worked when the purple "Test mode" banner disappears.
-
-### 2. One real purchase
-
-Buy something for a pound, check it reads correctly in
-<https://dashboard.stripe.com/payments> — including the personalisation in the
-**Metadata** panel — then refund it.
-
-### 3. Cleanup
-
-- Delete the Netlify project — it is unused and out of deploy credits.
-- Revoke the Netlify API token (it expires 8 September regardless):
-  <https://app.netlify.com/user/applications>
-- Remove `pdrutter-alt` as a collaborator on the GitHub repo at handover.
-- Revoke `CLOUDFLARE_API_TOKEN` when this work is finished:
-  <https://dash.cloudflare.com/profile/api-tokens>
-- `.env` holds credentials. It is gitignored and `chmod 600`; do not copy it.
+- [ ] Give Rebecca `HANDOVER.pdf` and the Gmail password
+      **in person, not in the PDF**. Check the Google recovery phone is hers:
+      <https://myaccount.google.com/security>
+- [ ] Revoke the Stripe restricted key "Claude catalogue edits":
+      <https://dashboard.stripe.com/apikeys> (live account, not sandbox)
+- [ ] Revoke `CLOUDFLARE_API_TOKEN`:
+      <https://dash.cloudflare.com/profile/api-tokens>
+- [ ] Delete the Netlify project; its token expired 8 September 2026 regardless:
+      <https://app.netlify.com/user/applications>
+- [ ] Remove `pdrutter-alt` from the GitHub repo. Paul's main account stays as a
+      collaborator: <https://github.com/samuelswizee3dstudio-byte/website/settings/access>
+- [ ] `.env` holds credentials. It is gitignored and `chmod 600`; do not copy it.
+      Delete the revoked keys from it.
+- [ ] Put the domain renewal (August 2027) in Paul's calendar.
 
 ---
 

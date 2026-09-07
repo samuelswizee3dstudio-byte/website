@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<title>Swizee 3D Studio — running the shop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 18mm 16mm 20mm 16mm; }
+  @page :first { margin: 0; }
+  :root {
+    --bg:#FAF4EC; --surface:#fff; --ink:#16130F; --soft:#5C554C; --accent:#EF6122;
+    --pink:#F6BFCB; --sky:#A9DCE8; --mint:#7FC98B; --lilac:#C3B2E8; --border:#E7DED0; --error:#C2321B;
+    --mono:#8A8073;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; }
+  body { font-family:"Nunito", system-ui, sans-serif; font-size:11pt; line-height:1.5; color:var(--ink); background:#fff; }
+  h1, h2, h3 { font-family:"Anton", Impact, sans-serif; font-weight:400; text-transform:uppercase; letter-spacing:.01em; margin:0; line-height:1.05; }
+  h1 { font-size:30pt; margin:0 0 5mm; color:var(--ink); }
+  h1 .n { color:var(--accent); margin-right:.25em; }
+  h2 { font-size:16pt; margin:7mm 0 2.5mm; page-break-after:avoid; break-after:avoid; }
+  h3 { font-size:12.5pt; margin:6mm 0 2mm; color:var(--soft); }
+  p { margin:0 0 3mm; }
+  ul, ol { margin:0 0 3mm; padding-left:6mm; }
+  li { margin-bottom:1.2mm; }
+  li > p { margin:0; }
+  strong { font-weight:800; }
+  code, kbd { font-family:"Nunito", system-ui, sans-serif; font-weight:700; background:#F4EDE2; border:1px solid var(--border); border-radius:4px; padding:0 .3em; font-size:.95em; white-space:nowrap; }
+  a { color:var(--ink); text-decoration:none; }
+  .url { color:var(--accent); font-weight:700; word-break:break-all; }
+  .section { page-break-before: always; break-before: page; }
+  .avoid { page-break-inside: avoid; break-inside: avoid; }
+
+  /* cover */
+  .cover { height:297mm; width:210mm; background:var(--bg); position:relative; overflow:hidden; page-break-after:always; }
+  .cover .band { position:absolute; left:0; right:0; top:0; height:18mm; background:var(--accent); }
+  .cover .layers { position:absolute; left:0; right:0; bottom:0; height:70mm;
+    background:repeating-linear-gradient(0deg, var(--border) 0 1px, transparent 1px 6px); opacity:.7; }
+  .cover .inner { position:absolute; left:20mm; right:20mm; top:48mm; }
+  .cover .logo { width:26mm; height:26mm; border-radius:50%; box-shadow:0 6px 20px rgba(22,19,15,.12); background:#fff; }
+  .cover .kicker { font-family:"Anton"; text-transform:uppercase; font-size:14pt; color:var(--accent); margin-top:14mm; letter-spacing:.04em; }
+  .cover h1 { font-size:54pt; line-height:.95; margin:3mm 0 8mm; }
+  .cover .sub { font-size:15pt; color:var(--soft); max-width:140mm; }
+  .cover .meta { position:absolute; left:20mm; bottom:28mm; font-size:10.5pt; color:var(--soft); }
+  .cover .meta b { color:var(--ink); }
+  .chips { display:flex; gap:3mm; margin-top:10mm; }
+  .chip { border-radius:999px; padding:1.5mm 5mm; font-weight:800; font-size:10.5pt; }
+  .chip.pink { background:var(--pink); } .chip.sky { background:var(--sky); } .chip.mint { background:var(--mint); } .chip.lilac { background:var(--lilac); }
+
+  /* callouts */
+  .note, .warn { page-break-inside:auto; }
+  .note { border-left:4px solid var(--sky); background:#F2FAFC; padding:3mm 4mm; margin:3mm 0 4mm; border-radius:0 8px 8px 0; }
+  .warn { border-left:4px solid var(--accent); background:#FFF3EC; padding:3mm 4mm; margin:3mm 0 4mm; border-radius:0 8px 8px 0; }
+  .warn b:first-child, .note b:first-child { display:block; font-family:"Anton"; text-transform:uppercase; font-weight:400; font-size:11pt; margin-bottom:1mm; letter-spacing:.02em; }
+  .warn b:first-child { color:var(--accent); }
+
+  /* tables */
+  table { width:100%; border-collapse:collapse; margin:2mm 0 4mm; font-size:10.5pt; page-break-inside:auto; }
+  th, td { text-align:left; vertical-align:top; padding:1.6mm 2.5mm; border-bottom:1px solid var(--border); }
+  th { font-family:"Anton"; font-weight:400; text-transform:uppercase; font-size:9.5pt; letter-spacing:.04em; color:var(--soft); border-bottom:2px solid var(--ink); }
+  tr { page-break-inside:avoid; }
+  td.k { white-space:nowrap; font-weight:800; }
+  table.kv td:first-child { width:38mm; }
+  table.meta td:first-child { width:34mm; } table.meta td:nth-child(2) { width:40mm; }
+
+  /* figures */
+  figure { margin:3mm 0 5mm; page-break-inside:avoid; break-inside:avoid; }
+  figure .frame { border:1px solid var(--border); border-radius:8px; overflow:hidden; background:#fff; box-shadow:0 1px 2px rgba(22,19,15,.06); position:relative; }
+  figure img { display:block; width:100%; height:auto; }
+  figure .frame.missing { background:repeating-linear-gradient(135deg,#EDE2D2 0 8px,#F7F0E4 8px 16px); min-height:40mm; display:flex; align-items:center; justify-content:center; color:var(--mono); font-weight:800; }
+  figcaption { font-size:9.5pt; color:var(--soft); margin-top:1.5mm; }
+  figcaption b { color:var(--ink); }
+  .hl { position:absolute; border:2.5px solid var(--accent); border-radius:6px; box-shadow:0 0 0 2px #fff, 0 0 0 1000px rgba(22,19,15,0); }
+  .pin { position:absolute; width:6.5mm; height:6.5mm; border-radius:50%; background:var(--accent); color:#fff; font-family:"Anton"; font-size:10.5pt; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 2px #fff; transform:translate(-50%,-50%); }
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:5mm; }
+  .steps { counter-reset: step; list-style:none; padding:0; }
+  .steps li { counter-increment: step; position:relative; padding-left:9mm; margin-bottom:2.2mm; }
+  .steps li::before { content: counter(step); position:absolute; left:0; top:.1em; width:6.5mm; height:6.5mm; border-radius:50%; background:var(--ink); color:#fff; font-family:"Anton"; font-size:10pt; display:flex; align-items:center; justify-content:center; }
+  .toc { columns:2; column-gap:10mm; font-size:11pt; }
+  .toc div { break-inside:avoid; padding:1.2mm 0; border-bottom:1px solid var(--border); display:flex; gap:3mm; }
+  .toc .n { font-family:"Anton"; color:var(--accent); width:7mm; }
+  .footer-note { font-size:9.5pt; color:var(--soft); }
+  .tick { list-style:none; padding:0; }
+  .tick li { padding-left:8mm; position:relative; margin-bottom:2mm; }
+  .tick li::before { content:""; position:absolute; left:0; top:.25em; width:4.5mm; height:4.5mm; border:1.5px solid var(--ink); border-radius:3px; }
+  .small { font-size:9.5pt; color:var(--soft); }
+</style>
+</head>
+<body>
+
+<!-- ============================ COVER ============================ -->
+<section class="cover">
+  <div class="band"></div>
+  <div class="layers"></div>
+  <div class="inner">
+    <img class="logo" src="../public/logo.png" alt="">
+    <div class="kicker">Swizee 3D Studio</div>
+    <h1>Running<br>the shop</h1>
+    <p class="sub">Everything Rebecca needs to keep swizee.co.uk selling: the accounts, what to do in Stripe, and who to ask when something else needs changing.</p>
+    <div class="chips"><span class="chip pink">Accounts</span><span class="chip sky">Stripe</span><span class="chip mint">Orders</span><span class="chip lilac">The website</span></div>
+  </div>
+  <div class="meta">Handover from Paul · September 2026<br><b>swizee.co.uk</b> · dashboard.stripe.com</div>
+</section>
+
+<!-- ============================ CONTENTS ============================ -->
+<h1>What's in here</h1>
+<div class="toc">
+  <div><span class="n">1</span><span>Your accounts</span></div>
+  <div><span class="n">2</span><span>How the shop works</span></div>
+  <div><span class="n">3</span><span>Stripe: the sandbox trap</span></div>
+  <div><span class="n">4</span><span>Adding something to sell</span></div>
+  <div><span class="n">5</span><span>Options, names and colours</span></div>
+  <div><span class="n">6</span><span>Changing a price, removing an item</span></div>
+  <div><span class="n">7</span><span>Reading an order</span></div>
+  <div><span class="n">8</span><span>Refunds and getting paid</span></div>
+  <div><span class="n">9</span><span>If something is not showing up</span></div>
+  <div><span class="n">10</span><span>Changing the words on the website</span></div>
+  <div><span class="n">11</span><span>The extra settings, all in one place</span></div>
+  <div><span class="n">12</span><span>What Paul still does</span></div>
+</div>
+
+<div class="note" style="margin-top:8mm"><b>The short version</b>
+Almost everything happens in one place, Stripe. Products, prices, orders, refunds and the money all live there, and the website rebuilds itself from Stripe about five minutes after you change something. You never need to touch the website itself. The only things Stripe cannot do are the words on the About page and the legal pages, and adding a YouTube video. For those, ask Paul, or follow section 10.</div>
+
+<!-- ============================ 1 ACCOUNTS ============================ -->
+<h1 class="section"><span class="n">1</span>Your accounts</h1>
+<p>Everything is registered to one Google account, <strong>samuel.swizee.3d.studio@gmail.com</strong>. Its password is not written in this document. Paul gives it to you separately. Whoever holds that Gmail can reset the password on every other account below, so keep its recovery phone number as yours.</p>
+
+<h2>The ones you will use</h2>
+<table>
+<tr><th style="width:26mm">Service</th><th>What it is for</th><th style="width:58mm">Where</th></tr>
+<tr><td class="k">Stripe</td><td>Products, prices, orders, refunds, and the money reaching your bank. You are the account owner. The rest of this guide is about Stripe.</td><td class="url">dashboard.stripe.com</td></tr>
+<tr><td class="k">Gmail</td><td>Owns everything else. Receives Stripe's emails, messages from the website's contact form, and password resets.</td><td class="url">mail.google.com</td></tr>
+<tr><td class="k">Instagram</td><td>@swizee3dstudio. The website links to it from the front page, the shop and the About page.</td><td class="url">instagram.com/swizee3dstudio</td></tr>
+<tr><td class="k">YouTube</td><td>Same Gmail. Videos you upload here can be embedded on the About page (section 10).</td><td class="url">studio.youtube.com</td></tr>
+</table>
+
+<h2>The ones running in the background</h2>
+<p>These keep the website up. You should know they exist and that they are in your name, but there is nothing to do in them day to day. If one of them emails you, forward it to Paul.</p>
+<table>
+<tr><th style="width:26mm">Service</th><th>What it does</th><th style="width:58mm">Owner</th></tr>
+<tr><td class="k">GitHub</td><td>Holds the website's code and wording. Any change here rebuilds the site. Only needed for section 10.</td><td>Same Gmail. Paul is a collaborator.</td></tr>
+<tr><td class="k">Cloudflare</td><td>Hosts the website and answers for the swizee.co.uk address. Free plan.</td><td>Same Gmail</td></tr>
+<tr><td class="k">Web3Forms</td><td>Passes contact-form messages from the website to the Gmail inbox.</td><td>Same Gmail</td></tr>
+<tr><td class="k">IONOS</td><td>The registration of the name <em>swizee.co.uk</em>, and nothing else.</td><td><strong>Paul</strong>, on his card. Renews August 2027.</td></tr>
+</table>
+
+<div class="warn"><b>One date to remember</b>
+The domain name renews in <strong>August 2027</strong> and is paid by Paul. If it lapsed, the website and the contact form would stop working. Before then, either Paul renews it or the registration moves to you. Put a reminder in for July 2027.</div>
+
+<!-- ============================ 2 HOW IT WORKS ============================ -->
+<h1 class="section"><span class="n">2</span>How the shop works</h1>
+<p>It helps to know the shape of it, because it explains why changes take a few minutes and why the sandbox matters so much.</p>
+<figure>
+  <div class="frame" style="padding:6mm 8mm; background:var(--bg)">
+    <svg viewBox="0 0 760 170" width="100%" style="display:block" font-family="Nunito, sans-serif">
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#16130F"/></marker></defs>
+      <g>
+        <rect x="10" y="30" width="200" height="90" rx="14" fill="#fff" stroke="#E7DED0"/>
+        <text x="110" y="62" text-anchor="middle" font-size="18" font-weight="800" fill="#16130F">Stripe</text>
+        <text x="110" y="86" text-anchor="middle" font-size="13" fill="#5C554C">products, prices, photos</text>
+        <text x="110" y="104" text-anchor="middle" font-size="13" fill="#5C554C">orders, refunds, payouts</text>
+      </g>
+      <line x1="215" y1="75" x2="280" y2="75" stroke="#16130F" stroke-width="2" marker-end="url(#ar)"/>
+      <text x="248" y="62" text-anchor="middle" font-size="11" fill="#5C554C">~5 min</text>
+      <g>
+        <rect x="285" y="30" width="200" height="90" rx="14" fill="#fff" stroke="#E7DED0"/>
+        <text x="385" y="62" text-anchor="middle" font-size="18" font-weight="800" fill="#16130F">swizee.co.uk</text>
+        <text x="385" y="86" text-anchor="middle" font-size="13" fill="#5C554C">rebuilds itself from Stripe</text>
+        <text x="385" y="104" text-anchor="middle" font-size="13" fill="#5C554C">hosted on Cloudflare</text>
+      </g>
+      <line x1="490" y1="75" x2="555" y2="75" stroke="#16130F" stroke-width="2" marker-end="url(#ar)"/>
+      <text x="522" y="62" text-anchor="middle" font-size="11" fill="#5C554C">checkout</text>
+      <g>
+        <rect x="560" y="30" width="190" height="90" rx="14" fill="#EF6122"/>
+        <text x="655" y="62" text-anchor="middle" font-size="18" font-weight="800" fill="#fff">Customer pays</text>
+        <text x="655" y="86" text-anchor="middle" font-size="13" fill="#fff">on Stripe's own page</text>
+        <text x="655" y="104" text-anchor="middle" font-size="13" fill="#fff">order lands back in Stripe</text>
+      </g>
+      <path d="M655 122 L655 150 L110 150 L110 122" fill="none" stroke="#16130F" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#ar)"/>
+      <text x="385" y="165" text-anchor="middle" font-size="11" fill="#5C554C">the order, the customer's details and what to print all appear under Transactions</text>
+    </svg>
+  </div>
+  <figcaption>Stripe is the source of truth. The website is a copy of it that refreshes itself.</figcaption>
+</figure>
+<ul>
+  <li><strong>Changes are not instant.</strong> The website waits until you have <em>stopped</em> editing for three minutes, then rebuilds once. Add ten products in a row and it updates once at the end. Allow about five minutes.</li>
+  <li><strong>No card details ever touch the website.</strong> Payment happens on Stripe's page, so there is nothing for you to secure there.</li>
+  <li><strong>The customer gets an email receipt from Stripe automatically.</strong> You do not need to send one.</li>
+  <li><strong>Collection or delivery</strong> is chosen by the customer at checkout. Collection is from Great Sankey; delivery is UK post and their address comes through with the order.</li>
+</ul>
+
+<!-- ============================ 3 SANDBOX ============================ -->
+<h1 class="section"><span class="n">3</span>Stripe: the sandbox trap</h1>
+<p>Stripe has a practice mode called a <strong>sandbox</strong>. It looks almost identical to the real thing, but nothing in it is real and <strong>nothing you add there will ever appear on the website</strong>. This has caught Paul more than once.</p>
+<p><strong>Before you do anything in Stripe, look at the top-left corner.</strong></p>
+<figure>
+  <div class="frame"><img src="shots/01-home.png" alt=""><div class="hl" style="left:1.2%;top:2.5%;width:15.5%;height:7.5%"></div></div>
+  <figcaption><b>Right.</b> The top-left says <b>Swizee 3D studio</b> and there is no coloured bar across the top. This is the live account.</figcaption>
+</figure>
+<div class="two">
+<figure>
+  <div class="frame"><img src="shots/02-switcher.png" alt=""><div class="hl" style="left:3%;top:49%;width:52%;height:8%"></div></div>
+  <figcaption><b>How people end up there.</b> Clicking the name in the top-left opens this menu. <b>Switch to sandbox</b> is the door in. There is no reason for you to ever click it.</figcaption>
+</figure>
+<div>
+<p><strong>If you find yourself in the sandbox</strong>, the top-left will say <em>Swizee 3D studio sandbox</em> and there will be an orange bar across the top of every page saying you are testing in a sandbox. Click the name in the top-left and choose the plain <strong>Swizee 3D studio</strong>, or click <strong>Exit sandbox</strong> on the orange bar.</p>
+<p>Anything you created while in there stays in the sandbox. You will need to add it again in the real account.</p>
+</div>
+</div>
+<div class="warn"><b>If something you added is not on the website</b>
+Check this first, before anything else. Nine times out of ten, the product went into the sandbox.</div>
+
+<!-- ============================ 4 ADDING ============================ -->
+<h1 class="section"><span class="n">4</span>Adding something to sell</h1>
+<ol class="steps">
+  <li>Click <strong>Product catalog</strong> in the left-hand menu. (Stripe spells it the American way.)</li>
+  <li>Click the purple <strong>Create product</strong> button, top right.</li>
+</ol>
+<figure>
+  <div class="frame"><img src="shots/03-catalog.png" alt=""><div class="hl" style="left:87.5%;top:11.5%;width:12%;height:6%"></div></div>
+  <figcaption>The product catalogue. Everything currently on sale is listed under <b>Active</b>. Archived items are kept but hidden.</figcaption>
+</figure>
+<ol class="steps" style="counter-reset: step 2">
+  <li>A panel called <strong>Add a product</strong> slides in. Fill in:
+    <table class="kv" style="margin-top:2mm">
+      <tr><td class="k">Name</td><td>What it is called on the website. Keep it short: "Flexi Lizard", not "Articulated 3D Printed Flexi Lizard Toy".</td></tr>
+      <tr><td class="k">Description</td><td>A sentence or two. It shows under the name on the product page.</td></tr>
+      <tr><td class="k">Image</td><td>Click <strong>Upload</strong>. Square photos look best. You can add several, and people can click through them on the website.</td></tr>
+    </table>
+  </li>
+  <li>Under <strong>Pricing</strong>, click <strong>One-off</strong>. <strong>Stripe pre-selects "Recurring"</strong>, which means a subscription, and the website ignores subscription prices. This is the step everyone misses.</li>
+  <li>Type the <strong>Amount</strong>, like <code>4.50</code>. Check it says <strong>GBP</strong>.</li>
+  <li>Click <strong>Add product</strong>. Wait about five minutes, then look at the website.</li>
+</ol>
+<figure>
+  <div class="frame"><img src="shots/04-add-product.png" alt=""><div class="hl" style="left:26%;top:65.8%;width:25.5%;height:6%"></div></div>
+  <figcaption>The Add a product panel with <b>One-off</b> chosen. The preview on the right is Stripe's, not the website's, so ignore it.</figcaption>
+</figure>
+<p>That is all a simple item needs. Everything in the next section is only for special cases.</p>
+
+<!-- ============================ 5 OPTIONS ============================ -->
+<h1 class="section"><span class="n">5</span>Options, names and colours</h1>
+<p>Special behaviour is switched on with <strong>Metadata</strong>: little "left box, right box" pairs that Stripe stores against a product. The website reads them. On a new product they are under <strong>More options</strong>, just below the image; on an existing product there is a <strong>Metadata</strong> panel on the right-hand side with a pencil to edit it.</p>
+<div class="two">
+<figure>
+  <div class="frame"><img src="shots/05-metadata.png" alt=""><div class="hl" style="left:2.5%;top:82%;width:90%;height:8.5%"></div></div>
+  <figcaption><b>On a new product:</b> click <b>More options</b> and the <b>Metadata</b> boxes appear. Left box is the key, right box is the value. Spelling matters: lower case, exactly as shown in this guide.</figcaption>
+</figure>
+<figure>
+  <div class="frame"><img src="shots/06b-metadata-panel.png" alt=""><div class="hl" style="left:78%;top:2.5%;width:17%;height:9%"></div></div>
+  <figcaption><b>On an existing product:</b> the <b>Metadata</b> panel on the right of the product page. The pencil opens it for editing. This is the Name Clicker Keyring, with colours, personalisation and a pinned web address.</figcaption>
+</figure>
+</div>
+
+<h2>Things where the customer types a name</h2>
+<p>Like the name clicker keyrings. Add one line of metadata:</p>
+<table class="meta"><tr><th>Left box</th><th>Right box</th><th></th></tr>
+<tr><td><code>personalise</code></td><td><code>true</code></td><td>The website adds a box for the customer to type in, allows letters and numbers only, and puts what they typed on your order.</td></tr>
+<tr><td><code>personalise_label</code></td><td><code>Name to print</code></td><td>Optional. Changes the wording above that box from "Name or word to print".</td></tr>
+</table>
+
+<h2>Options that cost different amounts</h2>
+<p>Like a keyring where 3 letters costs £4.50 and 4 letters costs £5.00. <strong>Do not make two products.</strong> Make one product with several prices:</p>
+<ol class="steps">
+  <li>Add the product as normal with the first price, then open it from the catalogue.</li>
+  <li>Next to the <strong>Pricing</strong> heading, click the <strong>+</strong> button. A panel called <strong>Add price to …</strong> opens.</li>
+  <li>Click <strong>One-off</strong> (again, Recurring is pre-selected). Type the amount.</li>
+  <li>Scroll down to <strong>Advanced</strong> and put the option's wording in <strong>Price description</strong>: <code>3 letters</code>, <code>4 letters</code> and so on. Use wording that contains the number. The website reads the number out of it and stops customers typing a longer name than they have paid for.</li>
+  <li>Click <strong>Create price</strong>. Repeat for each option.</li>
+</ol>
+<figure>
+  <div class="frame"><img src="shots/06-product-prices.png" alt=""><div class="hl" style="left:54.5%;top:38.5%;width:7%;height:41%"></div><div class="hl" style="left:74.5%;top:26%;width:3%;height:5%"></div></div>
+  <figcaption>The Name Clicker Keyring has one active price per name length. The <b>Description</b> column is what the website shows as buttons, and the price changes as the customer picks. The <b>+</b> adds another price. The greyed <b>Archived</b> prices are old ones, kept for the order history.</figcaption>
+</figure>
+<figure>
+  <div class="frame"><img src="shots/07-add-price.png" alt=""><div class="hl" style="left:26.5%;top:12.5%;width:25%;height:9.5%"></div><div class="hl" style="left:1.5%;top:89.5%;width:50%;height:6.5%"></div></div>
+  <figcaption>The Add price panel: <b>One-off</b>, the amount, then <b>Price description</b> under Advanced.</figcaption>
+</figure>
+
+<h2>Letting the customer choose a colour</h2>
+<p>Add one line to the product's metadata listing the colours separated by commas:</p>
+<table class="meta"><tr><th>Left box</th><th>Right box</th><th></th></tr>
+<tr><td><code>colours</code></td><td><code>Black, White, Blue, Pink</code></td><td>Gives a drop-down. The customer must pick one before adding to basket, and their choice appears on your order.</td></tr>
+<tr><td><code>colour_label</code></td><td><code>Base colour</code></td><td>Optional. Wording above the drop-down, instead of "Colour".</td></tr>
+<tr><td><code>colours_2</code></td><td><code>Orange, White, Green</code></td><td>A second drop-down, for things with two colours, like the base and the letters of a name clicker.</td></tr>
+<tr><td><code>colour_2_label</code></td><td><code>Letter colour</code></td><td>Wording above the second one.</td></tr>
+</table>
+<ul>
+  <li><strong>Spell the colours exactly how you want to read them on the order.</strong></li>
+  <li><strong>Colours do not change the price.</strong> If one colour costs more, that is a price option instead (above).</li>
+  <li><strong>To stop offering a colour</strong>, delete it from the list. Orders already placed keep the colour they were bought with. Delete the whole <code>colours</code> line and the drop-down disappears.</li>
+</ul>
+
+<!-- ============================ 6 PRICE / REMOVE ============================ -->
+<h1 class="section"><span class="n">6</span>Changing a price, removing an item</h1>
+<h2>Changing a price</h2>
+<p>Stripe will not let you change the amount of a price once it exists. Instead you add the new one and retire the old one:</p>
+<ol class="steps">
+  <li>Open the product. Click the <strong>+</strong> next to Pricing and add the new price (One-off, amount, and the same Price description if it is an option).</li>
+  <li>Find the old price in the list, click its <strong>…</strong> menu on the right, and choose <strong>Archive price</strong>.</li>
+</ol>
+<div class="warn"><b>Both steps matter</b>
+If you forget to archive the old one, the website shows both prices as options and customers can pick the cheaper.</div>
+<figure style="width:72%">
+  <div class="frame"><img src="shots/08-price-menu.png" alt=""><div class="hl" style="left:70.5%;top:50%;width:22%;height:7%"></div></div>
+  <figcaption>The <b>…</b> menu on a price. <b>Archive price</b> is the one you want. Avoid <b>Delete price</b>, which Stripe only allows if nobody has ever bought at that price.</figcaption>
+</figure>
+
+<h2>Taking something off the website</h2>
+<p><strong>Just for now</strong> (sold out, out of filament): open the product, edit its <strong>Metadata</strong>, and add <code>hidden</code> = <code>true</code>. It stays in Stripe with all its history but disappears from the website. Delete that line to bring it back.</p>
+<p><strong>For good:</strong> open the product, click the <strong>…</strong> button at the top right next to Edit product, and choose <strong>Archive product</strong>.</p>
+<figure>
+  <div class="frame"><img src="shots/09-product-menu.png" alt=""><div class="hl" style="left:84%;top:38%;width:13%;height:22%"></div></div>
+  <figcaption><b>Archive product</b> keeps it and its order history; <b>Delete product</b> is permanent and usually refused once it has been sold.</figcaption>
+</figure>
+
+<!-- ============================ 7 ORDERS ============================ -->
+<h1 class="section"><span class="n">7</span>Reading an order</h1>
+<p>Stripe emails you when someone pays. To see the orders, click <strong>Transactions</strong> in the left-hand menu; the <strong>Payments</strong> tab is the list of orders, newest first.</p>
+<figure>
+  <div class="frame"><img src="shots/10-transactions.png" alt=""><div class="hl" style="left:19%;top:47%;width:81%;height:7%"></div></div>
+  <figcaption>The Payments list. Each row is an order; click it to open. <b>Reversed</b> here means refunded. This is Paul's £2.50 test from 1 September.</figcaption>
+</figure>
+<p>On the order page, the <strong>Checkout summary</strong> in the middle has everything you need:</p>
+<ul>
+  <li>The customer's <strong>name, email, phone number and address</strong>.</li>
+  <li><strong>What they bought</strong>, how many, and what they paid.</li>
+  <li><strong>How they want it</strong>, on the <em>Shipping</em> line: either <em>Collect from Great Sankey, Warrington</em> or <em>UK delivery — Royal Mail 2nd Class</em>. For delivery, post it to the address under <em>Shipping details</em>.</li>
+</ul>
+<figure>
+  <div class="frame"><img src="shots/11-payment.png" alt=""><div class="hl" style="left:19%;top:59.5%;width:58%;height:20%"></div><div class="hl" style="left:43%;top:89.5%;width:34%;height:5%"></div></div>
+  <figcaption>An order. Customer and address in the <b>Checkout summary</b>; the <b>Shipping</b> line says collection or delivery. On an order that has not been refunded, a <b>Refund</b> button sits at the top right where "Manage payment application" is here.</figcaption>
+</figure>
+<p><strong>If they ordered anything personalised or chose colours</strong>, look at the <strong>Metadata</strong> box in the right-hand column, below <em>Customer</em>. It looks like this:</p>
+<table class="kv">
+<tr><td class="k">item_1</td><td>Name Clicker Keyring (3 letters) ×2: BEN — Base colour: Black, Letter colour: Orange</td></tr>
+<tr><td class="k">item_2</td><td>Flexi Lizard: Colour: Purple</td></tr>
+<tr><td class="k">items_to_personalise</td><td>2</td></tr>
+</table>
+<p>That is exactly what to print. <code>×2</code> means they ordered two of that one.</p>
+<figure style="width:85%">
+  <div class="frame"><img src="shots/12-payment-metadata.png" alt=""><div class="hl" style="left:75%;top:60%;width:24%;height:36%"></div></div>
+  <figcaption>The <b>Metadata</b> box, right-hand column. Paul's test order had nothing to personalise, so it only shows a count (and an older spelling of it). The <b>Payment breakdown</b> on the left is where you see Stripe's fee.</figcaption>
+</figure>
+<p>When the order is ready: <strong>collection</strong>, email them to arrange a time; <strong>delivery</strong>, post it. Stripe has already sent them a receipt.</p>
+
+<!-- ============================ 8 REFUNDS / PAYOUTS ============================ -->
+<h1 class="section"><span class="n">8</span>Refunds and getting paid</h1>
+<h2>Giving a refund</h2>
+<p>Open the order under Transactions and click <strong>Refund</strong> at the top right. You can refund all of it or part of it. The money goes back to the customer's card in a few days and Stripe emails them.</p>
+<p>You do not have to print something rude or impossible. Refund it and say why. The terms of sale on the website already allow this.</p>
+<div class="note"><b>Stripe keeps its fee on a refund</b>
+Stripe charges a small fee on every payment (a few pence plus a percentage). When you refund, the customer gets the full amount back but Stripe does not return its fee, so a refunded order costs you a few pence. Paul's test order in September 2026 left the balance at minus 24p for this reason; it clears against the next sale.</div>
+
+<h2>Where the money goes</h2>
+<p>Stripe collects the payments and pays them out to your bank account on a rolling schedule. <strong>Balances</strong> in the left-hand menu shows what is waiting; <strong>Transactions → Payouts</strong> lists each transfer to the bank. The bank account itself is under <strong>Settings</strong> (the cog, top right) <strong>→ Linked accounts and payouts</strong>, or directly at <span class="url">dashboard.stripe.com/settings/payouts</span>. The <strong>Settlement and transfer rules</strong> tab on the same page holds the payout schedule.</p>
+<figure>
+  <div class="frame"><img src="shots/13-payouts.png" alt=""><div class="hl" style="left:9.5%;top:74%;width:89%;height:12%"></div></div>
+  <figcaption>The bank account payouts go to: Nationwide, ending 3256. If that is ever not yours, stop and ask Paul before anything else.</figcaption>
+</figure>
+
+<!-- ============================ 9 TROUBLESHOOTING ============================ -->
+<h1 class="section"><span class="n">9</span>If something is not showing up</h1>
+<p>Work down this list, in order:</p>
+<ol class="steps">
+  <li><strong>Are you in the sandbox?</strong> Check the top-left says <strong>Swizee 3D studio</strong> with no coloured bar. This is the most common cause by a long way.</li>
+  <li><strong>Wait five more minutes</strong> and refresh the page.</li>
+  <li><strong>Is the product Active?</strong> Archived products do not show. In the catalogue, click <strong>Archived</strong> to check.</li>
+  <li><strong>Does it have a price, in GBP, as a One-off?</strong> No price, a price in dollars, or a Recurring price, and it will not appear.</li>
+  <li><strong>Did you add <code>hidden</code> = <code>true</code>?</strong> Check the Metadata panel.</li>
+  <li><strong>Still stuck?</strong> Ask Paul, and say what you did and when.</li>
+</ol>
+<div class="note"><b>Web addresses</b>
+Each product's address, like <em>swizee.co.uk/products/flexi-lizard</em>, comes from its name. Renaming "Axolotl" to "Axolotl Buddy" changes the address, and any link you already posted stops working. If you are going to share a link on Instagram, first add metadata <code>slug</code> = <code>axolotl</code> to pin the address, and never change it.</div>
+
+<!-- ============================ 10 WEBSITE WORDS ============================ -->
+<h1 class="section"><span class="n">10</span>Changing the words on the website</h1>
+<p>The front page, the About page, the contact page, the terms and the privacy policy are not in Stripe. <strong>The normal route is to ask Paul</strong>: send him the new wording and he will put it up.</p>
+<p>If Paul is not around, you can do it yourself. The wording lives in five plain text files on GitHub, one per page, and editing one rebuilds the website in a few minutes. It looks technical but it is a text box and a Save button.</p>
+<table class="kv">
+<tr><td class="k">Front page</td><td><code>home.md</code></td></tr>
+<tr><td class="k">About page</td><td><code>about.md</code> (also lists the YouTube videos)</td></tr>
+<tr><td class="k">Contact page</td><td><code>contact.md</code></td></tr>
+<tr><td class="k">Terms of sale</td><td><code>terms.md</code></td></tr>
+<tr><td class="k">Privacy policy</td><td><code>privacy.md</code></td></tr>
+</table>
+<ol class="steps">
+  <li>Sign in to <span class="url">github.com</span> with the Gmail account.</li>
+  <li>Go to <span class="url">github.com/samuelswizee3dstudio-byte/website/tree/main/src/content/copy</span> and click the file you want.</li>
+  <li>Click the <strong>pencil</strong> icon (top right of the file, "Edit this file").</li>
+  <li>Change the words. Leave the lines between the <code>---</code> marks at the top alone unless you are adding a video (below). Blank lines make paragraphs; a line starting with <code>##</code> is a heading.</li>
+  <li>Click the green <strong>Commit changes…</strong> button, then <strong>Commit changes</strong> again in the box that appears. Leave "Commit directly to the main branch" selected.</li>
+  <li>Wait about three minutes and refresh the website.</li>
+</ol>
+<figure>
+  <div class="frame"><img src="shots/14-github-file.png" alt=""><div class="hl" style="left:63%;top:26.5%;width:3.6%;height:5.5%"></div><div class="hl" style="left:23.5%;top:52%;width:7.5%;height:4%"></div></div>
+  <figcaption>The About page's file on GitHub, with the five wording files listed on the left. The pencil, top right of the file, opens it for editing (you will see it once signed in). Editing opens a plain text box with a green <b>Commit changes…</b> button above it.</figcaption>
+</figure>
+
+<h2>Adding a YouTube video to the About page</h2>
+<p>Upload the video to YouTube first. Its address will look like <em>youtube.com/watch?v=<strong>k3Fd5xHrOBE</strong></em>; the bold part is the video's ID. Then edit <code>about.md</code> and, in the block between the <code>---</code> marks at the top, add two lines under <code>videos:</code> in exactly this shape (two spaces before the dash, four before "title"):</p>
+<table class="kv"><tr><td colspan="2" style="font-weight:700; white-space:pre; line-height:1.4">videos:
+  - id: k3Fd5xHrOBE
+    title: "Printing a name clicker base"
+  - id: NEWVIDEOID
+    title: "What the new one is called"</td></tr></table>
+<p>Commit as above. To remove a video, delete its two lines. If you get the spacing wrong the website build fails and nothing changes; it does not break the live site. Ask Paul if that happens.</p>
+<div class="warn"><b>Do not edit anything outside that folder</b>
+Every other file in GitHub is code. A change there can take the site down, and the fix is Paul's, not yours.</div>
+
+<!-- ============================ 11 REFERENCE ============================ -->
+<h1 class="section"><span class="n">11</span>The extra settings, all in one place</h1>
+<p>These go in a <strong>product's</strong> Metadata. All optional. Most products need none.</p>
+<table class="meta">
+<tr><th>Left box</th><th>Right box</th><th>What it does</th></tr>
+<tr><td><code>personalise</code></td><td><code>true</code></td><td>Customer gets a box to type a name or word</td></tr>
+<tr><td><code>personalise_label</code></td><td><code>Name to print</code></td><td>Wording above that box</td></tr>
+<tr><td><code>colours</code></td><td><code>Black, White, Blue</code></td><td>Colour drop-down</td></tr>
+<tr><td><code>colour_label</code></td><td><code>Base colour</code></td><td>Wording above it</td></tr>
+<tr><td><code>colours_2</code></td><td><code>Orange, White</code></td><td>A second drop-down</td></tr>
+<tr><td><code>colour_2_label</code></td><td><code>Letter colour</code></td><td>Wording above the second one</td></tr>
+<tr><td><code>category</code></td><td><code>fidgets</code></td><td>Groups it with similar things on the shop page. Use the same word for things that belong together</td></tr>
+<tr><td><code>featured</code></td><td><code>true</code></td><td>Also shows it on the front page</td></tr>
+<tr><td><code>sort</code></td><td><code>10</code></td><td>Order on the page. Lower numbers first</td></tr>
+<tr><td><code>hidden</code></td><td><code>true</code></td><td>Temporarily removes it from the website</td></tr>
+<tr><td><code>slug</code></td><td><code>flexi-lizard</code></td><td>Pins the web address to swizee.co.uk/products/flexi-lizard</td></tr>
+</table>
+<p>On a <strong>price</strong>, when a product has more than one option:</p>
+<table class="meta">
+<tr><th>Where</th><th>Example</th><th>What it does</th></tr>
+<tr><td>Price description (under Advanced)</td><td><code>3 letters</code></td><td>The wording of that choice. Include the number for name items</td></tr>
+<tr><td>Price metadata <code>sort</code></td><td><code>1</code></td><td>Which choice appears first. Without it, cheapest first</td></tr>
+</table>
+<p class="small">Product videos (the short clip under the photos on a product page) cannot go into Stripe. Send the clip to Paul and he adds it.</p>
+
+<!-- ============================ 12 PAUL ============================ -->
+<h1 class="section"><span class="n">12</span>What Paul still does</h1>
+<p>Paul stays as a collaborator on GitHub and can sign in to Stripe as you when asked. He is the person for:</p>
+<ul>
+  <li>Any change to the look or layout of the website, or a new page.</li>
+  <li>Wording changes, when you would rather not use section 10.</li>
+  <li>Product videos.</li>
+  <li>Anything that arrives by email from GitHub, Cloudflare or Web3Forms.</li>
+  <li>The domain renewal in August 2027.</li>
+  <li>Anything on the website that looks broken.</li>
+</ul>
+<h2>Handover checklist</h2>
+<ul class="tick">
+  <li>You have the Gmail password (given in person) and the recovery phone on the Google account is yours.</li>
+  <li>You can sign in to Stripe and it says <strong>Swizee 3D studio</strong> top-left.</li>
+  <li>You have opened Transactions and found Paul's £2.50 test order and its refund.</li>
+  <li>You have checked the bank account under Settings → Bank accounts and currencies.</li>
+  <li>You can sign in to GitHub with the Gmail and see the <em>website</em> repository.</li>
+  <li>July 2027 reminder set for the domain renewal.</li>
+</ul>
+<p class="footer-note" style="margin-top:12mm">Technical reference for anyone working on the code lives in the repository's README. This guide was written in September 2026 against Stripe's dashboard as it looked then; Stripe moves buttons around occasionally, but the names stay close.</p>
+
+</body>
+</html>
