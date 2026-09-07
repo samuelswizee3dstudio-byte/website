@@ -188,7 +188,7 @@ The domain name renews in <strong>August 2027</strong> and is paid by Paul. If i
   <li><strong>Changes are not instant.</strong> The website waits until you have <em>stopped</em> editing for three minutes, then rebuilds once. Add ten products in a row and it updates once at the end. Allow about five minutes.</li>
   <li><strong>No card details ever touch the website.</strong> Payment happens on Stripe's page, so there is nothing for you to secure there.</li>
   <li><strong>The customer gets an email receipt from Stripe automatically.</strong> You do not need to send one.</li>
-  <li><strong>Collection or delivery</strong> is chosen by the customer at checkout. Collection is from Great Sankey; delivery is UK post and their address comes through with the order.</li>
+  <li><strong>How it reaches them</strong> is chosen by the customer at checkout. Either free local delivery, which is WA5 postcodes only and you take round yourself, or UK post by Royal Mail. Their address comes through with the order either way.</li>
 </ul>
 
 <!-- ============================ 3 SANDBOX ============================ -->
@@ -286,6 +286,7 @@ Check this first, before anything else. Nine times out of ten, the product went 
 <tr><td><code>colour_label</code></td><td><code>Base colour</code></td><td>Optional. Wording above the drop-down, instead of "Colour".</td></tr>
 <tr><td><code>colours_2</code></td><td><code>Orange, White, Green</code></td><td>A second drop-down, for things with two colours, like the base and the letters of a name clicker.</td></tr>
 <tr><td><code>colour_2_label</code></td><td><code>Letter colour</code></td><td>Wording above the second one.</td></tr>
+<tr><td><code>family_discount</code></td><td><code>true</code></td><td>Counts towards the family discount: 10% off when somebody buys three or more of these between them. Both name clickers already have it.</td></tr>
 </table>
 <ul>
   <li><strong>Spell the colours exactly how you want to read them on the order.</strong></li>
@@ -327,11 +328,11 @@ If you forget to archive the old one, the website shows both prices as options a
 <ul>
   <li>The customer's <strong>name, email, phone number and address</strong>.</li>
   <li><strong>What they bought</strong>, how many, and what they paid.</li>
-  <li><strong>How they want it</strong>, on the <em>Shipping</em> line: either <em>Collect from Great Sankey, Warrington</em> or <em>UK delivery — Royal Mail 2nd Class</em>. For delivery, post it to the address under <em>Shipping details</em>.</li>
+  <li><strong>How they want it</strong>, on the <em>Shipping</em> line: either <em>Free local delivery (WA5 postcodes)</em> or <em>UK delivery — Royal Mail 2nd Class</em>. Either way the address is under <em>Shipping details</em>. <strong>Check the postcode on a local one.</strong> Stripe will not let the website limit that option by postcode, so somebody further away can choose it by mistake. If they have, message them: either they pay the £3.50 postage or you refund the order. The terms of sale say so.</li>
 </ul>
 <figure>
   <div class="frame"><img src="shots/11-payment.png" alt=""><div class="hl" style="left:19%;top:59.5%;width:58%;height:20%"></div><div class="hl" style="left:43%;top:89.5%;width:34%;height:5%"></div></div>
-  <figcaption>An order. Customer and address in the <b>Checkout summary</b>; the <b>Shipping</b> line says collection or delivery. On an order that has not been refunded, a <b>Refund</b> button sits at the top right where "Manage payment application" is here.</figcaption>
+  <figcaption>An order. Customer and address in the <b>Checkout summary</b>; the <b>Shipping</b> line says local delivery or post. On an order that has not been refunded, a <b>Refund</b> button sits at the top right where "Manage payment application" is here.</figcaption>
 </figure>
 <p><strong>If they ordered anything personalised or chose colours</strong>, look at the <strong>Metadata</strong> box in the right-hand column, below <em>Customer</em>. It looks like this:</p>
 <table class="kv">
@@ -344,7 +345,7 @@ If you forget to archive the old one, the website shows both prices as options a
   <div class="frame"><img src="shots/12-payment-metadata.png" alt=""><div class="hl" style="left:75%;top:60%;width:24%;height:36%"></div></div>
   <figcaption>The <b>Metadata</b> box, right-hand column. Paul's test order had nothing to personalise, so it only shows a count (and an older spelling of it). The <b>Payment breakdown</b> on the left is where you see Stripe's fee.</figcaption>
 </figure>
-<p>When the order is ready: <strong>collection</strong>, email them to arrange a time; <strong>delivery</strong>, post it. Stripe has already sent them a receipt.</p>
+<p>When the order is ready: <strong>local delivery</strong>, take it round; <strong>post</strong>, send it second class. Stripe has already sent them a receipt.</p>
 
 <!-- ============================ 8 REFUNDS / PAYOUTS ============================ -->
 <h1 class="section"><span class="n">8</span>Refunds and getting paid</h1>
@@ -421,6 +422,7 @@ Every other file in GitHub is code. A change there can take the site down, and t
 <tr><td><code>colour_label</code></td><td><code>Base colour</code></td><td>Wording above it</td></tr>
 <tr><td><code>colours_2</code></td><td><code>Orange, White</code></td><td>A second drop-down</td></tr>
 <tr><td><code>colour_2_label</code></td><td><code>Letter colour</code></td><td>Wording above the second one</td></tr>
+<tr><td><code>family_discount</code></td><td><code>true</code></td><td>Counts towards the family discount, 10% off three or more</td></tr>
 <tr><td><code>category</code></td><td><code>fidgets</code></td><td>Groups it with similar things on the shop page. Use the same word for things that belong together</td></tr>
 <tr><td><code>featured</code></td><td><code>true</code></td><td>Also shows it on the front page</td></tr>
 <tr><td><code>sort</code></td><td><code>10</code></td><td>Order on the page. Lower numbers first</td></tr>
