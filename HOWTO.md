@@ -146,6 +146,9 @@ Stripe will not let you edit a price once it exists. Instead:
 2. Click **+ Add another price** and set the new amount
 3. Find the old price, click its **"..."** menu, and choose **Archive price**
 
+Anyone who already had the item in their basket is moved to the new price
+automatically, on the basket page and again at checkout; nothing is lost.
+
 **Both steps matter.** If you forget to archive the old one, the website shows
 both prices as options and customers can pick the cheaper.
 

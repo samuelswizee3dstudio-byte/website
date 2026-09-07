@@ -56,14 +56,14 @@ const first = product.variants[0];
         <p class="pdp__price" data-price>{formatPrice(first.unitAmount)}</p>
         {product.description && <p class="pdp__desc">{product.description}</p>}
 
-        <form id="add-form" novalidate>
+        <form id="add-form" novalidate data-slug={product.slug}>
           {hasVariants ? (
             <fieldset class="variants">
               <legend>How many letters?</legend>
               <div class="variants__row">
                 {product.variants.map((v: any, i: number) => (
                   <label class="variant">
-                    <input type="radio" name="priceId" value={v.id} data-amount={v.unitAmount} data-max={v.maxChars} checked={i === 0} class="visually-hidden" />
+                    <input type="radio" name="priceId" value={v.id} data-amount={v.unitAmount} data-max={v.maxChars} data-label={v.label} checked={i === 0} class="visually-hidden" />
                     <span class="variant__label">{v.label}</span>
                     <span class="variant__price">{formatPrice(v.unitAmount)}</span>
                   </label>
@@ -253,8 +253,12 @@ const first = product.variants[0];
         return;
       }
 
+      const chosen = form.querySelector<HTMLInputElement>('input[name="priceId"]:checked')
+        ?? form.querySelector<HTMLInputElement>('input[name="priceId"]');
       const result = addLine({
         priceId,
+        slug: form.dataset.slug ?? '',
+        variant: chosen?.dataset.label ?? '',
         text,
         colour: String(data.get('colour') ?? ''),
         colour2: String(data.get('colour2') ?? ''),

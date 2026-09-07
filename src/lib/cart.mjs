@@ -1,10 +1,13 @@
 // Client-side basket. Browser storage only — nothing reaches a server until
 // the customer presses Checkout.
 //
-// A stored line is deliberately minimal: { priceId, text, qty }. Names, prices
-// and photos are looked up from the build-time catalogue snapshot on the page,
-// so a basket left open for a week can never show a stale price, and a line
-// whose Stripe price has gone is dropped rather than silently mispriced.
+// A stored line is deliberately minimal: { priceId, text, qty }, plus the
+// product slug and option label it was chosen from. Names, prices and photos
+// are looked up from the build-time catalogue snapshot on the page, so a basket
+// left open for a week can never show a stale price. When a price has been
+// replaced in Stripe (prices there are immutable, so every change archives one
+// and creates another) the slug and label let the basket move the line to the
+// current price instead of dropping it.
 
 import { validatePersonalisation, validateQuantity, MAX_LINES } from './validation.mjs';
 
@@ -47,6 +50,8 @@ export function readCart() {
         colour: typeof l.colour === 'string' ? l.colour : '',
         colour2: typeof l.colour2 === 'string' ? l.colour2 : '',
         qty: Number.isInteger(l.qty) && l.qty > 0 ? Math.min(l.qty, 10) : 1,
+        slug: typeof l.slug === 'string' ? l.slug : '',
+        variant: typeof l.variant === 'string' ? l.variant : '',
       }))
       .slice(0, MAX_LINES);
   } catch {
@@ -70,7 +75,7 @@ function writeCart(lines) {
 /**
  * @returns {{ ok: true, lines: object[] } | { ok: false, message: string }}
  */
-export function addLine({ priceId, text = '', colour = '', colour2 = '', qty = 1 }) {
+export function addLine({ priceId, text = '', colour = '', colour2 = '', qty = 1, slug = '', variant = '' }) {
   if (typeof priceId !== 'string' || !priceId.startsWith('price_')) {
     return { ok: false, message: 'Please choose an option first.' };
   }
@@ -96,10 +101,23 @@ export function addLine({ priceId, text = '', colour = '', colour2 = '', qty = 1
     if (lines.length >= MAX_LINES) {
       return { ok: false, message: 'Your basket is full. Please check out, then start another order.' };
     }
-    lines.push({ priceId, text: cleanText, colour, colour2, qty: q.value });
+    lines.push({ priceId, text: cleanText, colour, colour2, qty: q.value, slug, variant });
   }
   writeCart(lines);
   return { ok: true, lines };
+}
+
+/**
+ * Move every line on an old price to its replacement. Used by the basket page
+ * when the catalogue no longer knows a price id but does know the product and
+ * option the line came from.
+ */
+export function replacePrice(oldId, newId) {
+  const lines = readCart();
+  let changed = false;
+  for (const l of lines) if (l.priceId === oldId) { l.priceId = newId; changed = true; }
+  if (changed) writeCart(lines);
+  return changed;
 }
 
 /** @returns {{ ok: true, lines: object[] } | { ok: false, message: string }} */

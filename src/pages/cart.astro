@@ -8,8 +8,13 @@ const products = await getCatalogue();
 // stores only { priceId, text, qty } and looks everything else up here, so a
 // basket cannot display a price that Stripe no longer charges.
 const index: Record<string, unknown> = {};
+// And the reverse: which price a product's option carries today, so a line
+// stored against a price that has since been replaced can be moved rather
+// than dropped. Keyed by slug and option label; single-option products use ''.
+const current: Record<string, string> = {};
 for (const p of products) {
   for (const v of p.variants) {
+    current[`${p.slug}::${p.variants.length > 1 ? v.label : ''}`] = v.id;
     index[v.id] = {
       slug: p.slug,
       name: p.name,
@@ -57,10 +62,11 @@ for (const p of products) {
   </div>
 
   <script is:inline type="application/json" id="catalogue" set:html={JSON.stringify(index)}></script>
+  <script is:inline type="application/json" id="current" set:html={JSON.stringify(current)}></script>
 </Base>
 
 <script>
-  import { readCart, setQty, removeLine, lineKey, onCartChange } from '../lib/cart.mjs';
+  import { readCart, setQty, removeLine, replacePrice, lineKey, onCartChange } from '../lib/cart.mjs';
   import { FAMILY_DISCOUNT_PERCENT as FAMILY_PERCENT, FAMILY_DISCOUNT_MIN_ITEMS as FAMILY_MIN } from '../lib/shipping.mjs';
 
   type Entry = { slug: string; name: string; variantLabel: string; unitAmount: number;
@@ -68,6 +74,9 @@ for (const p of products) {
 
   const catalogue: Record<string, Entry> = JSON.parse(
     document.querySelector('#catalogue')?.textContent || '{}'
+  );
+  const current: Record<string, string> = JSON.parse(
+    document.querySelector('#current')?.textContent || '{}'
   );
 
   const el = <T extends HTMLElement>(id: string) => document.querySelector<T>(id);
@@ -84,10 +93,20 @@ for (const p of products) {
 
   function render() {
     const stored = readCart();
+
+    // A price that has been replaced in Stripe: move the line to today's price
+    // for the same product and option. The customer sees the new price here,
+    // before checkout, which is the honest place for it.
+    for (const l of stored) {
+      if (catalogue[l.priceId]) continue;
+      const replacement = current[`${l.slug}::${l.variant}`];
+      if (replacement && catalogue[replacement] && replacePrice(l.priceId, replacement)) return; // re-rendered by the change event
+    }
+
     const known = stored.filter((l) => catalogue[l.priceId]);
 
-    // A line whose Stripe price has been archived or deleted cannot be bought.
-    // Drop it here rather than letting checkout fail with a confusing error.
+    // A line whose Stripe price has gone, with nothing to move it to, cannot be
+    // bought. Drop it here rather than letting checkout fail with a confusing error.
     if (known.length !== stored.length) {
       droppedEl.hidden = false;
       for (const l of stored) if (!catalogue[l.priceId]) removeLine(lineKey(l));

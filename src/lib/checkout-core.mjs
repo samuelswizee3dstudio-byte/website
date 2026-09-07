@@ -47,6 +47,24 @@ const clip = (s) => (s.length <= META_VALUE_MAX ? s : `${s.slice(0, META_VALUE_M
  * @param {Request} request
  * @param {Record<string, string|undefined>} env
  */
+/**
+ * The active price that replaced an archived one: same product, same option
+ * label (`variant_label` metadata). A product with one active price and a
+ * stale price with no label is the simple case of a single-price product.
+ * Returns null when there is no honest match.
+ *
+ * @param {{ metadata?: Record<string,string> }} stale
+ * @param {Array<{ id: string, active: boolean, currency: string, type: string, metadata?: Record<string,string> }>} candidates
+ */
+export function pickReplacementPrice(stale, candidates) {
+  const label = (stale.metadata?.variant_label ?? '').trim().toLowerCase();
+  const live = (candidates ?? []).filter((p) => p.active && p.currency === 'gbp' && p.type === 'one_time');
+  const same = live.filter((p) => (p.metadata?.variant_label ?? '').trim().toLowerCase() === label);
+  if (same.length === 1) return same[0];
+  if (!label && live.length === 1) return live[0];
+  return null;
+}
+
 export async function handleCheckout(request, env) {
   if (request.method !== 'POST') return fail(405, 'Method not allowed.');
 
@@ -119,14 +137,31 @@ export async function handleCheckout(request, env) {
   // Counted from Stripe's own product metadata, never from the basket.
   let familyUnits = 0;
 
-  for (const [i, price] of prices.entries()) {
+  for (const [i, stale] of prices.entries()) {
     const line = lines[i];
-    const product = price.product;
-
-    if (!price.active || price.currency !== 'gbp' || price.type !== 'one_time') {
+    const product = stale.product;
+    if (!product || typeof product === 'string' || product.deleted || !product.active) {
       return fail(400, 'Something in your basket is no longer available. Please empty your basket and try again.');
     }
-    if (!product || typeof product === 'string' || product.deleted || !product.active) {
+
+    // Stripe prices are immutable, so a price change archives one and creates
+    // another. A basket opened before the change still names the old id: charge
+    // today's price for the same option rather than failing the sale.
+    let price = stale;
+    if (!stale.active) {
+      let candidates;
+      try {
+        candidates = (await stripe.prices.list({ product: product.id, active: true, limit: 100 })).data;
+      } catch (err) {
+        console.error('Stripe price list failed:', err);
+        return fail(502, 'We could not reach the payment system. Please try again in a moment.');
+      }
+      price = pickReplacementPrice(stale, candidates);
+      if (!price) {
+        return fail(400, 'Something in your basket is no longer available. Please empty your basket and try again.');
+      }
+    }
+    if (price.currency !== 'gbp' || price.type !== 'one_time') {
       return fail(400, 'Something in your basket is no longer available. Please empty your basket and try again.');
     }
 
