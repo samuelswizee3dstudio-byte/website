@@ -170,6 +170,13 @@ main { flex: 1; }
 }
 
 /* --- Form fields ----------------------------------------------------------- */
+/* The browser's own `[hidden] { display: none }` is the weakest rule there is,
+   so any `display` on a class beats it and an element toggled with `.hidden =
+   true` stays on screen. Samuel spotted exactly that on 8 Sept 2026: the custom
+   colour box is a `.field`, which is `display: grid`, so it showed even when
+   hidden. Restate it here, with weight, once for the whole site. */
+[hidden] { display: none !important; }
+
 .field { display: grid; gap: var(--sw-2); }
 .field > label { font-weight: 800; font-size: 14px; }
 .input, .textarea {
