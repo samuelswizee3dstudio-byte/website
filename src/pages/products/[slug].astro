@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import { COLOUR_NOTE_MAX } from '../../lib/validation.mjs';
 import { getCatalogue, formatPrice } from '../../lib/catalogue.mjs';
 import { PERSONALISATION_PATTERN } from '../../lib/validation.mjs';
 
@@ -79,12 +80,21 @@ const first = product.variants[0];
               {product.colourChoices.map((c: any) => (
                 <div class="field">
                   <label for={`col-${c.key}`}>{c.label}</label>
-                  <select class="input select" id={`col-${c.key}`} name={c.key} required>
+                  <select class="input select" id={`col-${c.key}`} name={c.key} required data-custom={c.custom ? 'yes' : undefined}>
                     <option value="">Choose…</option>
                     {c.values.map((v: string) => <option value={v}>{v}</option>)}
                   </select>
                 </div>
               ))}
+              {product.colourChoices.some((c: any) => c.custom) && (
+                <div class="field" id="custom-colour-field" hidden>
+                  <label for="colourCustom">{product.colourCustomLabel}</label>
+                  <input class="input" id="colourCustom" name="colourCustom" type="text"
+                    maxlength={COLOUR_NOTE_MAX} autocomplete="off"
+                    placeholder="Pink base, white letters" />
+                  <p class="hint" id="custom-colour-error" role="status" aria-live="polite"></p>
+                </div>
+              )}
             </div>
           )}
 
@@ -133,7 +143,8 @@ const first = product.variants[0];
 
 <script>
   import { addLine } from '../../lib/cart.mjs';
-  import { validatePersonalisation } from '../../lib/validation.mjs';
+  import { validatePersonalisation, validateColourNote } from '../../lib/validation.mjs';
+  import { isCustomColour } from '../../lib/catalogue.mjs';
 
   const form = document.querySelector<HTMLFormElement>('#add-form');
   if (form) {
@@ -202,7 +213,25 @@ const first = product.variants[0];
     // A colour must be chosen before the item can be added, the same way a name
     // must. Without this the customer picks nothing and we print our best guess.
     const colourSelects = [...form.querySelectorAll<HTMLSelectElement>('.colours select')];
-    const coloursChosen = () => colourSelects.every((sel) => sel.value !== '');
+    // The free-text box belongs to whichever select offers "Custom"; it is
+    // shown only while that is the chosen option, so nobody fills in a box that
+    // will be ignored.
+    const customField = document.querySelector<HTMLElement>('#custom-colour-field');
+    const customInput = document.querySelector<HTMLInputElement>('#colourCustom');
+    const customError = document.querySelector<HTMLElement>('#custom-colour-error');
+    const customWanted = () =>
+      colourSelects.some((sel) => sel.dataset.custom === 'yes' && isCustomColour(sel.value));
+
+    const syncCustom = () => {
+      const on = customWanted();
+      if (customField) customField.hidden = !on;
+      if (customInput) customInput.required = on;
+      if (!on && customError) customError.textContent = '';
+    };
+
+    const coloursChosen = () =>
+      colourSelects.every((sel) => sel.value !== '') &&
+      (!customWanted() || validateColourNote(customInput?.value).ok);
 
     const syncSubmit = () => {
       const textOk = !textInput || validatePersonalisation(textInput.value, currentMax()).ok;
@@ -211,9 +240,20 @@ const first = product.variants[0];
     for (const sel of colourSelects) {
       sel.addEventListener('change', () => {
         if (formError) formError.textContent = '';
+        syncCustom();
         syncSubmit();
       });
     }
+    customInput?.addEventListener('input', () => {
+      if (customError) customError.textContent = '';
+      syncSubmit();
+    });
+    customInput?.addEventListener('blur', () => {
+      if (!customWanted()) return;
+      const check = validateColourNote(customInput.value);
+      if (customError) customError.textContent = check.ok ? '' : check.message;
+    });
+    syncCustom();
 
     textInput?.addEventListener('input', () => {
       const cleaned = textInput.value.replace(/[^A-Za-z0-9]/g, '').slice(0, currentMax());
@@ -247,10 +287,18 @@ const first = product.variants[0];
         setError('');
       }
 
-      if (!coloursChosen()) {
+      if (colourSelects.some((sel) => !sel.value)) {
         if (formError) formError.textContent = 'Please choose a colour first.';
         colourSelects.find((sel) => !sel.value)?.focus();
         return;
+      }
+      if (customWanted()) {
+        const check = validateColourNote(customInput?.value);
+        if (!check.ok) {
+          if (customError) customError.textContent = check.message;
+          customInput?.focus();
+          return;
+        }
       }
 
       const chosen = form.querySelector<HTMLInputElement>('input[name="priceId"]:checked')
@@ -262,6 +310,7 @@ const first = product.variants[0];
         text,
         colour: String(data.get('colour') ?? ''),
         colour2: String(data.get('colour2') ?? ''),
+        colourCustom: customWanted() ? String(data.get('colourCustom') ?? '') : '',
         qty: Number(data.get('qty') ?? 1),
       });
       if (!result.ok) {

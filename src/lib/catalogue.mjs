@@ -13,11 +13,11 @@ import { isFamilyDiscountItem } from './shipping.mjs';
 const GBP = 'gbp';
 
 /** @typedef {{ id: string, label: string, unitAmount: number, sort: number, maxChars: number }} Variant */
-/** @typedef {{ key: string, label: string, values: string[] }} ColourChoice */
+/** @typedef {{ key: string, label: string, values: string[], custom: boolean }} ColourChoice */
 /** @typedef {{ id: string, slug: string, name: string, description: string, images: string[],
  *              video: string | null, videoPoster: string | null,
  *              category: string | null, personalise: boolean, personaliseLabel: string,
- *              familyDiscount: boolean, colourChoices: ColourChoice[],
+ *              familyDiscount: boolean, colourChoices: ColourChoice[], colourCustomLabel: string,
  *              featured: boolean, sort: number, variants: Variant[],
  *              priceFrom: number, priceTo: number }} Product */
 
@@ -31,9 +31,22 @@ const GBP = 'gbp';
  *   colours_2      White, Black         (optional second dropdown)
  *   colour_2_label Letter colour
  *
+ * A value of "Custom" in either list means "let them describe their own": the
+ * product page shows a text box when it is chosen, and the checkout requires
+ * it. Rebecca asked for this on 8 Sept 2026 alongside the named combinations,
+ * so she can offer a set list without turning anyone away who wants something
+ * else.
+ *
  * @param {Record<string,string>|undefined} metadata
  * @returns {ColourChoice[]}
  */
+export const CUSTOM_COLOUR = 'Custom';
+
+/** True for the option that lets the customer describe their own colours. */
+export function isCustomColour(value) {
+  return String(value ?? '').trim().toLowerCase() === CUSTOM_COLOUR.toLowerCase();
+}
+
 export function colourChoicesFrom(metadata) {
   const list = (raw) =>
     String(raw ?? '')
@@ -50,11 +63,13 @@ export function colourChoicesFrom(metadata) {
   // swallowed colour list would look like the feature is broken.
   const first = list(metadata?.colours ?? metadata?.colors);
   if (first.length) {
-    out.push({ key: 'colour', label: metadata?.colour_label?.trim() || 'Colour', values: first });
+    out.push({ key: 'colour', label: metadata?.colour_label?.trim() || 'Colour',
+      values: first, custom: first.some(isCustomColour) });
   }
   const second = list(metadata?.colours_2 ?? metadata?.colors_2);
   if (second.length) {
-    out.push({ key: 'colour2', label: metadata?.colour_2_label?.trim() || 'Second colour', values: second });
+    out.push({ key: 'colour2', label: metadata?.colour_2_label?.trim() || 'Second colour',
+      values: second, custom: second.some(isCustomColour) });
   }
   return out;
 }
@@ -187,6 +202,7 @@ export function normalise(stripeProducts, stripePrices) {
       category: p.metadata?.category?.trim() || null,
       personalise: truthy(p.metadata?.personalise),
       familyDiscount: isFamilyDiscountItem(p.metadata),
+    colourCustomLabel: p.metadata?.colour_custom_label?.trim() || 'Tell us your colours',
       colourChoices: colourChoicesFrom(p.metadata),
       personaliseLabel: p.metadata?.personalise_label?.trim() || 'Name or word to print',
       featured: truthy(p.metadata?.featured),

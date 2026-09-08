@@ -68,6 +68,32 @@ export function maxCharsForPrice(price) {
   return PERSONALISATION_MAX;
 }
 
+export const COLOUR_NOTE_MAX = 60;
+export const COLOUR_NOTE_RE = /^[A-Za-z0-9 ,.&'()/-]{1,60}$/;
+
+/**
+ * The customer's own words when they pick "Custom" instead of one of the named
+ * combinations. Looser than a printed name — this is read by a person, not
+ * printed — but still a closed character set, because it reaches the Stripe
+ * Dashboard and an order email.
+ *
+ * @param {unknown} value
+ * @returns {{ ok: true, value: string } | { ok: false, message: string }}
+ */
+export function validateColourNote(value) {
+  if (typeof value !== 'string' || value.trim().length === 0) {
+    return { ok: false, message: 'Please describe the colours you would like.' };
+  }
+  const trimmed = value.trim().replace(/\s+/g, ' ');
+  if (trimmed.length > COLOUR_NOTE_MAX) {
+    return { ok: false, message: `Please keep it under ${COLOUR_NOTE_MAX} characters.` };
+  }
+  if (!COLOUR_NOTE_RE.test(trimmed)) {
+    return { ok: false, message: 'Letters, numbers and simple punctuation only please.' };
+  }
+  return { ok: true, value: trimmed };
+}
+
 /**
  * A colour choice must be one the product actually offers. Checked against the
  * list Stripe holds, never against anything the browser claims — same rule as

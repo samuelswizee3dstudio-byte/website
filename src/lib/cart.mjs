@@ -31,7 +31,7 @@ let memory = [];
 const storageOk = typeof window !== 'undefined' && hasStorage();
 
 export function lineKey(line) {
-  return `${line.priceId}::${line.text ?? ''}::${line.colour ?? ''}::${line.colour2 ?? ''}`;
+  return `${line.priceId}::${line.text ?? ''}::${line.colour ?? ''}::${line.colour2 ?? ''}::${line.colourCustom ?? ''}`;
 }
 
 export function readCart() {
@@ -49,6 +49,7 @@ export function readCart() {
         text: typeof l.text === 'string' ? l.text : '',
         colour: typeof l.colour === 'string' ? l.colour : '',
         colour2: typeof l.colour2 === 'string' ? l.colour2 : '',
+        colourCustom: typeof l.colourCustom === 'string' ? l.colourCustom : '',
         qty: Number.isInteger(l.qty) && l.qty > 0 ? Math.min(l.qty, 10) : 1,
         slug: typeof l.slug === 'string' ? l.slug : '',
         variant: typeof l.variant === 'string' ? l.variant : '',
@@ -75,7 +76,7 @@ function writeCart(lines) {
 /**
  * @returns {{ ok: true, lines: object[] } | { ok: false, message: string }}
  */
-export function addLine({ priceId, text = '', colour = '', colour2 = '', qty = 1, slug = '', variant = '' }) {
+export function addLine({ priceId, text = '', colour = '', colour2 = '', colourCustom = '', qty = 1, slug = '', variant = '' }) {
   if (typeof priceId !== 'string' || !priceId.startsWith('price_')) {
     return { ok: false, message: 'Please choose an option first.' };
   }
@@ -90,7 +91,7 @@ export function addLine({ priceId, text = '', colour = '', colour2 = '', qty = 1
   }
 
   const lines = readCart();
-  const key = lineKey({ priceId, text: cleanText, colour, colour2 });
+  const key = lineKey({ priceId, text: cleanText, colour, colour2, colourCustom });
   const existing = lines.find((l) => lineKey(l) === key);
 
   if (existing) {
@@ -101,7 +102,7 @@ export function addLine({ priceId, text = '', colour = '', colour2 = '', qty = 1
     if (lines.length >= MAX_LINES) {
       return { ok: false, message: 'Your basket is full. Please check out, then start another order.' };
     }
-    lines.push({ priceId, text: cleanText, colour, colour2, qty: q.value, slug, variant });
+    lines.push({ priceId, text: cleanText, colour, colour2, colourCustom, qty: q.value, slug, variant });
   }
   writeCart(lines);
   return { ok: true, lines };

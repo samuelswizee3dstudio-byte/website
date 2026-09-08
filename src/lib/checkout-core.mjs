@@ -10,9 +10,10 @@ import {
   validateQuantity,
   validateColour,
   maxCharsForPrice,
+  validateColourNote,
   MAX_LINES,
 } from './validation.mjs';
-import { colourChoicesFrom } from './catalogue.mjs';
+import { colourChoicesFrom, isCustomColour } from './catalogue.mjs';
 import {
   deliveryFeeFor,
   LOCAL_LABEL,
@@ -106,11 +107,14 @@ export async function handleCheckout(request, env) {
     // actually offers. Only the shape is checked here.
     const colour = typeof raw?.colour === 'string' ? raw.colour.trim().slice(0, 40) : '';
     const colour2 = typeof raw?.colour2 === 'string' ? raw.colour2.trim().slice(0, 40) : '';
+    // Only meaningful when a colour choice is "Custom"; checked once Stripe has
+    // said which options this product actually offers.
+    const colourCustom = typeof raw?.colourCustom === 'string' ? raw.colourCustom.trim().slice(0, 80) : '';
 
-    const key = `${priceId}::${text}::${colour}::${colour2}`;
+    const key = `${priceId}::${text}::${colour}::${colour2}::${colourCustom}`;
     const existing = merged.get(key);
     if (existing) existing.qty = Math.min(existing.qty + qty.value, 10);
-    else merged.set(key, { priceId, text, colour, colour2, qty: qty.value });
+    else merged.set(key, { priceId, text, colour, colour2, colourCustom, qty: qty.value });
   }
 
   const lines = [...merged.values()];
@@ -189,11 +193,27 @@ export async function handleCheckout(request, env) {
     const choices = colourChoicesFrom(product.metadata);
     /** @type {string[]} */
     const chosenColours = [];
+    let wantsCustom = false;
     for (const choice of choices) {
       const supplied = choice.key === 'colour' ? line.colour : line.colour2;
       const check = validateColour(supplied, choice.values);
       if (!check.ok) return fail(400, `${product.name} — ${choice.label}: ${check.message}`);
-      chosenColours.push(`${choice.label}: ${check.value}`);
+      // "Custom" means the customer described their own combination. Their
+      // words are required, and go into the order beside the choice so the
+      // family sees what to print.
+      if (choice.custom && isCustomColour(check.value)) {
+        wantsCustom = true;
+        const note = validateColourNote(line.colourCustom);
+        if (!note.ok) return fail(400, `${product.name} — ${choice.label}: ${note.message}`);
+        chosenColours.push(`${choice.label}: ${check.value} — ${note.value}`);
+      } else {
+        chosenColours.push(`${choice.label}: ${check.value}`);
+      }
+    }
+    // Wording with no Custom choice behind it would never be read. Refuse
+    // rather than drop it, as with a colour on a product that has none.
+    if (!wantsCustom && line.colourCustom) {
+      return fail(400, `"${product.name}": that colour does not take its own description. Please remove it and add it again.`);
     }
     // Reject colours on a product that has none, rather than dropping them: the
     // customer would think they had ordered something we never see.

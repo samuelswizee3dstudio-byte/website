@@ -250,6 +250,7 @@ These go in a product's **Metadata** box. All optional — most products need no
 | `colour_label` | `Base colour` | Wording above that drop-down |
 | `colours_2` | `Orange, White` | A second drop-down, for things with two colours |
 | `colour_2_label` | `Letter colour` | Wording above the second one |
+| `colour_custom_label` | `Tell us your colours` | Wording above the box that appears when someone picks **Custom** |
 | `family_discount` | `true` | Counts towards the family discount: 10% off when someone buys three or more of these between them |
 
 On a **price** (only when a product has more than one option):
@@ -258,6 +259,11 @@ On a **price** (only when a product has more than one option):
 |---|---|---|
 | `variant_label` | `3 letters` | The wording of that choice |
 | `sort` | `1` | Which choice appears first |
+
+**A note on Custom.** Put `Custom` in the colour list and the website adds a
+box for the customer to describe the colours they want in their own words. It
+comes through on the order beside their choice, like *Colour combination:
+Custom — pink base, white letters*. Take it out of the list and the box goes.
 
 **A note on the family discount.** Both name clickers already have
 `family_discount` set. If you add another clicker and want it to count towards
