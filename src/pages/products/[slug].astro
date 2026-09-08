@@ -91,7 +91,7 @@ const first = product.variants[0];
                   <label for="colourCustom">{product.colourCustomLabel}</label>
                   <input class="input" id="colourCustom" name="colourCustom" type="text"
                     maxlength={COLOUR_NOTE_MAX} autocomplete="off"
-                    placeholder="Pink base, white letters" />
+                    placeholder="Green base, orange letters" />
                   <p class="hint" id="custom-colour-error" role="status" aria-live="polite"></p>
                 </div>
               )}
@@ -362,7 +362,12 @@ const first = product.variants[0];
 
   /* Mobile: full-bleed square photo, then a horizontal thumbnail row. */
   .gallery__main { aspect-ratio: 1; border-radius: var(--sw-r-lg); overflow: hidden; background: var(--sw-bg); }
-  .gallery__main img { width: 100%; height: 100%; object-fit: cover; touch-action: pan-y; user-select: none; -webkit-user-drag: none; }
+    /* `contain`, not `cover`: Rebecca's colour-combination shots carry the combo
+     name printed along the bottom, and a cover crop cut it off and zoomed into
+     the middle — "the image for bubblegum seems to be too close up", 8 Sept
+     2026. Showing the whole photograph costs a little empty ground on an
+     odd-shaped one and never hides what the picture is for. */
+  .gallery__main img { width: 100%; height: 100%; object-fit: contain; touch-action: pan-y; user-select: none; -webkit-user-drag: none; }
   .gallery__main { position: relative; }
   .gallery__main:focus-visible { outline: 3px solid var(--sw-ink); outline-offset: 2px; }
   .gallery__arrow {
@@ -384,7 +389,7 @@ const first = product.variants[0];
   .thumbs li { flex: none; }
   .thumbs button { padding: 0; border: 2px solid var(--sw-border); border-radius: 12px; background: none; cursor: pointer; overflow: hidden; line-height: 0; }
   .thumbs button[aria-pressed='true'] { border-color: var(--sw-ink); }
-  .thumbs img { width: 56px; height: 56px; object-fit: cover; }
+  .thumbs img { width: 56px; height: 56px; object-fit: contain; background: var(--sw-surface); }
 
   .buy { display: grid; gap: var(--sw-3); }
   .pdp__title { margin-top: var(--sw-1); }
