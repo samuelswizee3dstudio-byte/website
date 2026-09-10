@@ -72,6 +72,17 @@ test('the variant selector names itself, and only clickers ask about letters', (
   assert.equal(named[0].variantsLabel, 'Which shape?');
 });
 
+test('the Custom colour example only mentions letters on a clicker', () => {
+  const clicker = normalise([product({ metadata: { personalise: 'true' } })], [price()]);
+  assert.equal(clicker[0].colourCustomPlaceholder, 'Green base, orange letters');
+
+  const cube = normalise([product()], [price()]);
+  assert.equal(cube[0].colourCustomPlaceholder, 'Lilac, grass green');
+
+  const named = normalise([product({ metadata: { colour_custom_placeholder: 'Mint, coral' } })], [price()]);
+  assert.equal(named[0].colourCustomPlaceholder, 'Mint, coral');
+});
+
 test('metadata slug wins over the product name', () => {
   const out = normalise([product({ name: 'Long Winded Name', metadata: { slug: 'axolotl' } })], [price()]);
   assert.equal(out[0].slug, 'axolotl');

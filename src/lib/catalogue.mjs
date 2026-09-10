@@ -19,6 +19,7 @@ const GBP = 'gbp';
  *              category: string | null, personalise: boolean, personaliseLabel: string,
  *              variantsLabel: string,
  *              familyDiscount: boolean, colourChoices: ColourChoice[], colourCustomLabel: string,
+ *              colourCustomPlaceholder: string,
  *              featured: boolean, sort: number, variants: Variant[],
  *              priceFrom: number, priceTo: number }} Product */
 
@@ -207,6 +208,12 @@ export function normalise(stripeProducts, stripePrices) {
       personalise: truthy(p.metadata?.personalise),
       familyDiscount: isFamilyDiscountItem(p.metadata),
     colourCustomLabel: p.metadata?.colour_custom_label?.trim() || 'Tell us your colours',
+      // The example in the Custom colour box used to be hard-coded "Green base,
+      // orange letters", which only makes sense on a name clicker. Everything
+      // else gets a plain list of colours, and a product can name its own.
+      colourCustomPlaceholder:
+        p.metadata?.colour_custom_placeholder?.trim() ||
+        (truthy(p.metadata?.personalise) ? 'Green base, orange letters' : 'Lilac, grass green'),
       colourChoices: colourChoicesFrom(p.metadata),
       personaliseLabel: p.metadata?.personalise_label?.trim() || 'Name or word to print',
       // The variant selector used to be hard-coded "How many letters?", which is

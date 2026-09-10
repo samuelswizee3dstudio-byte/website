@@ -91,7 +91,7 @@ const first = product.variants[0];
                   <label for="colourCustom">{product.colourCustomLabel}</label>
                   <input class="input" id="colourCustom" name="colourCustom" type="text"
                     maxlength={COLOUR_NOTE_MAX} autocomplete="off"
-                    placeholder="Green base, orange letters" />
+                    placeholder={product.colourCustomPlaceholder} />
                   <p class="hint" id="custom-colour-error" role="status" aria-live="polite"></p>
                 </div>
               )}
