@@ -100,9 +100,12 @@ export function formatPriceRange(product) {
 /**
  * Card price, per the design handoff: "from £3.50" when the product has
  * variants, plain "£3.50" when it does not.
+ *
+ * Variants that all cost the same are still one price to the customer — the
+ * shaped bubble poppers are nine shapes at £7 — so "from" would overstate it.
  */
 export function formatCardPrice(product) {
-  return product.variants.length > 1
+  return product.priceFrom !== product.priceTo
     ? `from ${formatPrice(product.priceFrom)}`
     : formatPrice(product.priceFrom);
 }

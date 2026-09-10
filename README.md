@@ -119,21 +119,26 @@ With no mailbox they do nothing, so recreating them was not worth the effort.
 spam. That failure is silent and shows up weeks later, so it is worth knowing
 about in advance.
 
-## Delivery and collection
+## Delivery
 
 UK only. Both options are offered at Stripe Checkout as shipping rates:
 
 | Option | Price | Quoted time |
 |---|---|---|
-| Collect from Great Sankey, Warrington | free | up to 7 working days |
-| UK delivery (Royal Mail 2nd Class) | £3.50, free over £20 | 7 days to make, then 2–3 in the post |
+| Free local delivery (WA5 postcodes) | free | 7 days to make, then up to 2 to drop round |
+| UK delivery (Royal Mail 2nd Class) | £3.50, free over £40 | 7 days to make, then 2–3 in the post |
+
+Collection was removed on 7 Sept 2026 at Rebecca's request: she does not want
+customers calling at the house while this is a child-led business. Stripe cannot
+restrict a shipping option by postcode, so the local option is visible to
+everyone — the label, the checkout note and `terms.md` all say WA5 only.
 
 Every number lives in `src/lib/shipping.mjs`. The site's copy and the checkout
 function both read from it, so changing the price is a one-line edit and the two
 cannot disagree. The free-delivery threshold is worked out server-side from
 Stripe's own prices, never from anything the browser sent.
 
-Stripe will not show shipping options without an address, so collection
+Stripe will not show shipping options without an address, so local-delivery
 customers are asked for one too. `custom_text.shipping_address` explains why.
 
 > This replaced the original brief's "collection only, no delivery". The Claude

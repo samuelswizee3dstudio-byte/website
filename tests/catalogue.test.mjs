@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { normalise, slugify, formatPrice, formatPriceRange, colourChoicesFrom } from '../src/lib/catalogue.mjs';
+import { normalise, slugify, formatPrice, formatPriceRange, formatCardPrice, colourChoicesFrom } from '../src/lib/catalogue.mjs';
 
 const product = (over = {}) => ({ id: 'prod_1', active: true, name: 'Thing', description: '', images: [], metadata: {}, ...over });
 const price = (over = {}) => ({ id: 'price_1', active: true, currency: 'gbp', type: 'one_time', unit_amount: 500, product: 'prod_1', nickname: null, metadata: {}, ...over });
@@ -77,6 +77,24 @@ test('duplicate names get distinct, deterministic slugs', () => {
 test('metadata image overrides the Stripe photo', () => {
   const out = normalise([product({ images: ['https://stripe/x.png'], metadata: { image: '/images/mine.jpg' } })], [price()]);
   assert.deepEqual(out[0].images, ['/images/mine.jpg']);
+});
+
+test('a card says "from" only when the variants actually differ in price', () => {
+  // Nine shaped bubble poppers all cost £7; "from £7" would overstate it.
+  const same = normalise([product()], [
+    price({ id: 'price_a', unit_amount: 700, metadata: { variant_label: 'Star' } }),
+    price({ id: 'price_b', unit_amount: 700, metadata: { variant_label: 'Heart' } }),
+  ]);
+  assert.equal(same[0].variants.length, 2);
+  assert.equal(formatCardPrice(same[0]), '£7');
+
+  const differ = normalise([product()], [
+    price({ id: 'price_a', unit_amount: 400, metadata: { variant_label: '2 x 2' } }),
+    price({ id: 'price_b', unit_amount: 600, metadata: { variant_label: '3 x 3' } }),
+  ]);
+  assert.equal(formatCardPrice(differ[0]), 'from £4');
+
+  assert.equal(formatCardPrice(normalise([product()], [price()])[0]), '£5');
 });
 
 test('prices format the way a price tag reads', () => {

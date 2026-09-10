@@ -11,3 +11,6 @@ npm-debug.log*
 # Handover PDF and Stripe screenshots hold personal details; the repo is public
 HANDOVER.pdf
 handover/shots/
+
+# local working scripts, never committed
+.scratch/
