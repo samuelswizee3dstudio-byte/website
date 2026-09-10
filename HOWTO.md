@@ -177,8 +177,10 @@ You will see:
 
 - The customer's **name, email and phone number**
 - **What they bought** and what they paid
-- **How they want it** — either *Collect from Great Sankey, Warrington* or
-  *UK delivery*. If they chose delivery, their address is shown here too
+- **How they want it** — either *Free local delivery (WA5 postcodes)* or
+  *UK delivery — Royal Mail 2nd Class*. Their address is shown here either way,
+  and it is worth a glance: Stripe cannot stop somebody outside WA5 picking the
+  free local option
 
 **If they ordered anything personalised**, scroll down that page to the box
 labelled **Metadata**. It looks like this:
@@ -193,8 +195,28 @@ That is exactly what to print. `×2` means they ordered two of that one.
 
 Stripe emails the customer a receipt automatically. When the order is ready:
 
-- **Collection** — email them to arrange a time
-- **Delivery** — post it
+- **Local (WA5)** — drop it round on your next run
+- **UK delivery** — post it
+
+---
+
+## How you know an order has come in
+
+Nothing on the website emails you. The alerts all come from Stripe, and there
+are two worth having:
+
+**The Stripe app on your phone.** Search for "Stripe Dashboard" in the App Store
+or Play Store, sign in with the same details you use on the computer, and allow
+notifications. You then get a push notification the moment a payment succeeds —
+this is the fastest one and the one to rely on.
+
+**Email.** Stripe emails the account address whenever a payment comes in. To
+check it is on, or to change which address it goes to: click your business name
+at the top left, then **Settings**, then **Personal details** → **Notifications**,
+and make sure *Successful payments* is ticked.
+
+Neither one tells you what to print. Open the payment in **Payments** and read
+the Metadata box, as above.
 
 ---
 
