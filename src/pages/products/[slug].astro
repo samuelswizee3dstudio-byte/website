@@ -60,7 +60,7 @@ const first = product.variants[0];
         <form id="add-form" novalidate data-slug={product.slug}>
           {hasVariants ? (
             <fieldset class="variants">
-              <legend>How many letters?</legend>
+              <legend>{product.variantsLabel}</legend>
               <div class="variants__row">
                 {product.variants.map((v: any, i: number) => (
                   <label class="variant">

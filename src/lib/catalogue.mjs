@@ -17,6 +17,7 @@ const GBP = 'gbp';
 /** @typedef {{ id: string, slug: string, name: string, description: string, images: string[],
  *              video: string | null, videoPoster: string | null,
  *              category: string | null, personalise: boolean, personaliseLabel: string,
+ *              variantsLabel: string,
  *              familyDiscount: boolean, colourChoices: ColourChoice[], colourCustomLabel: string,
  *              featured: boolean, sort: number, variants: Variant[],
  *              priceFrom: number, priceTo: number }} Product */
@@ -208,6 +209,12 @@ export function normalise(stripeProducts, stripePrices) {
     colourCustomLabel: p.metadata?.colour_custom_label?.trim() || 'Tell us your colours',
       colourChoices: colourChoicesFrom(p.metadata),
       personaliseLabel: p.metadata?.personalise_label?.trim() || 'Name or word to print',
+      // The variant selector used to be hard-coded "How many letters?", which is
+      // right for the name clickers and wrong for everything else — the bubble
+      // poppers vary by size and by shape. Products can name their own.
+      variantsLabel:
+        p.metadata?.variants_label?.trim() ||
+        (truthy(p.metadata?.personalise) ? 'How many letters?' : 'Choose your option'),
       featured: truthy(p.metadata?.featured),
       sort: intOr(p.metadata?.sort, Number.MAX_SAFE_INTEGER),
       variants,

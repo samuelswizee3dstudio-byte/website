@@ -197,6 +197,7 @@ only when it is exactly `true`.
 | `hidden` | `true` | Keeps the product out of the site without archiving it in Stripe |
 | `slug` | `axolotl` | Fixes the URL at `/products/axolotl`. Without it the URL comes from the product name — **set this before sharing a link, or renaming the product will break it** |
 | `image` | `/images/axolotl.jpg` | Uses a photo from `public/` instead of the Stripe photo |
+| `variants_label` | `Which size?` | Heading above the price options. Defaults to "How many letters?" on a personalisable product, "Choose your option" otherwise |
 | `colours` | `Black,White,Blue` | Comma-separated. Renders a dropdown the customer must choose from. `colors` accepted too |
 | `colour_label` | `Base colour` | Label above that dropdown. Defaults to "Colour" |
 | `colours_2` | `Orange,White` | A second dropdown, for items with two colours |

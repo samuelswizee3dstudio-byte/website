@@ -61,6 +61,17 @@ test('metadata flags are read, and only "true" counts', () => {
   assert.equal(out[0].personaliseLabel, 'Word');
 });
 
+test('the variant selector names itself, and only clickers ask about letters', () => {
+  const clicker = normalise([product({ metadata: { personalise: 'true' } })], [price()]);
+  assert.equal(clicker[0].variantsLabel, 'How many letters?');
+
+  const popper = normalise([product()], [price()]);
+  assert.equal(popper[0].variantsLabel, 'Choose your option');
+
+  const named = normalise([product({ metadata: { variants_label: 'Which shape?' } })], [price()]);
+  assert.equal(named[0].variantsLabel, 'Which shape?');
+});
+
 test('metadata slug wins over the product name', () => {
   const out = normalise([product({ name: 'Long Winded Name', metadata: { slug: 'axolotl' } })], [price()]);
   assert.equal(out[0].slug, 'axolotl');
