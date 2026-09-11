@@ -1,6 +1,6 @@
 ---
 title: "Fidgets made\njust for you."
-description: "3D printed sensory fidgets and personalised name keyrings. Handmade in Warrington with free local delivery in WA5!."
+description: "3D printed sensory fidgets and personalised name keyrings. Handmade in Warrington. Free local delivery in WA5, or UK delivery"
 ---
 
 Swizee 3d studio is a family business run from our home in Warrington. As a family with beautifully busy minds and busy hands, we started Swizee to create satisfying, durable sensory tools that help brains focus. 
