@@ -11,9 +11,11 @@ By placing an order you agree to them.
 Swizee 3D Studio is a small home business based in Warrington.
 The seller is Rebecca Dagger. We are not VAT registered.
 
-## Everything is made to order
+## Stock and custom printing
 
-We do not hold stock. When you order, we print your item specially for you.
+We are currently building up our workshop inventory so we can get your fidgets to you as quickly as possible! 
+**In stock items:** If your chosen colours are sitting happily on our shelf, we will package and send your order out right away. 
+**Custom & Personalised Items:** If you order a custom name keyring or a olour combo that isn't on the shelf yet, Swizee will print it from scratch.
 Please **allow 7 days** from the day you order. If something is going to take
 longer than that, we will email you.
 
@@ -38,13 +40,12 @@ refuse to print anything offensive and will refund you in full if we do.
 You choose at checkout, and we only sell within the United Kingdom.
 
 **Free local delivery** is for WA5 postcodes. We deliver those ourselves, by
-hand, usually within a couple of days of your order being made. It is only for
+hand, usually within a couple of days of your order being made or packed. It is only for
 WA5: if you choose it with an address outside that area we will contact you and
 either ask for the postage or refund the order.
 
 **UK delivery** costs £3.50 for any order, and is free when you spend over £40.
-We send those by Royal Mail 2nd Class. Allow 7 days for us to make your order,
-then a further 2 to 3 working days in the post.
+We send those by Royal Mail 2nd Class. For in stock items, we aim to dispatch within 1 to 2 working days. For custom or personalised items please allow 7 days for us to make your order, then a further 2 to 3 working days in the post.
 
 We do not offer collection.
 
@@ -58,19 +59,17 @@ you it is ready, we may treat the order as abandoned.
 
 ## Changing your mind
 
-Because everything is made to order, your rights differ by item:
+Because we offer both ready-made stock and custom items your cancellation rights depend on what you ordered: 
 
-- **Before we start printing**, message us and we will cancel and refund in full,
-  including any delivery you paid.
-- **Personalised items** cannot be cancelled or returned once printing has
+**In Stock Items:** You have standard legal right to change your mind. You can cancel your order any time before it ships for a full refund. You also have 14 days from the day you receive the item to tell us you have changed your mind and want to return it for a refund. It must be unused and undamaged. We
+  refund the item and the basic delivery you paid, but not the cost of sending
+  it back to us.
+**Custom & Personlised Items:** 
+- cannot be cancelled or returned once printing has
   started, unless they are faulty or not what you ordered. This is the exception
   for goods made to your specification or clearly personalised, in the Consumer
   Contracts Regulations 2013.
-- **Everything else** can be returned for a full refund. You have 14 days from
-  the day you receive it to tell us you have changed your mind, and a
-  further 14 days to get it back to us. It must be unused and undamaged. We
-  refund the item and the basic delivery you paid, but not the cost of sending
-  it back to us.
+- 
 
 ## If something is wrong
 
