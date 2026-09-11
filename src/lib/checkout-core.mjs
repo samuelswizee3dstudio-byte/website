@@ -66,6 +66,32 @@ export function pickReplacementPrice(stale, candidates) {
   return null;
 }
 
+/** Stripe truncates a long description in the Payments list; keep it scannable. */
+const DESCRIPTION_MAX = 300;
+
+/**
+ * The one-line order summary that goes on the payment itself.
+ *
+ * This is what the family sees in the Stripe app and in the Payments list, so
+ * it is effectively the order alert. A generic "Swizee order" meant opening
+ * every payment to find out what it was. Names and quantities only; the colours
+ * and personalisation detail stay in Metadata, which is the panel they print
+ * from.
+ *
+ * @param {Array<{ name: string, variant?: string, text?: string, qty: number }>} lines
+ */
+export function orderDescription(lines) {
+  const parts = (lines ?? []).map(({ name, variant, text, qty }) => {
+    let part = variant ? `${name} (${variant})` : name;
+    if (text) part += ` "${text}"`;
+    if (qty > 1) part += ` ×${qty}`;
+    return part;
+  });
+  if (parts.length === 0) return 'Swizee order';
+  const full = parts.join(', ');
+  return full.length <= DESCRIPTION_MAX ? full : `${full.slice(0, DESCRIPTION_MAX - 1)}…`;
+}
+
 export async function handleCheckout(request, env) {
   if (request.method !== 'POST') return fail(405, 'Method not allowed.');
 
@@ -140,6 +166,8 @@ export async function handleCheckout(request, env) {
   let subtotal = 0;
   // Counted from Stripe's own product metadata, never from the basket.
   let familyUnits = 0;
+  /** @type {Array<{ name: string, variant: string, text: string, qty: number }>} */
+  const summaryLines = [];
 
   for (const [i, stale] of prices.entries()) {
     const line = lines[i];
@@ -228,8 +256,11 @@ export async function handleCheckout(request, env) {
     subtotal += price.unit_amount * line.qty;
     if (isFamilyDiscountItem(product.metadata)) familyUnits += line.qty;
 
+    const variant = price.metadata?.variant_label || price.nickname || '';
+    // Every line, personalised or not: the description is the order at a glance.
+    summaryLines.push({ name: product.name, variant, text: line.text, qty: line.qty });
+
     if (line.text || chosenColours.length) {
-      const variant = price.metadata?.variant_label || price.nickname || '';
       const label = variant ? `${product.name} (${variant})` : product.name;
       const qtyNote = line.qty > 1 ? ` ×${line.qty}` : '';
       const parts = [];
@@ -323,9 +354,7 @@ export async function handleCheckout(request, env) {
         // Surfaced on the payment itself, so the family sees it wherever they
         // look, not only on the session.
         metadata,
-        description: personalisedCount
-          ? `Swizee order — ${personalisedCount} item(s) with choices`
-          : 'Swizee order',
+        description: orderDescription(summaryLines),
       },
       custom_text: {
         shipping_address: {

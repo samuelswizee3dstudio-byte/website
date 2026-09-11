@@ -206,17 +206,23 @@ Nothing on the website emails you. The alerts all come from Stripe, and there
 are two worth having:
 
 **The Stripe app on your phone.** Search for "Stripe Dashboard" in the App Store
-or Play Store, sign in with the same details you use on the computer, and allow
-notifications. You then get a push notification the moment a payment succeeds —
-this is the fastest one and the one to rely on.
+or Play Store and sign in with the same details you use on the computer. First
+allow notifications for Stripe in your phone's own Settings, then in the app tap
+the **merchant icon at the top left** of any screen, go to **Global settings** →
+**Notification settings**, and turn the toggle on for Swizee. You then get a push
+notification the moment a payment succeeds. This is the fastest one and the one
+to rely on.
 
-**Email.** Stripe emails the account address whenever a payment comes in. To
-check it is on, or to change which address it goes to: click your business name
-at the top left, then **Settings**, then **Personal details** → **Notifications**,
-and make sure *Successful payments* is ticked.
+**Email.** Stripe emails you whenever a payment comes in. To check it is on, go
+straight to <https://dashboard.stripe.com/settings/communication-preferences>
+(or **Settings** → **Communication preferences**) and make sure the successful
+payment notification is ticked. The setting is per person, so if anyone else is
+ever added to the account they tick their own.
 
-Neither one tells you what to print. Open the payment in **Payments** and read
-the Metadata box, as above.
+The payment itself now names the order, so the Payments list and the app both
+read like "Name Clicker Keyring (5 letters) "ELLIE", Sensory Clicky Cube"
+instead of just an amount. For the colours, and for anything typed into a Custom
+box, still open the payment in **Payments** and read the Metadata box, as above.
 
 ---
 
