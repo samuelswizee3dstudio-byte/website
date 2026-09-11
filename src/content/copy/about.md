@@ -30,4 +30,4 @@ first — come and say hello at [@swizee3dstudio](https://www.instagram.com/swiz
 
 ## Meet the quality control team! 
 While Samuel is the Chief Designer, and Rebecca looks after the business, Swizee 3d Studio wouldn't be complete without Samuel's younger brothers. 
-As a family with beautifully busy minds and hands, they take their jobs very seriously as our official **Chief Product Testers**. Before any new fidget or keyring makes it onto our website, it has to pass their rigorous "destruction and satisfaction" tests. If a fidget isnt clicky, bendy, or durable enough to keep their hands busy, it doesn't get printed! 
+As a family with beautifully busy minds and hands, they take their jobs very seriously as our official **Chief Product Testers**. Before any new fidget or keyring makes it onto our website, it has to pass their rigorous "destruction and satisfaction" tests. If a fidget isn't clicky, bendy, or durable enough to keep their hands busy, it doesn't get printed! 

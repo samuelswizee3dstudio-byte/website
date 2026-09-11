@@ -13,9 +13,14 @@ The seller is Rebecca Dagger. We are not VAT registered.
 
 ## Stock and custom printing
 
-We are currently building up our workshop inventory so we can get your fidgets to you as quickly as possible! 
-**In stock items:** If your chosen colours are sitting happily on our shelf, we will package and send your order out right away. 
-**Custom & Personalised Items:** If you order a custom name keyring or a olour combo that isn't on the shelf yet, Swizee will print it from scratch.
+We are currently building up our workshop inventory so we can get your fidgets
+to you as quickly as possible!
+
+**In stock items:** If your chosen colours are sitting happily on our shelf, we
+will package and send your order out right away.
+
+**Custom and personalised items:** If you order a custom name keyring or a
+colour combo that isn't on the shelf yet, Swizee will print it from scratch.
 Please **allow 7 days** from the day you order. If something is going to take
 longer than that, we will email you.
 
@@ -59,17 +64,19 @@ you it is ready, we may treat the order as abandoned.
 
 ## Changing your mind
 
-Because we offer both ready-made stock and custom items your cancellation rights depend on what you ordered: 
+Because we offer both ready-made stock and custom items your cancellation rights
+depend on what you ordered:
 
-**In Stock Items:** You have standard legal right to change your mind. You can cancel your order any time before it ships for a full refund. You also have 14 days from the day you receive the item to tell us you have changed your mind and want to return it for a refund. It must be unused and undamaged. We
-  refund the item and the basic delivery you paid, but not the cost of sending
-  it back to us.
-**Custom & Personlised Items:** 
-- cannot be cancelled or returned once printing has
-  started, unless they are faulty or not what you ordered. This is the exception
-  for goods made to your specification or clearly personalised, in the Consumer
-  Contracts Regulations 2013.
-- 
+**In stock items:** You have standard legal right to change your mind. You can
+cancel your order any time before it ships for a full refund. You also have 14
+days from the day you receive the item to tell us you have changed your mind and
+want to return it for a refund. It must be unused and undamaged. We refund the
+item and the basic delivery you paid, but not the cost of sending it back to us.
+
+**Custom and personalised items:** cannot be cancelled or returned once printing
+has started, unless they are faulty or not what you ordered. This is the
+exception for goods made to your specification or clearly personalised, in the
+Consumer Contracts Regulations 2013.
 
 ## If something is wrong
 
