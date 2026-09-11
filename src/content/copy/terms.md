@@ -95,4 +95,4 @@ Use the [contact form](/contact). We aim to reply within a few days.
 
 These terms are governed by the law of England and Wales.
 
-*Last updated: 1 September 2026*
+*Last updated: 11 September 2026*
