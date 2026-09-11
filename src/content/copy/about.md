@@ -10,10 +10,9 @@ videos:
     title: "Printing a name clicker base, ready for your custom order"
 ---
 
-Swizee 3D Studio is Samuel, who is eleven, and his mum Rebecca. We run it from home in Warrington. 
-As a family with beautifully busy minds and busy hands, we started Swizee to create satisfying, durable sensory tools that help brains focus. 
+Swizee 3D Studio is a family business run from our home in Warrington. As a family with beautifully busy minds and busy hands, we started Swizee to create satisfying, durable sensory tools that help brains focus. 
 
-Samuel (or one of his younger brothers) picks what to make, Swizee, our head 3d printer, does the printing, and Rebecca handles the orders and the boring bits.
+The team is made up of mum Rebecca, eleven year old Samuel, and his 9 and 5 year old brothers. The boys pick what to make and put every single design through its paces as our official product testers. Swizee, our head 3d printer, does the printing, and Rebecca handles the orders and the boring bits.
 
 We mostly make two things: sensory fidgets that are quiet enough for a classroom or the work desk, and custom made fidget keyrings where you choose the letters and colours. 
 
