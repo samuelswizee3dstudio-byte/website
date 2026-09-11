@@ -307,5 +307,15 @@ Instagram, set a `slug` first and never change it.
 
 ## What is not in Stripe
 
-Changing the words on the website — the About page, the front page, the terms —
-is not done in Stripe. **Ask Paul.**
+Changing the words on the website — the front page, the About page, the contact
+page, the terms and the privacy policy — is not done in Stripe.
+
+**Ask in the "Swizee website" WhatsApp group.** Say what you want it to say, in
+your own words; it goes up for you, usually within the hour. You do not need to
+write it neatly and you do not need to wait for Paul.
+
+You can also edit the wording yourself on GitHub — the five files are in
+`src/content/copy/`, and the handover guide walks through it — but the terms of
+sale and the privacy policy are the exception. Those two say what you promise a
+customer, and they are the only pages that could land on you personally, so
+send Paul what you want them to say rather than editing them yourself.
