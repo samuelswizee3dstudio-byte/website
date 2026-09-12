@@ -361,7 +361,7 @@ export async function handleCheckout(request, env) {
           message: `Free local delivery is for ${LOCAL_POSTCODE_AREA} postcodes only. Anywhere else in the UK, please choose Royal Mail.`,
         },
         submit: {
-          message: 'Everything is made to order. Allow 7 days to make, then 2 to 3 days in the post.',
+          message: 'Custom and personalised orders are made to order. Allow 7 days to make, then 2 to 3 days in the post.',
         },
       },
       locale: 'en-GB',
